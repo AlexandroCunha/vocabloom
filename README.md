@@ -24,8 +24,23 @@ Try it without an API key: `MOCK=1 node server.js` returns the demo worksheet fo
 3. Settings > Environment Variables: add `ANTHROPIC_API_KEY` and `ACCESS_CODE`, then redeploy.
 4. Share the Vercel URL and the access code with your teachers.
 
+## Security and privacy (EU)
+- **GDPR by design:** no database, no cookies, no analytics, no third-party fonts or scripts. Student answers stay in the student's own browser. See [`public/privacy.html`](public/privacy.html): a privacy notice **template** that the school must complete and have reviewed.
+- **Do not upload personal data.** The PDF is sent to the AI provider to be converted. Before use with students, the school needs a data processing agreement and a lawful basis, and should check where the provider processes data.
+- **Hardening:** strict security headers (CSP, HSTS, `nosniff`, no framing), access code compared in constant time, limits on wrong codes and on conversions, validated AI output, escaped HTML, size-limited share links, no runtime dependencies. Details in [`SECURITY.md`](SECURITY.md).
+- **Rate limits are best effort.** They live in server memory, so on Vercel each instance counts separately. For a hard limit, add Vercel's firewall / rate limiting.
+- Keep `ACCESS_CODE` long and secret, and change it if it leaks.
+
+## Tests
+```
+npm test        # Node's built-in test runner, no install needed
+```
+
 ## Limits to know
 - PDFs up to about 3 MB (Vercel request limit). Very long PDFs may be refused; split them.
 - Without `ACCESS_CODE`, anyone with the URL can spend your API credits. Always set one.
 - Each conversion costs a small amount of API usage (typically cents).
 - Student results are not stored on a server (by design for this version). A platform with classes and teacher dashboards needs a database: that is the next project.
+
+## Licence
+MIT. See [`LICENSE`](LICENSE).
