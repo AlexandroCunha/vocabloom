@@ -1,0 +1,396 @@
+{
+ "title": "English Vocabulary Worksheet",
+ "answerKeyFound": false,
+ "sections": [
+  {
+   "type": "short",
+   "title": "Exercise 1 – Match the words to their correct meanings",
+   "instructions": "Write the correct vocabulary word next to each definition. The words are in a random sequence.",
+   "passage": "",
+   "wordBank": [
+    "Alienate",
+    "Assume",
+    "At least",
+    "Behave",
+    "Channel",
+    "Code",
+    "Existence",
+    "Ferocious",
+    "Forgo",
+    "Found",
+    "Fresco",
+    "Havoc",
+    "Impact",
+    "In order to",
+    "Inclusive",
+    "Lavish",
+    "Persistent",
+    "Raggedy",
+    "Restore",
+    "Sum up",
+    "Tantrum",
+    "Technique",
+    "Tempting",
+    "Traditional",
+    "Wake",
+    "Willingness"
+   ],
+   "items": [
+    {
+     "prompt": "A strong effect or influence on something.",
+     "answers": [
+      "Impact"
+     ]
+    },
+    {
+     "prompt": "To give up something or decide not to have it.",
+     "answers": [
+      "Forgo"
+     ]
+    },
+    {
+     "prompt": "A method or way of doing something.",
+     "answers": [
+      "Technique"
+     ],
+     "hint": "It is a method or way of doing something.",
+     "explanation": "A technique is a particular method, such as a way of painting."
+    },
+    {
+     "prompt": "To act in a particular way.",
+     "answers": [
+      "Behave"
+     ]
+    },
+    {
+     "prompt": "A painting made directly onto a wall or ceiling.",
+     "answers": [
+      "Fresco"
+     ]
+    },
+    {
+     "prompt": "To make something return to its original or previous condition.",
+     "answers": [
+      "Restore"
+     ]
+    },
+    {
+     "prompt": "Very attractive or appealing.",
+     "answers": [
+      "Tempting"
+     ]
+    },
+    {
+     "prompt": "To make someone feel isolated or unwelcome.",
+     "answers": [
+      "Alienate"
+     ]
+    },
+    {
+     "prompt": "A violent or uncontrolled outburst of anger.",
+     "answers": [
+      "Tantrum"
+     ]
+    },
+    {
+     "prompt": "To believe something is true without having proof.",
+     "answers": [
+      "Assume"
+     ]
+    },
+    {
+     "prompt": "The state of being alive or real.",
+     "answers": [
+      "Existence"
+     ]
+    },
+    {
+     "prompt": "To direct something, such as energy or emotions, towards a particular purpose.",
+     "answers": [
+      "Channel"
+     ]
+    },
+    {
+     "prompt": "Torn, old-fashioned or in poor condition.",
+     "answers": [
+      "Raggedy"
+     ],
+     "hint": "It describes clothes that are torn or in poor condition.",
+     "explanation": "Raggedy means torn, worn out or in poor condition."
+    },
+    {
+     "prompt": "To give a brief summary of the main points.",
+     "answers": [
+      "Sum up"
+     ],
+     "hint": "It is a two-word verb meaning to give a short summary.",
+     "explanation": "To sum up means to give the main points briefly."
+    },
+    {
+     "prompt": "Very fierce, violent or aggressive.",
+     "answers": [
+      "Ferocious"
+     ]
+    },
+    {
+     "prompt": "Including everyone and making sure nobody is left out.",
+     "answers": [
+      "Inclusive"
+     ]
+    },
+    {
+     "prompt": "A set of rules or symbols used to communicate information.",
+     "answers": [
+      "Code"
+     ]
+    },
+    {
+     "prompt": "The desire or readiness to do something.",
+     "answers": [
+      "Willingness"
+     ]
+    },
+    {
+     "prompt": "At a minimum; no less than.",
+     "answers": [
+      "At least"
+     ]
+    },
+    {
+     "prompt": "For the purpose of achieving a goal.",
+     "answers": [
+      "In order to"
+     ]
+    },
+    {
+     "prompt": "Extremely expensive, rich or impressive.",
+     "answers": [
+      "Lavish"
+     ],
+     "hint": "Think of something very rich and expensive.",
+     "explanation": "Lavish describes something extremely expensive or impressive, like a luxury hotel."
+    },
+    {
+     "prompt": "Causing great damage, confusion or destruction.",
+     "answers": [
+      "Havoc"
+     ],
+     "hint": "Think of a word for great damage or chaos after a storm.",
+     "explanation": "Havoc means great damage or confusion, for example after a storm."
+    },
+    {
+     "prompt": "Continuing to do something despite difficulties.",
+     "answers": [
+      "Persistent"
+     ]
+    },
+    {
+     "prompt": "The period or aftermath following an event, especially a death.",
+     "answers": [
+      "Wake"
+     ]
+    },
+    {
+     "prompt": "To discover or come across something, especially in a book.",
+     "answers": [
+      "Found"
+     ]
+    },
+    {
+     "prompt": "Following customs and beliefs that have existed for a long time.",
+     "answers": [
+      "Traditional"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "fill",
+   "title": "Exercise 2 – Complete the sentences",
+   "instructions": "Choose the correct word from the word bank in Exercise 1. Use each word only once.",
+   "passage": "",
+   "wordBank": [],
+   "items": [
+    {
+     "prompt": "The storm caused complete ___ in the town.",
+     "answers": [
+      "Havoc"
+     ],
+     "hint": "Think of a word for great damage or chaos after a storm.",
+     "explanation": "Havoc means great damage or confusion, for example after a storm."
+    },
+    {
+     "prompt": "She used a special ___ to create the painting.",
+     "answers": [
+      "Technique"
+     ],
+     "hint": "It is a method or way of doing something.",
+     "explanation": "A technique is a particular method, such as a way of painting."
+    },
+    {
+     "prompt": "We need to ___ the main ideas of the presentation.",
+     "answers": [
+      "Sum up"
+     ],
+     "hint": "It is a two-word verb meaning to give a short summary.",
+     "explanation": "To sum up means to give the main points briefly."
+    },
+    {
+     "prompt": "He was wearing a ___ old jacket.",
+     "answers": [
+      "Raggedy"
+     ],
+     "hint": "It describes clothes that are torn or in poor condition.",
+     "explanation": "Raggedy means torn, worn out or in poor condition."
+    },
+    {
+     "prompt": "The hotel was decorated in a ___ style.",
+     "answers": [
+      "Lavish"
+     ],
+     "hint": "Think of something very rich and expensive.",
+     "explanation": "Lavish describes something extremely expensive or impressive, like a luxury hotel."
+    },
+    {
+     "prompt": "You should never ___ that everyone agrees with you.",
+     "answers": [
+      "Assume"
+     ]
+    },
+    {
+     "prompt": "The school aims to create an ___ environment.",
+     "answers": [
+      "Inclusive"
+     ]
+    },
+    {
+     "prompt": "The children had a ___ when they were told they couldn't go outside.",
+     "answers": [
+      "Tantrum"
+     ]
+    },
+    {
+     "prompt": "She showed great ___ to help the homeless.",
+     "answers": [
+      "Willingness"
+     ]
+    },
+    {
+     "prompt": "The new law had a significant ___ on society.",
+     "answers": [
+      "Impact"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "open",
+   "title": "Exercise 3 – Translate into your own language",
+   "instructions": "Write the meaning of each expression.",
+   "passage": "",
+   "wordBank": [],
+   "items": [
+    {
+     "prompt": "In order to"
+    },
+    {
+     "prompt": "At least"
+    },
+    {
+     "prompt": "Sum up"
+    },
+    {
+     "prompt": "Forgo"
+    },
+    {
+     "prompt": "Willingness"
+    },
+    {
+     "prompt": "Havoc"
+    },
+    {
+     "prompt": "Restore"
+    },
+    {
+     "prompt": "Alienate"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "title": "Extra – Choose the correct answer (demo)",
+   "instructions": "Tap the best answer.",
+   "passage": "Tom was very tired after work, so he decided to forgo the party and go to bed early.",
+   "wordBank": [],
+   "items": [
+    {
+     "prompt": "What did Tom decide to do?",
+     "options": [
+      "Go to the party",
+      "Skip the party",
+      "Organise the party"
+     ],
+     "answers": [
+      "Skip the party"
+     ],
+     "hint": "Look at the word 'forgo' in the text.",
+     "explanation": "To forgo something means to go without it, so Tom skipped the party."
+    },
+    {
+     "prompt": "Why?",
+     "options": [
+      "He was tired",
+      "He was angry"
+     ],
+     "answers": [
+      "He was tired"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "truefalse",
+   "title": "Extra – True or false (demo)",
+   "instructions": "Decide if each sentence is true or false.",
+   "passage": "",
+   "wordBank": [],
+   "items": [
+    {
+     "prompt": "A fresco is a painting on a wall.",
+     "answers": [
+      "True"
+     ]
+    },
+    {
+     "prompt": "Lavish means very cheap.",
+     "answers": [
+      "False"
+     ],
+     "hint": "Is 'lavish' a positive word about money?",
+     "explanation": "Lavish means very expensive or rich, not cheap."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "title": "Extra – Match the opposites (demo)",
+   "instructions": "Choose the opposite word.",
+   "passage": "",
+   "wordBank": [],
+   "items": [
+    {
+     "left": "Include",
+     "right": "Alienate"
+    },
+    {
+     "left": "Damage",
+     "right": "Restore"
+    },
+    {
+     "left": "Modern",
+     "right": "Traditional"
+    }
+   ]
+  }
+ ]
+}

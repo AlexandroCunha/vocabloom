@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1F6E83">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%231F6E83%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%275%27 fill=%27%23B4252A%27/%3E%3C/svg%3E">
+<title>Vocabloom</title>
+<style>
+:root{--bg:#F2F8F9;--card:#fff;--ink:#16262D;--text:#33434B;--mute:#677B83;--line:#DCE8EB;
+--teal:#388A9F;--teal2:#1F6E83;--teal3:#14586B;--tealbg:#E6F3F6;
+--red:#B4252A;--red2:#8F1C20;--pink:#CC3366;
+--ok:#1B9A5A;--okbg:#E7F6EE;--bad:#D6453D;--badbg:#FDEDEB;--rev:#A9730A;--revbg:#FFF4DC;--fix:#2563B8;--fixbg:#E8F0FD;
+--shadow:0 10px 30px rgba(20,88,107,.10);--r:20px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;font-weight:400}
+h1,h2,h3{font-family:Cabin,Poppins,system-ui,sans-serif;color:var(--ink)}
+button{font-family:inherit;font-size:15.5px;border:0;border-radius:14px;padding:0 18px;min-height:48px;background:var(--red);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(180,37,42,.22);transition:transform .12s,background .15s,box-shadow .15s}
+button:hover{background:var(--red2)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+button.sec{background:var(--tealbg);color:var(--teal3);box-shadow:none}
+button.sec:hover{background:#d4eaef}
+button.ghost{background:#fff;color:var(--teal3);border:1.5px solid var(--teal);box-shadow:none}
+button.ghost:hover{background:var(--tealbg)}
+button.danger{background:var(--badbg);color:var(--bad);box-shadow:none}
+button.sm{min-height:36px;font-size:13.5px;padding:0 12px;border-radius:12px}
+input[type=text],input[type=password],textarea,select{width:100%;font-family:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical;min-height:68px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(56,138,159,.18)}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px 48px}
+
+/* hero / header */
+.top,.hero{color:#fff;background:radial-gradient(circle at 92% -10%,rgba(255,255,255,.22),transparent 42%),radial-gradient(circle at 0% 105%,rgba(255,255,255,.12),transparent 45%),linear-gradient(135deg,#3F95AB 0%,#1F7790 50%,#14586B 100%)}
+.top{padding:22px 16px 46px;border-radius:0 0 30px 30px}
+.top .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.top h1{margin:0;font-size:28px;letter-spacing:-.3px;color:#fff;line-height:1.1}
+.top p{margin:2px 0 0;font-size:13px;font-weight:300;opacity:.92}
+.steps{display:flex;gap:8px;max-width:720px;margin:-26px auto 16px;padding:0 14px;position:relative}
+.steps div{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:var(--mute);border-radius:16px;font-size:13px;padding:10px 6px;font-weight:600;box-shadow:var(--shadow);transition:all .2s}
+.steps div b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--tealbg);color:var(--teal3);font-size:12px}
+.steps div.on{background:var(--teal3);color:#fff}
+.steps div.on b{background:var(--red);color:#fff}
+.steps div.done{color:var(--teal3)}
+.steps div.done b{background:var(--teal);color:#fff}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);animation:up .4s both}
+.panel h2{margin:0 0 4px;font-size:24px;letter-spacing:-.2px}
+.lead{margin:0 0 16px;color:var(--mute);font-size:14px}
+label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:var(--ink)}
+.drop{display:block;border:2px dashed #9CCAD6;border-radius:var(--r);background:linear-gradient(180deg,#F4FAFB,#E9F5F8);text-align:center;padding:30px 14px;cursor:pointer;font-weight:600;color:var(--teal3);transition:all .2s}
+.drop:hover{border-color:var(--teal);transform:translateY(-1px)}
+.drop.has{border-style:solid;border-color:var(--teal);background:var(--tealbg)}
+.drop input{display:none}
+.drop small{font-weight:400;color:var(--mute)}
+.drop .ic{display:block;margin:0 auto 8px;width:46px;height:46px;border-radius:14px;background:var(--red);color:#fff;font-size:24px;line-height:46px;box-shadow:0 8px 18px rgba(180,37,42,.25)}
+.err{background:var(--badbg);color:#A5302A;border-radius:14px;padding:11px 14px;margin:14px 0;font-size:14px}
+.note{border-radius:14px;padding:11px 14px;margin:12px 0;font-size:14px}
+.note.ok{background:var(--okbg);color:#14663D}
+.note.warn{background:var(--revbg);color:#7A5400}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.btns button{flex:1 1 150px}
+.nav{display:flex;gap:10px;margin-top:16px}
+.nav button{flex:1}
+.load{position:fixed;inset:0;background:rgba(242,248,249,.96);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px}
+.spin{width:58px;height:58px;border-radius:50%;border:6px solid #D2E8EE;border-top-color:var(--red);animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+/* review */
+.xsec{border:1.5px solid var(--line);border-radius:18px;padding:14px;margin:14px 0;background:#FAFDFD}
+.sech{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.tag{background:var(--tealbg);color:var(--teal3);font-weight:700;font-size:11.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
+.xsec .e{margin-top:8px}
+.it{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:#fff;display:grid;gap:8px}
+.it .top2{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--red)}
+.it small{color:var(--mute);font-size:12.5px}
+.phone{border:2px solid var(--line);border-radius:26px;background:var(--bg);padding:0 0 12px;margin-top:14px;overflow:hidden;box-shadow:inset 0 0 0 6px #fff}
+.linkbox{display:flex;gap:8px}
+.linkbox input{flex:1;font-size:13px}
+
+/* worksheet (player) */
+.hero{padding:26px 16px 50px;text-align:center;border-radius:0 0 34px 34px}
+.hero h1{margin:8px 0 2px;font-size:30px;letter-spacing:-.4px;color:#fff;line-height:1.15}
+.brand-mini{display:inline-flex;gap:8px;align-items:center;font-family:Cabin,sans-serif;font-weight:700;font-size:15px;opacity:.95;letter-spacing:.3px}
+.namebar{display:flex;gap:10px;align-items:center;padding:0 14px;max-width:720px;margin:-26px auto 0;position:relative}
+.namebar input{box-shadow:var(--shadow);border-color:transparent}
+.namebar .date{color:var(--mute);font-size:13px;white-space:nowrap;background:#fff;padding:12px 14px;border-radius:14px;box-shadow:var(--shadow)}
+.bar{position:sticky;top:0;z-index:5;background:rgba(242,248,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 16px 12px;border-bottom:1px solid var(--line);margin-top:14px}
+.bar .t{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--ink);max-width:720px;margin:0 auto}
+.prog{height:9px;background:#D9E8EC;border-radius:8px;overflow:hidden;margin:6px auto 0;max-width:720px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--ok));border-radius:8px;transition:width .4s}
+.pl{padding:0 14px;max-width:720px;margin:0 auto}
+.pl h3{font-size:21px;margin:30px 2px 4px;color:var(--teal3);border-left:5px solid var(--red);padding-left:12px;line-height:1.25}
+.pl .sub{margin:0 2px 12px;color:var(--mute);font-size:14px}
+.passage{background:#fff;border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:16px;padding:14px 16px;white-space:pre-wrap;margin-bottom:12px;font-size:16px;box-shadow:var(--shadow)}
+details.bank{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:12px}
+details.bank summary{font-weight:600;cursor:pointer;color:var(--teal3)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{padding:5px 12px;border-radius:999px;background:var(--tealbg);color:var(--teal3);font-size:14px;font-weight:500;border:1px solid #C5E2EA;transition:opacity .2s}
+.chip.used{opacity:.35;text-decoration:line-through}
+.card{background:var(--card);border:1.5px solid transparent;border-radius:18px;padding:14px 14px 12px;margin-bottom:12px;box-shadow:var(--shadow);animation:up .35s both;transition:background .2s,border-color .2s}
+.card.ok{border-color:var(--ok);background:var(--okbg);animation:pop .35s}
+.card.bad{border-color:var(--bad);background:var(--badbg)}
+.card.rev{border-color:#E3B64A;background:var(--revbg)}
+.card.fix{border-color:var(--fix);background:var(--fixbg);animation:pop .35s}
+.q{font-size:16px;margin-bottom:10px;line-height:1.75;color:var(--ink)}
+.q b{color:#fff;background:var(--teal);border-radius:8px;padding:1px 8px;margin-right:6px;font-size:13px;font-weight:600}
+input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:0 3px;border-radius:10px;border:1.5px solid var(--line);border-bottom:3px solid var(--teal);font-size:16px;background:#fff}
+.row{display:flex;gap:8px}
+.msg{font-size:14px;margin-top:8px}
+.msg.ok{color:var(--ok);font-weight:600}.msg.bad{color:#B4382F;font-weight:600}.msg.rev{color:var(--rev);font-weight:600}.msg.h{color:var(--mute)}.msg.fix{color:var(--fix);font-weight:600}
+.tip{margin-top:8px;padding:8px 12px;background:rgba(255,255,255,.8);border-radius:12px;font-size:14px;color:var(--text);font-weight:400}
+.opts{display:grid;gap:9px}
+.opt{background:#fff;color:var(--ink);border:1.5px solid var(--line);text-align:left;padding:12px 16px;box-shadow:none;font-weight:500;border-radius:14px}
+.opt:hover{background:var(--tealbg);border-color:var(--teal)}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
+.mk{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow)}
+.mkp{color:var(--mute);font-size:14px;margin-top:6px}
+.mk>div:first-child{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.pill{flex:none;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px}
+.pill.fix{background:var(--fixbg);color:var(--fix)}.pill.bad{background:var(--badbg);color:var(--bad)}.pill.rev{background:var(--revbg);color:var(--rev)}
+.actions{display:flex;gap:10px;margin:14px 0}
+.actions button{flex:1}
+.final{display:none;position:relative;overflow:hidden;text-align:center;background:linear-gradient(160deg,#fff,#EAF5F8);border:2px solid var(--teal);border-radius:24px;padding:22px 16px;margin:18px 0;box-shadow:var(--shadow)}
+.final.show{display:block;animation:up .4s both}
+.final .big{font-family:Cabin,sans-serif;font-size:52px;font-weight:700;color:var(--teal3);line-height:1}
+.foot{text-align:center;color:var(--mute);font-size:12px;margin:18px 0 6px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;box-shadow:var(--shadow)}
+.ov{position:fixed;inset:0;background:rgba(10,30,38,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px}
+.ov .box{background:#fff;border-radius:22px;padding:18px;width:100%;max-width:560px}
+.ov textarea{min-height:200px;font-size:13px}
+.cf{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;opacity:0;animation:fall 2.4s ease-out forwards}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(260px) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script id="ws-data" type="application/json">null</script>
+<script>
+/* Vocabloom: PDF -> interactive worksheet.
+   Modes: teacher (upload, review, share) and student (worksheet only; data comes from the link hash or is embedded in a downloaded file). */
+const SRC = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+const alts = s => String(s || '').split('|').map(x => x.trim()).filter(Boolean);
+const LOGO = '<svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><g fill="#fff"><circle cx="16" cy="8" r="6"/><circle cx="24" cy="14" r="6" opacity=".85"/><circle cx="21" cy="24" r="6" opacity=".7"/><circle cx="11" cy="24" r="6" opacity=".85"/><circle cx="8" cy="14" r="6"/></g><circle cx="16" cy="16" r="5.5" fill="#E4474C"/></svg>';
+const TYPE_NAMES = {fill:'Fill in the blanks', short:'Short answer', choice:'Multiple choice', truefalse:'True / False', match:'Matching', open:'Open writing'};
+
+function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(a,r){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),1900);}
+function showText(title,text){
+  const o=document.createElement('div');o.className='ov';
+  o.innerHTML='<div class="box"><h3 style="margin:0 0 8px">'+esc(title)+'</h3><textarea readonly></textarea><div class="nav"><button class="sec">Close</button></div></div>';
+  document.body.appendChild(o);const ta=$('textarea',o);ta.value=text;ta.focus();ta.select();$('button',o).onclick=()=>o.remove();
+}
+async function copyText(text,title){try{await navigator.clipboard.writeText(text);toast('Copied!');}catch(e){showText(title||'Copy this text',text);}}
+
+/* ---------- worksheet data helpers ---------- */
+function fix(W){
+  W=W||{};
+  return {
+    title:String(W.title||'Worksheet'),answerKeyFound:!!W.answerKeyFound,
+    sections:(W.sections||[]).map(s=>({
+      type:s.type||'open',title:s.title||'',instructions:s.instructions||'',passage:s.passage||'',wordBank:s.wordBank||[],
+      items:(s.items||[]).map(i=>({prompt:i.prompt||'',answers:i.answers||[],options:i.options||[],left:i.left||'',right:i.right||'',hint:i.hint||'',explanation:i.explanation||''}))
+    }))
+  };
+}
+const slimJSON = W => JSON.stringify(W,(k,v)=>(v===''||(Array.isArray(v)&&!v.length))?undefined:v);
+const blanks = it => (it.prompt.match(/___/g)||[]).length;
+function isScored(sec,it){if(sec.type==='open')return false;if(sec.type==='match')return !!it.answers[0];return it.answers.length>0;}
+
+/* ---------- share links (data lives in the URL hash, no database needed) ---------- */
+const b64u={
+  enc(bytes){let s='';for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');},
+  dec(t){t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const s=atob(t);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
+};
+async function pack(W){
+  const bytes=new TextEncoder().encode(slimJSON(W));
+  if(window.CompressionStream){
+    const out=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+    return 's='+b64u.enc(out);
+  }
+  return 'j='+b64u.enc(bytes);
+}
+async function unpack(h){
+  const m=String(h).match(/^#?([sj])=([\w-]+)$/);if(!m)return null;
+  let bytes=b64u.dec(m[2]);
+  if(m[1]==='s'){bytes=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());}
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function buildExport(W){
+  const open='<script id="ws-data" type="application/json">';
+  const i=SRC.indexOf(open),j=SRC.indexOf('</'+'script>',i);
+  const json=slimJSON(W).replace(/</g,'\\u003c');
+  return SRC.slice(0,i+open.length)+json+SRC.slice(j);
+}
+function download(name,text){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/html'}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);
+}
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'worksheet';
+
+/* ---------- the interactive worksheet (students) ---------- */
+function renderPlayer(root,W0,po){
+  const W=fix(W0);po=po||{};
+  const key='vocabloom2:'+hash(slimJSON(W));
+  let S={name:'',v:{},c:{},r:{},h:{},t:{},w:{},lw:{}};
+  if(po.persist){try{const x=JSON.parse(localStorage.getItem(key)||'null');if(x)S=Object.assign(S,x);}catch(e){}}
+  const save=()=>{if(po.persist){try{localStorage.setItem(key,JSON.stringify(S));}catch(e){}}};
+  const rnd=rng(hash(W.title+'|'+W.sections.length));
+  const items={},matchOpts={};
+  W.sections.forEach((sec,si)=>{
+    if(sec.type==='match'){const seen={};matchOpts[si]=shuffle(sec.items.map(i=>i.answers[0]||i.right).filter(x=>x&&!seen[x]&&(seen[x]=1)),rnd);}
+    sec.items.forEach((it,ii)=>{const id='s'+si+'i'+ii;items[id]={id,it,sec,si,scored:isScored(sec,it)};});
+  });
+  const scoredIds=Object.keys(items).filter(i=>items[i].scored),total=scoredIds.length;
+  const q=s=>$(s,root);
+
+  function bw(it,k){const a=alts(it.answers[k]||'');const L=a.length?Math.max.apply(null,a.map(x=>x.length)):8;return Math.min(20,Math.max(7,L+2));}
+  function itemHtml(sec,si,it,ii){
+    const id='s'+si+'i'+ii,num='<b>'+(ii+1)+'.</b> ',sc=items[id].scored;
+    const btns=sc?'<div class="row" style="margin-top:6px"><button data-act="check" data-id="'+id+'">&#10003; Check</button><button class="sec" data-act="hint" data-id="'+id+'" aria-label="Hint">&#128161;</button></div>':'';
+    const msg='<div class="msg" id="m-'+id+'"></div>';
+    const inp=(k,ph,extra)=>'<input type="text" '+(extra||'')+' data-id="'+id+'" data-k="'+k+'" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="'+ph+'">';
+    if(sec.type==='fill'){
+      const parts=it.prompt.split('___'),n=parts.length-1;
+      const s=parts.map((p,k)=>esc(p)+(k<n?'<input type="text" class="blk" style="width:'+bw(it,k)+'ch" data-id="'+id+'" data-k="'+k+'" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="blank '+(k+1)+'">':'')).join('');
+      return '<div class="card" id="w-'+id+'"><div class="q">'+num+s+'</div>'+btns+msg+'</div>';
+    }
+    if(sec.type==='short')return '<div class="card" id="w-'+id+'"><div class="q">'+num+esc(it.prompt)+'</div>'+inp(0,sc?'Type your answer':'Your answer')+btns+msg+'</div>';
+    if(sec.type==='open')return '<div class="card"><div class="q">'+num+esc(it.prompt)+'</div><textarea data-id="'+id+'" data-k="0" placeholder="Write your answer here..." autocapitalize="sentences"></textarea></div>';
+    if(sec.type==='choice'||sec.type==='truefalse')return '<div class="card" id="w-'+id+'"><div class="q">'+num+esc(it.prompt)+'</div><div class="opts">'+it.options.map(o=>'<button class="opt" data-act="pick" data-id="'+id+'" data-v="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>'+msg+'</div>';
+    if(sec.type==='match')return '<div class="card" id="w-'+id+'"><div class="q">'+num+esc(it.prompt)+'</div><select data-id="'+id+'"><option value="">Choose&hellip;</option>'+matchOpts[si].map(o=>'<option>'+esc(o)+'</option>').join('')+'</select>'+msg+'</div>';
+    return '';
+  }
+  const secHtml=W.sections.map((sec,si)=>
+    '<div class="pl" id="sec-'+si+'"><h3>'+esc(sec.title||('Exercise '+(si+1)))+'</h3>'
+    +(sec.instructions?'<p class="sub">'+esc(sec.instructions)+'</p>':'')
+    +(sec.passage?'<div class="passage">'+esc(sec.passage)+'</div>':'')
+    +(sec.wordBank.length?'<details class="bank"><summary>Word bank ('+sec.wordBank.length+')</summary><div class="chips">'+sec.wordBank.map(w=>'<span class="chip" data-w="'+esc(norm(w))+'">'+esc(w)+'</span>').join('')+'</div></details>':'')
+    +sec.items.map((it,ii)=>itemHtml(sec,si,it,ii)).join('')+'</div>').join('');
+
+  root.innerHTML='<div class="hero"><div class="brand-mini">'+LOGO+'<span>Vocabloom</span></div><h1>'+esc(W.title)+'</h1></div>'
+   +'<div class="namebar" style="max-width:720px;margin:0 auto"><input id="sname" type="text" placeholder="Your name" autocomplete="name"><span class="date">'+new Date().toLocaleDateString('en-GB')+'</span></div>'
+   +(total?'<div class="bar"><div class="t"><span>Score</span><span id="score"></span></div><div class="prog"><i id="pb"></i></div></div>':'<div style="height:6px"></div>')
+   +secHtml
+   +'<div class="pl"><div id="mist"></div><div class="final" id="final"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
+   +'<div class="actions"><button class="sec" data-act="reset">Start over</button>'+(total?'<button data-act="all">Check all</button>':'')+'</div>'
+   +'<div class="actions"><button class="ghost" data-act="copyres">Copy my results</button></div><p class="foot">Made with Vocabloom</p></div>';
+
+  function correct(id){
+    const o=items[id],it=o.it,t=o.sec.type,v=S.v[id];
+    if(!o.scored)return false;
+    if(t==='fill'){const n=blanks(it);if(!n)return false;for(let k=0;k<n;k++){const a=alts(it.answers[k]||'');if(!a.length||!a.some(x=>norm(x)===norm((v||[])[k])))return false;}return true;}
+    if(t==='short')return Array.isArray(v)&&it.answers.some(a=>alts(a).some(x=>norm(x)&&norm(x)===norm(v[0])));
+    if(t==='choice'||t==='truefalse'||t==='match')return typeof v==='string'&&norm(v)===norm(it.answers[0]);
+    return false;
+  }
+  const answerText=id=>{const o=items[id];return o.sec.type==='fill'?o.it.answers.map(a=>alts(a)[0]||'').join(' ; '):(o.it.answers[0]?alts(o.it.answers[0])[0]:'');};
+  const answered=id=>{
+    const o=items[id],v=S.v[id],t=o.sec.type;if(!o.scored)return false;
+    if(t==='fill')return Array.isArray(v)&&v.some(x=>String(x||'').trim());
+    if(t==='short')return Array.isArray(v)&&String(v[0]||'').trim()!=='';
+    return typeof v==='string'&&v!=='';
+  };
+  function status(id){
+    const o=items[id],t=o.sec.type;
+    if(!o.scored)return 'none';
+    if(S.r[id])return 'rev';
+    const instant=(t==='choice'||t==='truefalse'||t==='match');
+    if(!instant&&!S.c[id])return 'none';
+    if(!answered(id))return 'none';
+    return correct(id)?(S.w[id]?'fix':'ok'):'bad';
+  }
+  function autoHint(id){
+    const o=items[id];if(o.sec.type!=='fill'&&o.sec.type!=='short')return '';
+    const ans=o.sec.type==='fill'?o.it.answers.map(a=>alts(a)[0]||''):[answerText(id)];
+    return 'Starts with: '+ans.map(w=>w.split('').map((c,i)=>c===' '?'  ':(i===0?c:'•')).join(' ')).join('   |   ');
+  }
+  const hintOf=id=>items[id].it.hint||autoHint(id);
+  function submit(id){
+    if(!answered(id)||correct(id))return;
+    const snap=JSON.stringify(S.v[id]);
+    if(S.lw[id]!==snap){S.lw[id]=snap;S.t[id]=(S.t[id]||0)+1;S.w[id]=1;}
+  }
+  function paint(id){
+    const o=items[id],card=q('#w-'+id),msg=q('#m-'+id);if(!card||!msg)return;
+    const t=o.sec.type,st=status(id),it=o.it;
+    card.className='card'+(st==='none'?'':' '+st);msg.className='msg'+(st==='none'?'':' '+st);msg.innerHTML='';
+    if(t==='choice'||t==='truefalse'){const v=S.v[id];card.querySelectorAll('.opt').forEach(b=>{b.className='opt';if(v!==undefined&&b.dataset.v===v&&st!=='none')b.classList.add(st==='bad'?'bad':'ok');});}
+    if(t==='match'){const s=card.querySelector('select');if(S.v[id]!==undefined)s.value=S.v[id];}
+    const tip=(ic,txt)=>txt?'<div class="tip">'+ic+' '+esc(txt)+'</div>':'';
+    if(st==='ok')msg.innerHTML='Correct, well done!';
+    else if(st==='fix')msg.innerHTML='Corrected! You got this wrong at first, then fixed it.'+tip('📘',it.explanation);
+    else if(st==='rev')msg.innerHTML='Answer: <b>'+esc(answerText(id))+'</b>'+tip('📘',it.explanation);
+    else if(st==='bad')msg.innerHTML='Not quite. Have another go.'+tip('💡',hintOf(id))+((S.t[id]||0)>=2?tip('📘',it.explanation):'');
+  }
+  function updateBank(){
+    W.sections.forEach((sec,si)=>{
+      if(!sec.wordBank.length)return;
+      const used=new Set();
+      root.querySelectorAll('#sec-'+si+' [data-id][data-k]').forEach(e=>used.add(norm(e.value)));
+      root.querySelectorAll('#sec-'+si+' .chip').forEach(c=>c.classList.toggle('used',used.has(c.dataset.w)));
+    });
+  }
+  function counts(){
+    let ok=0,first=0,fixed=0;const per={};
+    scoredIds.forEach(id=>{
+      const o=items[id],p=per[o.si]||(per[o.si]={ok:0,n:0,title:o.sec.title});p.n++;
+      const st=status(id);
+      if(st==='ok'){ok++;first++;p.ok++;}else if(st==='fix'){ok++;fixed++;p.ok++;}
+    });
+    return {ok,first,fixed,per};
+  }
+  const mistakeIds=()=>scoredIds.filter(id=>S.w[id]);
+  const qNum=id=>(+id.split('i')[1]+1);
+  const mistakeLabel=st=>st==='fix'?'Corrected':(st==='rev'?'Answer shown':'Still to fix');
+  function renderMistakes(){
+    const box=q('#mist');if(!box)return;const ids=mistakeIds();
+    if(!ids.length){box.innerHTML='';return;}
+    box.innerHTML='<h3 style="margin-top:20px">Your mistakes</h3><p class="sub">Questions you got wrong at some point. Tap one to go back to it.</p>'+ids.map(id=>{
+      const o=items[id],st=status(id),cls=st==='fix'?'fix':(st==='rev'?'rev':'bad');
+      return '<div class="mk" data-act="goto" data-id="'+id+'"><div><b>'+esc(o.sec.title||('Exercise '+(o.si+1)))+' &middot; Q'+qNum(id)+'</b><span class="pill '+cls+'">'+mistakeLabel(st)+'</span></div><div class="mkp">'+esc(o.it.prompt.replace(/___/g,'_____'))+'</div>'+((st==='fix'||st==='rev')&&o.it.explanation?'<div class="tip">📘 '+esc(o.it.explanation)+'</div>':'')+'</div>';
+    }).join('');
+  }
+  function score(show){
+    if(!total)return;
+    const c=counts(),ok=c.ok;
+    q('#score').textContent=ok+' / '+total;q('#pb').style.width=(ok/total*100)+'%';
+    renderMistakes();
+    const f=q('#final');
+    if(ok===total||show===true){
+      if(ok===total&&!f.classList.contains('show')){const cols=['#B4252A','#388A9F','#1B9A5A','#E4B43A','#CC3366'];for(let i=0;i<34;i++){const c=document.createElement('i');c.className='cf';c.style.left=(Math.random()*100)+'%';c.style.background=cols[i%cols.length];c.style.animationDelay=(Math.random()*.6)+'s';f.appendChild(c);setTimeout(()=>c.remove(),3200);}}
+      f.classList.add('show');q('#fscore').textContent=ok+' / '+total;
+      q('#fdetail').textContent='Right first time: '+c.first+' · Corrected after a mistake: '+c.fixed+' · Not yet correct: '+(total-ok);
+      q('#fmsg').textContent=ok===total?(c.fixed?'All correct! Well done for fixing your mistakes.':'Perfect! Well done!'):(ok>=total*0.8?'Very good! Have another look at the ones you missed.':'Keep practising, you are getting there!');
+      if(show===true)f.scrollIntoView({behavior:'smooth',block:'center'});
+    }else f.classList.remove('show');
+  }
+  function resultsText(){
+    const c=counts();
+    const L=[W.title,'Student: '+(S.name||'(no name)'),'Date: '+new Date().toLocaleDateString('en-GB')];
+    if(total){
+      L.push('Score: '+c.ok+' / '+total,'Right first time: '+c.first,'Corrected after a mistake: '+c.fixed,'Not yet correct: '+(total-c.ok));
+      Object.keys(c.per).forEach(k=>L.push('- '+c.per[k].title+': '+c.per[k].ok+' / '+c.per[k].n));
+      const ids=mistakeIds();
+      if(ids.length){
+        L.push('','## Mistakes');
+        ids.forEach(id=>{const o=items[id],n=S.t[id]||0;L.push('- '+(o.sec.title||'Exercise '+(o.si+1))+', Q'+qNum(id)+': '+mistakeLabel(status(id)).toLowerCase()+' ('+n+' wrong '+(n===1?'answer':'answers')+')');});
+      }
+    }
+    W.sections.forEach((sec,si)=>{
+      if(sec.type!=='open')return;
+      L.push('','## '+sec.title);
+      sec.items.forEach((it,ii)=>{const v=S.v['s'+si+'i'+ii];L.push((ii+1)+'. '+it.prompt+' -> '+((v&&v[0])||'(blank)'));});
+    });
+    return L.join('\n');
+  }
+
+  let resetArm=0;
+  root.onclick=e=>{
+    const b=e.target.closest('[data-act]');if(!b||!root.contains(b))return;
+    const a=b.dataset.act,id=b.dataset.id;
+    if(a==='check'){S.c[id]=1;submit(id);save();paint(id);score();}
+    else if(a==='hint'){
+      const m=q('#m-'+id);S.h[id]=(S.h[id]||0)+1;
+      if(S.h[id]===1&&!S.r[id]){const h=hintOf(id);m.className='msg h';m.innerHTML=h?'💡 '+esc(h):'No hint for this one. Tap again to see the answer.';}
+      else{S.r[id]=1;S.w[id]=1;paint(id);score();}
+      save();
+    }
+    else if(a==='pick'){S.v[id]=b.dataset.v;submit(id);save();paint(id);score();}
+    else if(a==='all'){scoredIds.forEach(i=>{if(answered(i)){S.c[i]=1;submit(i);}paint(i);});save();score(true);}
+    else if(a==='goto'){const el=q('#w-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+    else if(a==='copyres')copyText(resultsText(),'Copy your results');
+    else if(a==='reset'){
+      if(Date.now()-resetArm<3000){S={name:'',v:{},c:{},r:{},h:{},t:{},w:{},lw:{}};save();renderPlayer(root,W0,po);window.scrollTo(0,0);}
+      else{resetArm=Date.now();b.textContent='Tap again to confirm';setTimeout(()=>{if(b.isConnected)b.textContent='Start over';},3000);}
+    }
+  };
+  root.oninput=e=>{
+    const t=e.target;
+    if(t.id==='sname'){S.name=t.value;save();return;}
+    const id=t.dataset.id;if(!id||t.tagName==='SELECT')return;
+    const k=+t.dataset.k||0;if(!Array.isArray(S.v[id]))S.v[id]=[];S.v[id][k]=t.value;
+    if(S.c[id]&&!S.r[id]){delete S.c[id];paint(id);}
+    save();updateBank();score();
+  };
+  root.onchange=e=>{const t=e.target;if(t.tagName==='SELECT'&&t.dataset.id){S.v[t.dataset.id]=t.value;submit(t.dataset.id);save();paint(t.dataset.id);score();}};
+  root.onkeydown=e=>{
+    const t=e.target;
+    if(e.key==='Enter'&&t.tagName==='INPUT'&&t.dataset.id){e.preventDefault();const b=root.querySelector('[data-act="check"][data-id="'+t.dataset.id+'"]');if(b){b.click();t.blur();}}
+  };
+  q('#sname').value=S.name||'';
+  root.querySelectorAll('input[data-id],textarea[data-id]').forEach(el=>{const v=S.v[el.dataset.id];if(Array.isArray(v)&&v[+el.dataset.k||0]!==undefined)el.value=v[+el.dataset.k||0];});
+  Object.keys(items).forEach(paint);updateBank();score();
+}
+
+/* ---------- teacher app ---------- */
+function startTeacher(){
+  let W=null,step=1,file=null;
+  const app=$('#app');
+  app.innerHTML='<div class="top"><div class="in">'+LOGO+'<div><h1>Vocabloom</h1><p>Turn any PDF worksheet into an interactive page</p></div></div></div>'
+    +'<div class="steps" id="steps"><div><b>1</b>Upload</div><div><b>2</b>Review</div><div><b>3</b>Share</div></div><div class="wrap" id="stage"></div>';
+  function go(n){step=n;document.querySelectorAll('#steps div').forEach((d,i)=>{d.className=(i+1===n)?'on':(i+1<n?'done':'');});[null,s1,s2,s3][n]();window.scrollTo(0,0);}
+
+  /* 1. upload */
+  function s1(){
+    const code=(()=>{try{return localStorage.getItem('vb-code')||'';}catch(e){return '';}})();
+    $('#stage').innerHTML='<section class="panel"><h2>Upload a PDF</h2><p class="lead">Any worksheet: vocabulary, grammar, reading, true/false, matching&hellip; The AI finds the exercises and turns them into questions students can answer on a phone.</p>'
+      +'<label class="drop" id="drop"><input type="file" id="file" accept="application/pdf,.pdf"><span id="dropt"><span class="ic">&#8593;</span>Tap to choose a PDF<br><small>or drop it here &middot; up to about 3 MB</small></span></label>'
+      +'<label class="f" for="code">School access code</label><input type="password" id="code" autocomplete="current-password" placeholder="Ask your school admin">'
+      +'<div class="err" id="err" hidden></div>'
+      +'<div class="btns"><button id="go" disabled>Convert to interactive page</button></div>'
+      +'<div class="btns"><button class="ghost" id="demo">Try the demo worksheet</button></div></section>';
+    $('#code').value=code;
+    const pick=f=>{
+      $('#err').hidden=true;
+      if(!f)return;
+      if(!/pdf$/i.test(f.type)&&!/\.pdf$/i.test(f.name)){showErr('Please choose a PDF file.');return;}
+      if(f.size>3.1*1024*1024){showErr('This PDF is '+(f.size/1048576).toFixed(1)+' MB. The limit is about 3 MB. Compress it (for example with an online PDF compressor) and try again.');return;}
+      file=f;$('#drop').classList.add('has');$('#dropt').innerHTML='<span class="ic">&#10003;</span>'+esc(f.name)+'<br><small>'+(f.size/1024).toFixed(0)+' KB &middot; tap to change</small>';$('#go').disabled=false;
+    };
+    $('#file').onchange=e=>pick(e.target.files[0]);
+    const d=$('#drop');
+    ['dragover','dragenter'].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();}));
+    d.addEventListener('drop',e=>{e.preventDefault();pick(e.dataTransfer.files[0]);});
+    $('#go').onclick=convert;
+    $('#demo').onclick=async()=>{
+      try{const r=await fetch('demo.json');if(!r.ok)throw 0;W=fix(await r.json());go(2);}
+      catch(e){showErr('The demo needs the website to be running (it cannot load from a plain file).');}
+    };
+  }
+  function showErr(m){const e=$('#err');e.textContent=m;e.hidden=false;}
+  function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});}
+  async function convert(){
+    if(location.protocol==='file:'){showErr('Open the Vocabloom website to convert PDFs. This copy was opened as a plain file.');return;}
+    const code=$('#code').value;try{localStorage.setItem('vb-code',code);}catch(e){}
+    const ov=document.createElement('div');ov.className='load';
+    const msgs=['Reading your PDF...','Finding the exercises...','Working out the answers...','Almost there...'];let mi=0;
+    ov.innerHTML='<div class="spin"></div><div id="lm" style="font-weight:700;font-size:18px">'+msgs[0]+'</div><div style="color:#5f776f;font-size:14px">This usually takes 20&ndash;60 seconds.</div>';
+    document.body.appendChild(ov);
+    const iv=setInterval(()=>{mi=Math.min(mi+1,msgs.length-1);$('#lm').textContent=msgs[mi];},9000);
+    try{
+      const pdf=await toB64(file);
+      const r=await fetch('/api/convert',{method:'POST',headers:{'content-type':'application/json','x-access-code':code},body:JSON.stringify({pdf})});
+      let j={};try{j=await r.json();}catch(e){}
+      if(!r.ok)throw new Error(j.error||('Server error ('+r.status+')'));
+      W=fix(j.worksheet);go(2);
+    }catch(e){showErr(e.message||'Something went wrong. Please try again.');}
+    finally{clearInterval(iv);ov.remove();}
+  }
+
+  /* 2. review */
+  const answersStr=(sec,it)=>sec.type==='fill'?it.answers.join(' ; '):it.answers.join(' | ');
+  function itemEdit(sec,it,ii){
+    const t=sec.type;let h='<div class="it" data-ii="'+ii+'"><div class="top2"><span>'+(ii+1)+'.</span><button class="danger sm" data-del="item">Remove</button></div>';
+    const extra='<input type="text" data-f="hint" value="'+esc(it.hint||'')+'" placeholder="Hint shown after a wrong answer (optional)"><input type="text" data-f="explanation" value="'+esc(it.explanation||'')+'" placeholder="Explanation (optional)">';
+    if(t==='match')return h+'<input type="text" data-f="left" value="'+esc(it.left||it.prompt)+'" placeholder="Left item"><input type="text" data-f="right" value="'+esc(it.right||it.answers[0]||'')+'" placeholder="Correct partner">'+extra+'</div>';
+    h+='<textarea data-f="prompt">'+esc(it.prompt)+'</textarea>';
+    if(t==='fill')h+='<input type="text" data-f="answers" value="'+esc(answersStr(sec,it))+'" placeholder="Answer for each blank, separated by ;"><small>Several blanks: separate with ; &middot; accepted alternatives for one blank: separate with |</small>';
+    if(t==='short')h+='<input type="text" data-f="answers" value="'+esc(answersStr(sec,it))+'" placeholder="Accepted answers, separated by |"><small>Leave empty if there is no single right answer (it will not be scored).</small>';
+    if(t==='choice'){
+      h+='<textarea data-f="options" placeholder="One option per line">'+esc(it.options.join('\n'))+'</textarea><select data-f="correct">'+optsSel(it)+'</select>';
+    }
+    if(t==='truefalse')h+='<select data-f="tf"><option value="">No answer</option><option'+(it.answers[0]==='True'?' selected':'')+'>True</option><option'+(it.answers[0]==='False'?' selected':'')+'>False</option></select>';
+    if(t!=='open')h+=extra;
+    return h+'</div>';
+  }
+  const optsSel=it=>'<option value="">Correct answer?</option>'+it.options.map(o=>'<option'+(it.answers[0]===o?' selected':'')+'>'+esc(o)+'</option>').join('');
+  function s2(){
+    let h='<section class="panel"><h2>Review the exercises</h2>'
+      +(W.answerKeyFound?'<div class="note ok"><b>Answer key found.</b> The correct answers come from your PDF.</div>':'<div class="note warn"><b>No answer key in the PDF.</b> The AI worked out the answers itself. Please check them before sharing.</div>')
+      +'<label class="f">Worksheet title</label><input type="text" data-wf="title" value="'+esc(W.title)+'">';
+    W.sections.forEach((sec,si)=>{
+      h+='<div class="xsec" data-si="'+si+'"><div class="sech"><span class="tag">'+TYPE_NAMES[sec.type]+'</span><button class="danger sm" data-del="sec">Remove exercise</button></div>'
+        +'<input class="e" type="text" data-sf="title" value="'+esc(sec.title)+'" placeholder="Exercise title">'
+        +'<textarea class="e" data-sf="instructions" placeholder="Instructions for students" style="min-height:48px">'+esc(sec.instructions)+'</textarea>'
+        +(sec.passage?'<textarea class="e" data-sf="passage" placeholder="Reading text">'+esc(sec.passage)+'</textarea>':'')
+        +(sec.type==='short'||sec.type==='fill'?'<input class="e" type="text" data-sf="wordBank" value="'+esc(sec.wordBank.join(', '))+'" placeholder="Word bank (comma separated, optional)">':'')
+        +sec.items.map((it,ii)=>itemEdit(sec,it,ii)).join('')+'</div>';
+    });
+    h+='<div class="nav"><button class="sec" id="b1">&larr; New PDF</button><button id="b3">Continue &rarr;</button></div></section>';
+    $('#stage').innerHTML=h;
+    const st=$('#stage');
+    st.oninput=e=>{
+      const t=e.target;
+      if(t.dataset.wf){W[t.dataset.wf]=t.value;return;}
+      const sc=t.closest('.xsec');if(!sc)return;const sec=W.sections[+sc.dataset.si];
+      if(t.dataset.sf){sec[t.dataset.sf]=t.dataset.sf==='wordBank'?t.value.split(',').map(x=>x.trim()).filter(Boolean):t.value;return;}
+      const ie=t.closest('.it');if(!ie)return;const it=sec.items[+ie.dataset.ii],f=t.dataset.f;
+      if(f==='prompt')it.prompt=t.value;
+      else if(f==='hint')it.hint=t.value;
+      else if(f==='explanation')it.explanation=t.value;
+      else if(f==='left'){it.left=t.value;it.prompt=t.value;}
+      else if(f==='right'){it.right=t.value;it.answers=t.value.trim()?[t.value.trim()]:[];}
+      else if(f==='answers')it.answers=(sec.type==='fill'?t.value.split(';'):t.value.split('|')).map(x=>x.trim()).filter(Boolean).map(x=>x);
+      else if(f==='options'){
+        it.options=t.value.split('\n').map(x=>x.trim()).filter(Boolean);
+        if(it.answers[0]&&!it.options.includes(it.answers[0]))it.answers=[];
+        ie.querySelector('select[data-f=correct]').innerHTML=optsSel(it);
+      }
+    };
+    st.onchange=e=>{
+      const t=e.target,sc=t.closest('.xsec'),ie=t.closest('.it');if(!sc||!ie)return;
+      const it=W.sections[+sc.dataset.si].items[+ie.dataset.ii];
+      if(t.dataset.f==='correct'||t.dataset.f==='tf')it.answers=t.value?[t.value]:[];
+    };
+    st.onclick=e=>{
+      const b=e.target.closest('[data-del]');if(!b)return;
+      const sc=b.closest('.xsec'),si=+sc.dataset.si,y=window.scrollY;
+      if(b.dataset.del==='sec')W.sections.splice(si,1);
+      else W.sections[si].items.splice(+b.closest('.it').dataset.ii,1);
+      W.sections=W.sections.filter(s=>s.items.length);
+      s2();window.scrollTo(0,y);
+    };
+    $('#b1').onclick=()=>go(1);
+    $('#b3').onclick=()=>{if(!W.sections.length){toast('Nothing left to share');return;}go(3);};
+  }
+
+  /* 3. share */
+  async function s3(){
+    $('#stage').innerHTML='<section class="panel"><h2>Share with your students</h2><p class="lead">Send them the link. It opens on any phone, no login needed.</p>'
+      +'<div class="linkbox"><input type="text" id="lnk" readonly value="Preparing link..."><button id="cl">Copy</button></div>'
+      +'<div class="note warn" id="long" hidden>This link is very long. WhatsApp and some apps may cut it. If that happens, use <b>Download</b> and send the file instead.</div>'
+      +'<div class="btns"><button class="sec" id="dl">Download as a file</button><button class="ghost" id="op">Open student view</button></div>'
+      +'<p class="lead" style="margin:0">Students tap <i>Copy my results</i> at the end and send you the text.</p>'
+      +'<div class="phone"><div id="pv"></div></div>'
+      +'<div class="nav"><button class="sec" id="b2">&larr; Edit</button><button class="sec" id="b1">New PDF</button></div></section>';
+    renderPlayer($('#pv'),W,{persist:false});
+    $('#b1').onclick=()=>{W=null;file=null;go(1);};$('#b2').onclick=()=>go(2);
+    $('#dl').onclick=()=>{download(slug(W.title)+'.html',buildExport(W));toast('Downloaded');};
+    let link='';
+    try{
+      const p=await pack(W);link=location.origin+location.pathname+'#'+p;
+      $('#lnk').value=link;$('#long').hidden=link.length<6000;
+    }catch(e){$('#lnk').value='Could not create a link. Use Download instead.';}
+    $('#cl').onclick=()=>{if(link)copyText(link,'Copy the link');};
+    $('#op').onclick=()=>{if(link)window.open(link,'_blank','noopener');};
+  }
+  go(1);
+}
+
+/* ---------- start ---------- */
+(async function(){
+  let data=null;
+  try{data=JSON.parse($('#ws-data').textContent);}catch(e){}
+  if(!data&&location.hash.length>3){try{data=await unpack(location.hash);}catch(e){data=null;}}
+  if(data&&data.sections){document.title=data.title||'Worksheet';renderPlayer($('#app'),data,{persist:true});}
+  else startTeacher();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "vocabloom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Turn any PDF worksheet into an interactive page students can answer on their phone.",
+  "scripts": {
+    "dev": "node server.js",
+    "test:mock": "MOCK=1 node server.js"
+  },
+  "engines": { "node": ">=18" }
+}
