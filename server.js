@@ -13,7 +13,8 @@ const TYPES = {
   '.js': 'text/javascript',
   '.css': 'text/css',
   '.svg': 'image/svg+xml',
-  '.png': 'image/png'
+  '.png': 'image/png',
+  '.txt': 'text/plain; charset=utf-8'
 };
 
 function loadEnvFile() {

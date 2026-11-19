@@ -1,0 +1,5 @@
+# Security contact for Vocabloom (RFC 9116)
+Contact: https://github.com/AlexandroCunha/vocabloom/security/advisories/new
+Expires: 2027-11-19T00:00:00.000Z
+Preferred-Languages: en, pt
+Policy: https://github.com/AlexandroCunha/vocabloom/blob/main/SECURITY.md

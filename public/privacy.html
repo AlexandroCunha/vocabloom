@@ -27,16 +27,32 @@
   <li><strong>PDF files (teachers).</strong> When a teacher converts a PDF, the file is sent through our server to an AI service (Anthropic) that reads it and returns the exercises. Vocabloom does not keep the PDF or the result: there is no database.</li>
   <li><strong>Access code (teachers).</strong> The code is kept in the browser tab only while it is open (session storage) and is sent with each conversion to check that you may use the tool.</li>
   <li><strong>Share links.</strong> The worksheet is stored inside the link itself, in the part after the <code>#</code>. That part is not sent to our server when a student opens the link.</li>
-  <li><strong>Students.</strong> A student can type a name and answer the exercises. Answers, name and progress stay in that device&rsquo;s browser (local storage) so the student can continue later. Nothing is sent to us. The &ldquo;Copy my results&rdquo; button only copies text to the clipboard, and the student decides whether to send it to the teacher.</li>
+  <li><strong>Students.</strong> A student can type a name and answer the exercises. Answers, name and progress stay in that device&rsquo;s browser (local storage) so the student can continue later. Nothing is sent to us, and teachers cannot see students&rsquo; answers.</li>
   <li><strong>Hosting logs.</strong> Our hosting provider ([hosting provider]) may record technical data such as IP address and time of each request, for security and to keep the service running.</li>
 </ul>
 <p>Vocabloom sets no cookies, uses no analytics or advertising, and loads no fonts or scripts from other companies.</p>
+
+<h2>Artificial intelligence</h2>
+<p>An AI service reads the teacher&rsquo;s PDF and builds the exercises. It may also write the hints and explanations that students see, and the student pages say so. The AI can make mistakes, so teachers are asked to check every exercise, answer, hint and explanation before sharing the link. Vocabloom makes no automated decisions about students: the score is feedback for practice and is not stored or sent anywhere.</p>
+
+<h2>Children and young people</h2>
+<p>Students may be under 16 or under 18. The school remains responsible for them and decides how the link is shared (for example inside its own virtual classroom). Vocabloom asks for no account, email address or other identifier: a name is optional and stays on the student&rsquo;s device. [Describe how the school informs students and parents or guardians.]</p>
 
 <h2>Please do not upload personal data</h2>
 <p>Worksheets should contain teaching material only. Do not upload files that contain names, photos, marks or other personal data of students or staff.</p>
 
 <h2>Why we process data and for how long</h2>
 <p>Purpose: to let teachers prepare interactive exercises. Legal basis: [for example, public task or legitimate interests, to be confirmed by the school]. Files are processed only while a conversion is running. Data kept in a student&rsquo;s browser can be removed at any time by clearing the site data for this website.</p>
+
+<h2>Who else handles data</h2>
+<ul>
+  <li><strong>AI provider:</strong> [name, for example Anthropic], receives the PDF during a conversion.</li>
+  <li><strong>Hosting provider:</strong> [name, for example Vercel], region: [for example Dublin, Ireland], receives technical request data.</li>
+</ul>
+<p>The school should keep a data processing agreement with each of them.</p>
+
+<h2>How the data is protected</h2>
+<p>Connections are encrypted (HTTPS). The tool uses strict browser security rules, limits repeated wrong access codes and conversions, checks everything the AI returns before showing it, and has no database to leak. Security problems can be reported as described in the project&rsquo;s security policy (see <code>/.well-known/security.txt</code>).</p>
 
 <h2>Transfers outside the European Economic Area</h2>
 <p>The AI service provider may process data outside the EEA. Before using Vocabloom, the school should have a data processing agreement and appropriate safeguards (for example Standard Contractual Clauses) in place with that provider: [reference to the agreement].</p>
