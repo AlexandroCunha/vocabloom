@@ -259,12 +259,13 @@ function renderPlayer(root,W0,po){
    +'<div class="namebar" style="max-width:720px;margin:0 auto"><input id="sname" type="text" placeholder="Your name" autocomplete="name"><span class="date">'+new Date().toLocaleDateString('en-GB')+'</span></div>'
    +(total?'<div class="bar"><div class="t"><span>Score</span><span id="score"></span></div><div class="prog"><i id="pb"></i></div></div>':'<div style="height:6px"></div>')
    +secHtml
-   +'<div class="pl"><div id="mist"></div><div class="final" id="final"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
+   +'<div class="pl"><div id="mist"></div><div id="prac"></div><div class="final" id="final"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
    +'<div class="actions"><button class="sec" data-act="reset">Start over</button>'+(total?'<button data-act="all">Check all</button>':'')+'</div>'
    +'<div class="actions"><button class="ghost" data-act="copyres">Copy my results</button></div><p class="foot">Made with Vocabloom'+(location.protocol==='file:'?'':' &middot; <a href="privacy.html">Privacy</a>')+'</p></div>';
 
-  function correct(id){
-    const o=items[id],it=o.it,t=o.sec.type,v=S.v[id];
+  const correct=id=>correctWith(id,S.v[id]);
+  function correctWith(id,v){
+    const o=items[id],it=o.it,t=o.sec.type;
     if(!o.scored)return false;
     if(t==='fill'){const n=blanks(it);if(!n)return false;for(let k=0;k<n;k++){const a=alts(it.answers[k]||'');if(!a.length||!a.some(x=>norm(x)===norm((v||[])[k])))return false;}return true;}
     if(t==='short')return Array.isArray(v)&&it.answers.some(a=>alts(a).some(x=>norm(x)&&norm(x)===norm(v[0])));
@@ -342,7 +343,7 @@ function renderPlayer(root,W0,po){
     if(!total)return;
     const c=counts(),ok=c.ok;
     q('#score').textContent=ok+' / '+total;q('#pb').style.width=(ok/total*100)+'%';
-    renderMistakes();
+    renderMistakes();if(P.mode!=='run')renderPractice();
     const f=q('#final');
     if(ok===total||show===true){
       if(ok===total&&!f.classList.contains('show')){const cols=['#B4252A','#388A9F','#1B9A5A','#E4B43A','#CC3366'];for(let i=0;i<34;i++){const c=document.createElement('i');c.className='cf';c.style.left=(Math.random()*100)+'%';c.style.background=cols[i%cols.length];c.style.animationDelay=(Math.random()*.6)+'s';f.appendChild(c);setTimeout(()=>c.remove(),3200);}}
@@ -364,6 +365,7 @@ function renderPlayer(root,W0,po){
         ids.forEach(id=>{const o=items[id],n=S.t[id]||0;L.push('- '+(o.sec.title||'Exercise '+(o.si+1))+', Q'+qNum(id)+': '+mistakeLabel(status(id)).toLowerCase()+' ('+n+' wrong '+(n===1?'answer':'answers')+')');});
       }
     }
+    if(P.mode==='done')L.push('','Optional practice: '+P.ok+' / '+P.ids.length+' mistakes fixed');
     W.sections.forEach((sec,si)=>{
       if(sec.type!=='open')return;
       L.push('','## '+sec.title);
@@ -371,6 +373,57 @@ function renderPlayer(root,W0,po){
     });
     return L.join('\n');
   }
+
+
+  /* ---- Optional "Practise my mistakes" (same questions as the PDF, no score change) ---- */
+  let P={mode:S.pskip?'closed':'idle',ids:[],i:0,ok:0,tries:0,st:'ask'};
+  const ptip=(ic,txt)=>txt?'<div class="tip">'+ic+' '+esc(txt)+'</div>':'';
+  function pqHtml(id){
+    const o=items[id],it=o.it,t=o.sec.type;
+    if(t==='fill'){const parts=it.prompt.split('___'),n=parts.length-1;return '<div class="q">'+parts.map((p,k)=>esc(p)+(k<n?'<input type="text" class="blk" style="width:'+bw(it,k)+'ch" data-pk="'+k+'" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="blank '+(k+1)+'">':'')).join('')+'</div>';}
+    if(t==='short')return '<div class="q">'+esc(it.prompt)+'</div><input type="text" data-pk="0" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type your answer">';
+    if(t==='choice'||t==='truefalse')return '<div class="q">'+esc(it.prompt)+'</div><div class="opts">'+it.options.map(x=>'<button class="opt" data-act="p-pick" data-v="'+esc(x)+'">'+esc(x)+'</button>').join('')+'</div>';
+    if(t==='match')return '<div class="q">'+esc(it.prompt)+'</div><select data-pk="0"><option value="">Choose&hellip;</option>'+matchOpts[items[id].si].map(x=>'<option>'+esc(x)+'</option>').join('')+'</select>';
+    return '';
+  }
+  function renderPractice(){
+    const box=q('#prac');if(!box)return;
+    if(P.mode==='closed'){box.innerHTML='';return;}
+    if(P.mode==='idle'){
+      const n=mistakeIds().length;
+      box.innerHTML=n?'<div class="card prac"><h3 style="margin:0 0 4px">Practise your mistakes?</h3><p class="sub" style="margin:0 0 10px">Optional. Try the '+n+' question'+(n===1?'':'s')+' you got wrong again, one at a time. It will not change your score.</p><div class="actions" style="margin:0"><button data-act="p-start">Practise now</button><button class="sec" data-act="p-skip">No thanks, skip</button></div></div>':'';
+      return;
+    }
+    if(P.mode==='done'){
+      box.innerHTML='<div class="card prac ok"><h3 style="margin:0 0 4px">Practice complete</h3><p style="margin:0 0 10px">'+P.ok+' of '+P.ids.length+' fixed. Well done for going back over them!</p><div class="actions" style="margin:0"><button class="sec" data-act="p-skip">Close</button></div></div>';
+      return;
+    }
+    const id=P.ids[P.i];
+    box.innerHTML='<div class="card prac"><div class="sub" style="margin:0 0 6px">Practice &middot; question '+(P.i+1)+' of '+P.ids.length+' &middot; '+esc(items[id].sec.title||('Exercise '+(items[id].si+1)))+'</div>'
+      +pqHtml(id)+'<div class="msg" id="pmsg"></div>'
+      +'<div class="row" style="margin-top:8px"><button data-act="p-check" id="pchk">&#10003; Check</button><button class="sec" data-act="p-hint">&#128161; Hint</button><button data-act="p-next" id="pnext" style="display:none">Next &rarr;</button></div>'
+      +'<div class="actions" style="margin:10px 0 0"><button class="ghost" data-act="p-skipq">Skip this question</button><button class="ghost" data-act="p-end">Stop practice</button></div></div>';
+  }
+  function pValue(){
+    const box=q('#prac'),els=[].slice.call(box.querySelectorAll('[data-pk]'));
+    const id=P.ids[P.i],t=items[id].sec.type;
+    if(t==='fill'||t==='short')return els.map(e=>e.value);
+    return els.length?els[0].value:(P.pick||'');
+  }
+  function pResolve(){
+    P.st='done';const n=q('#pnext'),c=q('#pchk');if(n)n.style.display='';if(c)c.style.display='none';
+  }
+  function pCheck(v){
+    const id=P.ids[P.i],o=items[id],m=q('#pmsg');if(P.st!=='ask')return;
+    const filled=Array.isArray(v)?v.some(x=>String(x||'').trim()):String(v||'')!=='';
+    if(!filled){m.className='msg';m.innerHTML='Type or choose an answer first.';return;}
+    P.tries++;
+    if(correctWith(id,v)){P.ok++;m.className='msg ok';m.innerHTML='Correct, well done!'+ptip('📘',o.it.explanation);pResolve();return;}
+    m.className='msg bad';
+    if(P.tries>=3){m.innerHTML='Answer: <b>'+esc(answerText(id))+'</b>'+ptip('📘',o.it.explanation);pResolve();}
+    else m.innerHTML='Not quite. Have another go.'+ptip('💡',hintOf(id))+(P.tries>=2?ptip('📘',o.it.explanation):'');
+  }
+  function pGo(){P.i++;P.tries=0;P.st='ask';P.pick='';P.mode=P.i>=P.ids.length?'done':'run';renderPractice();}
 
   let resetArm=0;
   root.onclick=e=>{
@@ -386,6 +439,13 @@ function renderPlayer(root,W0,po){
     else if(a==='pick'){S.v[id]=b.dataset.v;submit(id);save();paint(id);score();}
     else if(a==='all'){scoredIds.forEach(i=>{if(answered(i)){S.c[i]=1;submit(i);}paint(i);});save();score(true);}
     else if(a==='goto'){const el=q('#w-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+    else if(a==='p-start'){P.ids=mistakeIds().slice();P.i=0;P.ok=0;P.tries=0;P.st='ask';P.pick='';P.mode=P.ids.length?'run':'idle';renderPractice();const el=q('#prac');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+    else if(a==='p-skip'){P.mode='closed';S.pskip=1;save();renderPractice();}
+    else if(a==='p-check')pCheck(pValue());
+    else if(a==='p-pick'){if(P.st!=='ask')return;P.pick=b.dataset.v;const all=q('#prac').querySelectorAll('.opt');all.forEach(x=>x.className='opt');pCheck(P.pick);if(correctWith(P.ids[P.i],P.pick))b.classList.add('ok');else b.classList.add('bad');}
+    else if(a==='p-hint'){const m=q('#pmsg'),h=hintOf(P.ids[P.i]);m.className='msg h';m.innerHTML=h?'💡 '+esc(h):'No hint for this one.';}
+    else if(a==='p-next'||a==='p-skipq')pGo();
+    else if(a==='p-end'){P.mode='idle';renderPractice();}
     else if(a==='copyres')copyText(resultsText(),'Copy your results');
     else if(a==='reset'){
       if(Date.now()-resetArm<3000){S={name:'',v:{},c:{},r:{},h:{},t:{},w:{},lw:{}};save();renderPlayer(root,W0,po);window.scrollTo(0,0);}
@@ -400,9 +460,10 @@ function renderPlayer(root,W0,po){
     if(S.c[id]&&!S.r[id]){delete S.c[id];paint(id);}
     save();updateBank();score();
   };
-  root.onchange=e=>{const t=e.target;if(t.tagName==='SELECT'&&t.dataset.id){S.v[t.dataset.id]=t.value;submit(t.dataset.id);save();paint(t.dataset.id);score();}};
+  root.onchange=e=>{const t=e.target;if(t.tagName==='SELECT'&&t.dataset.pk!==undefined){pCheck(t.value);return;}if(t.tagName==='SELECT'&&t.dataset.id){S.v[t.dataset.id]=t.value;submit(t.dataset.id);save();paint(t.dataset.id);score();}};
   root.onkeydown=e=>{
     const t=e.target;
+    if(e.key==='Enter'&&t.tagName==='INPUT'&&t.dataset.pk!==undefined){e.preventDefault();pCheck(pValue());return;}
     if(e.key==='Enter'&&t.tagName==='INPUT'&&t.dataset.id){e.preventDefault();const b=root.querySelector('[data-act="check"][data-id="'+t.dataset.id+'"]');if(b){b.click();t.blur();}}
   };
   q('#sname').value=S.name||'';
