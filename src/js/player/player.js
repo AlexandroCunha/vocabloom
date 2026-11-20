@@ -47,7 +47,19 @@ function renderPlayer(root, rawWorksheet, options) {
   const typeOf = id => items[id].section.type;
   const isRight = id => items[id].scored && isCorrect(typeOf(id), items[id].item, state.values[id]);
   const isAnswered = id => items[id].scored && hasAnswer(typeOf(id), state.values[id]);
-  const hintFor = id => items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
+  /** The student's slips in what they typed (a missing capital letter, a spelling error), or null when there is no clear slip. */
+  const slipsOf = id => (items[id].scored ? diagnose(typeOf(id), items[id].item, state.values[id]) : null);
+  /** A hint about what the student actually got wrong comes first; the stored hint is for everything else. */
+  const hintFor = id => {
+    const slips = isRight(id) ? null : slipsOf(id);
+    return (slips && slips.length ? slipHint(slips) : '') || items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
+  };
+  /** After the answer is shown: what was different in the student's own answer, or else the stored explanation. */
+  function lessonTip(id) {
+    const slips = slipsOf(id);
+    return slips && slips.length ? tipHtml('💡', slipReveal(slips)) : tipHtml('📘', items[id].item.explanation);
+  }
+  const reminderTip = id => tipHtml('💡', capitalReminder(slipsOf(id) || []));
   const mistakeIds = () => scoredIds.filter(id => state.everWrong[id]);
   const sourceOf = id => ({ type: typeOf(id), item: items[id].item, choices: index.matchOptions[items[id].sectionIndex] || [] });
 
@@ -92,10 +104,13 @@ function renderPlayer(root, rawWorksheet, options) {
   function feedbackHtml(id, status) {
     const item = items[id].item;
     switch (status) {
-      case 'ok': return 'Correct, well done!';
-      case 'fix': return 'Corrected! You got this wrong at first, then fixed it.' + tipHtml('📘', item.explanation);
-      case 'rev': return 'Answer: <b>' + esc(answerText(typeOf(id), item)) + '</b>' + tipHtml('📘', item.explanation);
-      case 'bad': return 'Not quite. Have another go.' + tipHtml('💡', hintFor(id)) + ((state.wrongAttempts[id] || 0) >= 2 ? tipHtml('📘', item.explanation) : '');
+      case 'ok': return 'Correct, well done!' + reminderTip(id);
+      case 'fix': return 'Corrected! You got this wrong at first, then fixed it.' + tipHtml('📘', item.explanation) + reminderTip(id);
+      case 'rev': return 'Answer: <b>' + esc(answerText(typeOf(id), item)) + '</b>' + lessonTip(id);
+      case 'bad': {
+        const slipped = (slipsOf(id) || []).length > 0;   // a slip is not a gap in understanding, so the explanation would not help
+        return 'Not quite. Have another go.' + tipHtml('💡', hintFor(id)) + ((state.wrongAttempts[id] || 0) >= 2 && !slipped ? tipHtml('📘', item.explanation) : '');
+      }
       default: return '';
     }
   }
@@ -135,7 +150,7 @@ function renderPlayer(root, rawWorksheet, options) {
       const entry = items[id];
       const status = statusOf(id);
       const pill = MISTAKE_LABELS[status] ? status : 'bad';
-      const explanation = (status === 'fix' || status === 'rev') ? tipHtml('📘', entry.item.explanation) : '';
+      const explanation = status === 'rev' ? lessonTip(id) : (status === 'fix' ? tipHtml('📘', entry.item.explanation) : '');
       return '<div class="mk" data-act="goto" data-id="' + id + '"><div><b>' + esc(entry.section.title || ('Exercise ' + (entry.sectionIndex + 1))) + ' &middot; Q' + (entry.itemIndex + 1) + '</b>'
         + '<span class="pill ' + pill + '">' + (MISTAKE_LABELS[status] || MISTAKE_LABELS.bad) + '</span></div>'
         + '<div class="mkp">' + esc(entry.item.prompt.replace(/___/g, '_____')) + '</div>' + explanation + '</div>';
@@ -159,6 +174,25 @@ function renderPlayer(root, rawWorksheet, options) {
     return 'Keep practising, you are getting there!';
   }
 
+  /** What the student can do now that the answers are checked: fix what is left, practise, keep a deck. */
+  function nextStepsHtml() {
+    const toFix = scoredIds.filter(id => !['ok', 'fix'].includes(statusOf(id)));
+    const mistakes = mistakeIds().length;
+    const lines = [];
+    if (toFix.length) {
+      const unanswered = toFix.filter(id => !isAnswered(id)).length;
+      lines.push('<button data-act="goto" data-id="' + toFix[0] + '">' + (toFix.length === 1 ? 'Go to the question still to fix' : 'Go to the first of ' + toFix.length + ' still to fix') + '</button>');
+      if (unanswered) lines.push('<p class="sub">' + unanswered + ' ' + (unanswered === 1 ? 'question has' : 'questions have') + ' no answer yet.</p>');
+    }
+    if (mistakes) {
+      lines.push('<p class="sub">Your mistakes, a chance to practise them and your review deck are just below.</p>');
+    } else if (!toFix.length) {
+      lines.push('<p class="sub">Nothing to practise this time.</p>');
+    }
+    if (options.home) lines.push('<a class="next-link" href="#review">My review deck</a>');
+    return lines.join('');
+  }
+
   function updateScore(showFinal) {
     if (!total) return;
     const results = countResults();
@@ -176,6 +210,7 @@ function renderPlayer(root, rawWorksheet, options) {
     find('#fscore').textContent = results.right + ' / ' + total;
     find('#fdetail').textContent = 'Right first time: ' + results.firstTime + ' · Corrected after a mistake: ' + results.fixed + ' · Not yet correct: ' + (total - results.right);
     find('#fmsg').textContent = finalMessage(results);
+    find('#fnext').innerHTML = nextStepsHtml();
     if (showFinal === true) final.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -189,6 +224,7 @@ function renderPlayer(root, rawWorksheet, options) {
   const deckPanel = createDeckPanel({
     root, panel: '#deck', speak,
     enabled: Boolean(options.persist),
+    home: Boolean(options.home),
     source: worksheet.title,
     mistakes: () => mistakeIds().map(sourceOf),
     isDismissed: () => state.deckDismissed,

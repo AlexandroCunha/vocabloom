@@ -17,7 +17,7 @@ const PURE_FILES = [
   'js/core/local-data.js', 'js/core/platform.js', 'js/share/codec.js', 'js/share/qr.js', 'js/player/keep-place.js'
 ];
 const EXPORTED = ['norm', 'alts', 'hash', 'seededRandom', 'shuffle', 'slug', 'normaliseWorksheet', 'slimJSON', 'isScored',
-  'isCorrect', 'hasAnswer', 'answerText', 'firstLetterHint', 'pack', 'unpack', 'MAX_UNPACKED_BYTES',
+  'isCorrect', 'hasAnswer', 'answerText', 'firstLetterHint', 'editDistance', 'compareAnswer', 'diagnose', 'slipHint', 'slipReveal', 'capitalReminder', 'pack', 'unpack', 'MAX_UNPACKED_BYTES',
   'spokenText', 'splitForSpeech', 'pickVoice', 'createSpeaker', 'SPEECH_CHUNK_CHARS', 'SPEECH_LANG', 'SPEECH_RATE',
   'dayNumber', 'emptyDeck', 'cardId', 'makeCard', 'addCard', 'dueCards', 'answerCard', 'deckStats', 'deckIndex',
   'sanitiseDeck', 'loadDeck', 'saveDeck', 'deleteDeck', 'DECK_KEY', 'DECK_MAX_CARDS', 'DECK_WAIT_DAYS', 'DECK_SESSION_SIZE',
@@ -729,4 +729,67 @@ test('a browser that does not know the scroll word "instant" still gets the page
   win.fire('resize'); win.runTimers();
   assert.deepEqual(JSON.parse(JSON.stringify(win.scrolls)), [{ x: 0, y: 1000 - 40 - 0 }]);
   f.stopKeepingPlace();
+});
+
+/* ---------- naming the student's real mistake ---------- */
+
+const short = answers => ({ answers });
+const slipText = value => Array.from(value || [], slip => slip.typed + '>' + slip.expected + ':' + (slip.spelling ? 's' : '') + (slip.capital ? 'c' : ''));
+
+test('edit distance counts single-letter changes', () => {
+  assert.equal(f.editDistance('brazilian', 'brazillian'), 1);
+  assert.equal(f.editDistance('cat', 'cat'), 0);
+  assert.equal(f.editDistance('', 'abc'), 3);
+  assert.equal(f.editDistance('kitten', 'sitting'), 3);
+});
+
+test('a lower-case nationality with a spelling error is named as both slips, without giving the answer away', () => {
+  const slips = f.diagnose('short', short(['I am Brazilian.']), ['I am brazillian']);
+  assert.deepEqual(slipText(slips), ['brazillian>Brazilian:sc']);
+  const hint = f.slipHint(slips);
+  assert.match(hint, /spelling and the capital letter/);
+  assert.match(hint, /brazillian/);
+  assert.doesNotMatch(hint, /Brazilian/);
+  assert.match(f.slipReveal(slips), /\u201CBrazilian\u201D \(spelling and capital letter\)/);
+});
+
+test('a missing capital letter alone is a hint about the capital letter, not about anything else', () => {
+  const slips = f.diagnose('short', short(['I am Brazilian.']), ['i am brazilian']);
+  assert.deepEqual(slipText(slips), ['i>I:c', 'brazilian>Brazilian:c']);
+  assert.equal(f.slipHint(slips.slice(1)), 'Does \u201Cbrazilian\u201D need a capital letter?');
+  assert.match(f.slipHint(slips), /Check the capital letters in \u201Ci\u201D and \u201Cbrazilian\u201D\./);
+});
+
+test('a spelling error alone is a spelling hint', () => {
+  const slips = f.diagnose('short', short(['I am Brazilian.']), ['I am Brazillian']);
+  assert.equal(f.slipHint(slips), 'Check the spelling of \u201CBrazillian\u201D.');
+});
+
+test('a right answer has no slips, or only a capital letter to remember', () => {
+  assert.deepEqual(Array.from(f.diagnose('short', short(['Dublin']), ['Dublin'])), []);
+  assert.equal(f.capitalReminder(f.diagnose('short', short(['Dublin']), ['dublin'])), 'Remember the capital letter: \u201CDublin\u201D.');
+  assert.equal(f.capitalReminder([]), '');
+});
+
+test('a different word, or a different number of words, is not a slip: the stored hint applies', () => {
+  assert.equal(f.diagnose('short', short(['I am Brazilian.']), ['I am Irish']), null);
+  assert.equal(f.diagnose('short', short(['I am Brazilian.']), ['Brazilian']), null);
+  assert.equal(f.diagnose('short', short(['am']), ['is']), null);   // short words must be exact
+  assert.equal(f.diagnose('short', short(['go']), ['']), null);     // nothing typed
+});
+
+test('every accepted alternative is considered, and the closest one wins', () => {
+  const slips = f.diagnose('short', short(['color|colour']), ['colur']);
+  assert.deepEqual(slipText(slips), ['colur>color:s']);
+});
+
+test('fill-in answers are diagnosed blank by blank, and one wild blank cancels the diagnosis', () => {
+  const item = { prompt: '___ is from ___.', answers: ['She', 'Brazil'] };
+  assert.deepEqual(slipText(f.diagnose('fill', item, ['she', 'Brazill'])), ['she>She:c', 'Brazill>Brazil:s']);
+  assert.equal(f.diagnose('fill', item, ['she', 'Peru']), null);
+  assert.equal(f.diagnose('fill', item, ['she', '']), null);
+});
+
+test('choices, true/false and matching have no slips to name', () => {
+  assert.equal(f.diagnose('choice', { answers: ['A'], options: ['A', 'B'] }, 'B'), null);
 });
