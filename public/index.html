@@ -3,8 +3,17 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1F6E83">
+<meta name="color-scheme" content="light">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="Interactive English worksheets that students answer on their phones.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vocabloom">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%231F6E83%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%275%27 fill=%27%23B4252A%27/%3E%3C/svg%3E">
 <title>Vocabloom</title>
 <style>
@@ -13,34 +22,43 @@
 --teal:#388A9F;--teal2:#1F6E83;--teal3:#14586B;--tealbg:#E6F3F6;
 --red:#B4252A;--red2:#8F1C20;--pink:#CC3366;
 --ok:#1B9A5A;--okbg:#E7F6EE;--bad:#D6453D;--badbg:#FDEDEB;--rev:#A9730A;--revbg:#FFF4DC;--fix:#2563B8;--fixbg:#E8F0FD;
---shadow:0 10px 30px rgba(20,88,107,.10);--r:20px}
+--shadow:0 10px 30px rgba(20,88,107,.10);--r:20px;
+/* Width of the page column, and the space the notch and home indicator take on an iPhone (0 everywhere else). */
+--col:720px;--sat:env(safe-area-inset-top,0px);--sar:env(safe-area-inset-right,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);
+color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* No double-tap zoom or tap delay on anything that can be pressed. */
+a,button,input,select,textarea,summary,label,[role=button]{touch-action:manipulation}
 body{margin:0;font-family:"Avenir Next",Avenir,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;font-weight:400}
 h1,h2,h3{font-family:"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif;color:var(--ink)}
+a{color:var(--teal2);text-underline-offset:2px}
+/* Hover colours only where there is a mouse: on a phone a tap would leave them stuck. */
+@media (hover:hover){a:hover{color:var(--teal3)}}
+a:focus-visible,button:focus-visible,summary:focus-visible,.chip[data-act]:focus-visible,.say:focus-visible{outline:3px solid rgba(56,138,159,.55);outline-offset:2px}
 button{font-family:inherit;font-size:15.5px;border:0;border-radius:14px;padding:0 18px;min-height:48px;background:var(--red);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(180,37,42,.22);transition:transform .12s,background .15s,box-shadow .15s}
-button:hover{background:var(--red2)}
+@media (hover:hover){button:hover{background:var(--red2)}}
 button:active{transform:scale(.97)}
 button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 button.sec{background:var(--tealbg);color:var(--teal3);box-shadow:none}
-button.sec:hover{background:#d4eaef}
+@media (hover:hover){button.sec:hover{background:#d4eaef}}
 button.ghost{background:#fff;color:var(--teal3);border:1.5px solid var(--teal);box-shadow:none}
-button.ghost:hover{background:var(--tealbg)}
+@media (hover:hover){button.ghost:hover{background:var(--tealbg)}}
 button.danger{background:var(--badbg);color:var(--bad);box-shadow:none}
 button.sm{min-height:36px;font-size:13.5px;padding:0 12px;border-radius:12px}
 input[type=text],input[type=password],textarea,select{width:100%;font-family:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
 textarea{resize:vertical;min-height:68px}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(56,138,159,.18)}
-.wrap{max-width:720px;margin:0 auto;padding:0 14px 48px}
+.wrap{max-width:var(--col);margin:0 auto;padding:0 max(14px,var(--sar)) calc(48px + var(--sab)) max(14px,var(--sal))}
 
 /* Header, steps, upload / review / share screens, loading overlay. */
 /* hero / header */
 .top,.hero{color:#fff;background:radial-gradient(circle at 92% -10%,rgba(255,255,255,.22),transparent 42%),radial-gradient(circle at 0% 105%,rgba(255,255,255,.12),transparent 45%),linear-gradient(135deg,#3F95AB 0%,#1F7790 50%,#14586B 100%)}
-.top{padding:22px 16px 46px;border-radius:0 0 30px 30px}
-.top .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.top{padding:calc(22px + var(--sat)) max(16px,var(--sar)) 46px max(16px,var(--sal));border-radius:0 0 30px 30px}
+.top .in{max-width:var(--col);margin:0 auto;display:flex;align-items:center;gap:12px}
 .top h1{margin:0;font-size:28px;letter-spacing:-.3px;color:#fff;line-height:1.1}
 .top p{margin:2px 0 0;font-size:13px;font-weight:300;opacity:.92}
-.steps{display:flex;gap:8px;max-width:720px;margin:-26px auto 16px;padding:0 14px;position:relative}
+.steps{display:flex;gap:8px;max-width:var(--col);margin:-26px auto 16px;padding:0 max(14px,var(--sar)) 0 max(14px,var(--sal));position:relative}
 .steps div{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:var(--mute);border-radius:16px;font-size:13px;padding:10px 6px;font-weight:600;box-shadow:var(--shadow);transition:all .2s}
 .steps div b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--tealbg);color:var(--teal3);font-size:12px}
 .steps div.on{background:var(--teal3);color:#fff}
@@ -51,10 +69,16 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);bo
 .panel h2{margin:0 0 4px;font-size:24px;letter-spacing:-.2px}
 .lead{margin:0 0 16px;color:var(--mute);font-size:14px}
 label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:var(--ink)}
-.drop{display:block;border:2px dashed #9CCAD6;border-radius:var(--r);background:linear-gradient(180deg,#F4FAFB,#E9F5F8);text-align:center;padding:30px 14px;cursor:pointer;font-weight:600;color:var(--teal3);transition:all .2s}
-.drop:hover{border-color:var(--teal);transform:translateY(-1px)}
+.drop{position:relative;display:block;border:2px dashed #9CCAD6;border-radius:var(--r);background:linear-gradient(180deg,#F4FAFB,#E9F5F8);text-align:center;padding:30px 14px;cursor:pointer;font-weight:600;color:var(--teal3);transition:all .2s}
+@media (hover:hover){.drop:hover{border-color:var(--teal);transform:translateY(-1px)}}
+/* a file is being dragged over the box */
+.drop.over{border-style:solid;border-color:var(--teal);background:var(--tealbg);box-shadow:0 0 0 4px rgba(56,138,159,.18)}
+.drop:has(input:focus-visible){outline:3px solid rgba(56,138,159,.55);outline-offset:2px}
 .drop.has{border-style:solid;border-color:var(--teal);background:var(--tealbg)}
-.drop input{display:none}
+/* The file input stays in the page (not display:none) so the keyboard can reach it. */
+.drop input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.mouse-only{display:none}
+@media (hover:hover) and (pointer:fine){.touch-only{display:none}.mouse-only{display:inline}}
 .drop small{font-weight:400;color:var(--mute)}
 .drop .ic{display:block;margin:0 auto 8px;width:46px;height:46px;border-radius:14px;background:var(--red);color:#fff;font-size:24px;line-height:46px;box-shadow:0 8px 18px rgba(180,37,42,.25)}
 .err{background:var(--badbg);color:#A5302A;border-radius:14px;padding:11px 14px;margin:14px 0;font-size:14px}
@@ -63,9 +87,10 @@ label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:v
 .note.warn{background:var(--revbg);color:#7A5400}
 .btns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
 .btns button{flex:1 1 150px}
+.btns button.wide{flex-basis:100%}
 .nav{display:flex;gap:10px;margin-top:16px}
 .nav button{flex:1}
-.load{position:fixed;inset:0;background:rgba(242,248,249,.96);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px}
+.load{position:fixed;inset:0;background:rgba(242,248,249,.96);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:max(20px,var(--sat)) max(20px,var(--sar)) max(20px,var(--sab)) max(20px,var(--sal))}
 .spin{width:58px;height:58px;border-radius:50%;border:6px solid #D2E8EE;border-top-color:var(--red);animation:sp .9s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -83,19 +108,28 @@ label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:v
 .linkbox{display:flex;gap:8px}
 .linkbox input{flex:1;font-size:13px}
 
+/* short link and QR code */
+.shortbox{border:1.5px solid var(--line);border-radius:18px;padding:14px;margin:14px 0;background:#FAFDFD}
+.shortbox h3{margin:0 0 4px;font-size:18px}
+.qr{max-width:260px;margin:12px auto}
+.qr svg{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.box.qrbig{text-align:center}
+.qrbig .qr{max-width:min(78vw,60vh);max-width:min(78vw,60dvh)}
+.qrlink{word-break:break-all;font-size:14px;color:var(--mute);margin:10px 0 0}
+
 /* The student worksheet: hero, cards, feedback, mistakes, practice, results. */
 /* worksheet (player) */
-.hero{padding:26px 16px 50px;text-align:center;border-radius:0 0 34px 34px}
+.hero{padding:calc(26px + var(--sat)) max(16px,var(--sar)) 50px max(16px,var(--sal));text-align:center;border-radius:0 0 34px 34px}
 .hero h1{margin:8px 0 2px;font-size:30px;letter-spacing:-.4px;color:#fff;line-height:1.15}
 .brand-mini{display:inline-flex;gap:8px;align-items:center;font-family:"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif;font-weight:700;font-size:15px;opacity:.95;letter-spacing:.3px}
-.namebar{display:flex;gap:10px;align-items:center;padding:0 14px;max-width:720px;margin:-26px auto 0;position:relative}
+.namebar{display:flex;gap:10px;align-items:center;padding:0 max(14px,var(--sar)) 0 max(14px,var(--sal));max-width:var(--col);margin:0 auto;position:relative}
 .namebar input{box-shadow:var(--shadow);border-color:transparent}
 .namebar .date{color:var(--mute);font-size:13px;white-space:nowrap;background:#fff;padding:12px 14px;border-radius:14px;box-shadow:var(--shadow)}
-.bar{position:sticky;top:0;z-index:5;background:rgba(242,248,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 16px 12px;border-bottom:1px solid var(--line);margin-top:14px}
-.bar .t{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--ink);max-width:720px;margin:0 auto}
-.prog{height:9px;background:#D9E8EC;border-radius:8px;overflow:hidden;margin:6px auto 0;max-width:720px}
+.bar{position:sticky;top:0;z-index:5;background:rgba(242,248,249,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:calc(10px + var(--sat)) max(16px,var(--sar)) 12px max(16px,var(--sal));border-bottom:1px solid var(--line);margin-top:14px}
+.bar .t{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--ink);max-width:var(--col);margin:0 auto}
+.prog{height:9px;background:#D9E8EC;border-radius:8px;overflow:hidden;margin:6px auto 0;max-width:var(--col)}
 .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--ok));border-radius:8px;transition:width .4s}
-.pl{padding:0 14px;max-width:720px;margin:0 auto}
+.pl{padding:0 max(14px,var(--sar)) 0 max(14px,var(--sal));max-width:var(--col);margin:0 auto}
 .pl h3{font-size:21px;margin:30px 2px 4px;color:var(--teal3);border-left:5px solid var(--red);padding-left:12px;line-height:1.25}
 .pl .sub{margin:0 2px 12px;color:var(--mute);font-size:14px}
 .passage{background:#fff;border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:16px;padding:14px 16px;white-space:pre-wrap;margin-bottom:12px;font-size:16px;box-shadow:var(--shadow)}
@@ -110,6 +144,7 @@ details.bank summary{font-weight:600;cursor:pointer;color:var(--teal3)}
 .card.rev{border-color:#E3B64A;background:var(--revbg)}
 .card.fix{border-color:var(--fix);background:var(--fixbg);animation:pop .35s}
 .q{font-size:16px;margin-bottom:10px;line-height:1.75;color:var(--ink)}
+.q,.passage{display:flow-root}
 .q b{color:#fff;background:var(--teal);border-radius:8px;padding:1px 8px;margin-right:6px;font-size:13px;font-weight:600}
 input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:0 3px;border-radius:10px;border:1.5px solid var(--line);border-bottom:3px solid var(--teal);font-size:16px;background:#fff}
 .row{display:flex;gap:8px}
@@ -118,7 +153,7 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .tip{margin-top:8px;padding:8px 12px;background:rgba(255,255,255,.8);border-radius:12px;font-size:14px;color:var(--text);font-weight:400}
 .opts{display:grid;gap:9px}
 .opt{background:#fff;color:var(--ink);border:1.5px solid var(--line);text-align:left;padding:12px 16px;box-shadow:none;font-weight:500;border-radius:14px}
-.opt:hover{background:var(--tealbg);border-color:var(--teal)}
+@media (hover:hover){.opt:hover{background:var(--tealbg);border-color:var(--teal)}}
 .opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
 .opt.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
 .mk{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow)}
@@ -131,14 +166,86 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .final{display:none;position:relative;overflow:hidden;text-align:center;background:linear-gradient(160deg,#fff,#EAF5F8);border:2px solid var(--teal);border-radius:24px;padding:22px 16px;margin:18px 0;box-shadow:var(--shadow)}
 .final.show{display:block;animation:up .4s both}
 .final .big{font-family:"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif;font-size:52px;font-weight:700;color:var(--teal3);line-height:1}
-.foot{text-align:center;color:var(--mute);font-size:12px;margin:18px 0 6px}
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;box-shadow:var(--shadow)}
-.ov{position:fixed;inset:0;background:rgba(10,30,38,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:16px}
-.ov .box{background:#fff;border-radius:22px;padding:18px;width:100%;max-width:560px}
+.foot{text-align:center;color:var(--mute);font-size:12px;margin:18px 0 6px;padding-bottom:var(--sab)}
+.toast{position:fixed;left:50%;bottom:calc(26px + var(--sab));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;box-shadow:var(--shadow)}
+.ov{position:fixed;inset:0;background:rgba(10,30,38,.55);z-index:70;display:flex;justify-content:center;overflow-y:auto;overscroll-behavior:contain;padding:max(16px,var(--sat)) max(16px,var(--sar)) max(16px,var(--sab)) max(16px,var(--sal))}
+.ov .box{background:#fff;border-radius:22px;padding:18px;width:100%;max-width:560px;margin:auto}
 .ov textarea{min-height:200px;font-size:13px}
 .cf{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;opacity:0;animation:fall 2.4s ease-out forwards}
 @keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(260px) rotate(540deg)}}
+/* read aloud */
+.say{float:right;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;min-height:40px;padding:0;margin:0 0 6px 10px;border-radius:50%;background:var(--tealbg);color:var(--teal3);box-shadow:none;font-size:17px;line-height:1}
+@media (hover:hover){.say:hover{background:#d4eaef}}
+.say.speaking{background:var(--teal3);color:#fff}
+.chip[data-act]{cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+@media (hover:hover){.chip[data-act]:hover{background:#d4eaef}}
+.chip.speaking{background:var(--teal3);color:#fff;border-color:var(--teal3)}
+/* review deck, student home, offline bar */
+.card.deck{border-color:#C5E2EA;background:linear-gradient(160deg,#fff,#F2F9FB)}
+@media (max-width:359px){.card.deck .actions{flex-direction:column}.card.deck .actions button{flex:none}}
+.home-top{margin-top:-26px;position:relative}
+.recent{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:13px 16px;margin-bottom:10px;color:var(--ink);font-weight:600;text-decoration:none;box-shadow:var(--shadow)}
+@media (hover:hover){.recent:hover{border-color:var(--teal)}}
+.recent small{color:var(--mute);font-weight:400;white-space:nowrap}
+.net{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--ink);color:#fff;text-align:center;font-size:13.5px;padding:10px max(14px,var(--sar)) calc(10px + var(--sab)) max(14px,var(--sal))}
+.net[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Adjustments for particular devices. Loaded last, so they override the phone-first rules above. */
+
+/* ---- A phone held sideways: very little height, so the header gives some of it back ---- */
+@media (orientation:landscape) and (max-height:500px){
+.top{padding-top:calc(10px + var(--sat));padding-bottom:36px}
+.top h1{font-size:22px}
+.top p{display:none}
+.hero{padding-top:calc(10px + var(--sat));padding-bottom:36px}
+.hero h1{font-size:22px;margin:2px 0 0}
+.brand-mini{font-size:13px}
+.steps div{padding-top:6px;padding-bottom:6px}
+.bar{padding-top:calc(6px + var(--sat));padding-bottom:8px;margin-top:8px}
+.pl h3{margin-top:20px}
+/* the large QR code has to fit above the Close button without scrolling */
+.qrbig .qr{max-width:46vh;max-width:46dvh}
+}
+
+/* ---- Touch screens: fields need 16px or more, or Safari on iPhone zooms the page when one is selected ---- */
+@media (pointer:coarse){
+.linkbox input,.ov textarea{font-size:16px}
+}
+
+/* ---- Wider screens ---- */
+@media (min-width:640px){
+/* short answers (True / False, single words) sit side by side */
+.opts.short{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}
+}
+@media (min-width:900px){
+:root{--col:760px}
+}
+
+/* ---- Computers: the teacher's tool uses the room ---- */
+@media (min-width:1000px){
+.teacher{--col:960px}
+.teacher .panel{padding:28px 32px}
+
+/* upload: what it is on the left, the form on the right */
+.up{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0 40px;align-items:start}
+.up-intro h2{font-size:30px}
+.up-form .drop{margin-top:2px}
+
+/* review: the fields of each question sit in two columns */
+.it{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.it>.top2,.it>[data-f=prompt]{grid-column:1/-1}
+.it>[data-f=hint]{grid-column:1}
+.it>[data-f=explanation]{grid-column:2}
+.it>small{align-self:center}
+
+/* share: link and QR code on the left, what students see on the right (it stays in view while the page scrolls) */
+.share{display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"main preview" "nav preview";gap:0 36px;align-items:start}
+.share-main{grid-area:main}
+.share-preview{grid-area:preview;position:sticky;top:16px}
+.share-nav{grid-area:nav}
+.share-preview .phone{margin-top:0;max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);overflow:auto;overscroll-behavior:contain}
+}
 </style>
 </head>
 <body>
@@ -167,17 +274,56 @@ function toast(message) {
   setTimeout(() => element.remove(), 1900);
 }
 
+/**
+ * Shows an overlay (a dark backdrop holding a box). Escape or a click on the backdrop closes it,
+ * and focus goes back to what had it before. Returns the function that closes the overlay.
+ */
+function showOverlay(overlay) {
+  const opener = document.activeElement;
+  document.body.appendChild(overlay);
+  const onKey = event => { if (event.key === 'Escape') close(); };
+  function close() {
+    overlay.remove();
+    document.removeEventListener('keydown', onKey);
+    if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus();
+  }
+  document.addEventListener('keydown', onKey);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+  return close;
+}
+
 /** Fallback when the clipboard is blocked: shows the text so the user can copy it by hand. */
 function showText(title, text) {
   const overlay = document.createElement('div');
   overlay.className = 'ov';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', title);
   overlay.innerHTML = '<div class="box"><h3 style="margin:0 0 8px">' + esc(title) + '</h3><textarea readonly></textarea><div class="nav"><button class="sec">Close</button></div></div>';
-  document.body.appendChild(overlay);
+  const close = showOverlay(overlay);
   const field = $('textarea', overlay);
   field.value = text;
   field.focus();
   field.select();
-  $('button', overlay).onclick = () => overlay.remove();
+  $('button', overlay).onclick = close;
+}
+
+/** True when a drag carries files (and not, say, selected text). */
+const dragHasFiles = event => Array.from((event.dataTransfer && event.dataTransfer.types) || []).indexOf('Files') !== -1;
+
+const ARROW_STEPS = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+
+/**
+ * Arrow keys move between the answer buttons of one question, so a keyboard user does not have to Tab through
+ * every one. Returns true when the key was used.
+ */
+function moveBetweenOptions(event) {
+  const step = ARROW_STEPS[event.key];
+  const current = event.target;
+  if (!step || !current.classList || !current.classList.contains('opt')) return false;
+  const group = Array.from(current.parentNode.querySelectorAll('.opt'));
+  const next = group[(group.indexOf(current) + step + group.length) % group.length];
+  if (next) next.focus();
+  return true;
 }
 
 async function copyText(text, title) {
@@ -354,6 +500,502 @@ function firstLetterHint(type, item) {
 }
 
 /*
+ * Read-aloud for questions, reading texts and words, using the browser's own speech synthesis.
+ * Nothing is sent by Vocabloom itself. Only the worksheet's text is ever spoken, never what a student typed.
+ *
+ * The helpers (spokenText, splitForSpeech, pickVoice) have no DOM and are unit-tested.
+ * createSpeaker wraps window.speechSynthesis; nothing plays until a student presses a button.
+ */
+
+const SPEECH_LANG = 'en-GB';
+const SPEECH_RATE = 0.9;           // a little slower than normal, for learners
+const SPEECH_CHUNK_CHARS = 180;    // some browsers stop long utterances, so long texts are read in pieces
+
+/** Spoken text should not contain stray spaces or doubled punctuation. */
+function tidySpeech(text) {
+  return String(text)
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/,(\s*,)+/g, ',')
+    .replace(/,\s*([.;:!?])/g, '$1')
+    .replace(/^[,;\s]+/, '')
+    .trim();
+}
+
+/**
+ * What to say for one question. A blank is spoken as a short pause and the word "blank";
+ * once the question is settled (`revealAnswers`) the right answer is read in its place.
+ */
+function spokenText(type, item, revealAnswers) {
+  const answerFor = k => firstAlternative((type === 'fill' ? item.answers[k] : (k === 0 ? item.answers[0] : '')) || '');
+  const prompt = String(item.prompt || '');
+  const hasBlank = prompt.indexOf('___') !== -1;
+  let blankNumber = 0;
+  let text = prompt.replace(/___/g, () => {
+    const answer = revealAnswers ? answerFor(blankNumber) : '';
+    blankNumber += 1;
+    return answer ? ' ' + answer + ' ' : ', blank, ';
+  });
+  // A new sentence is added after the question: end it properly first, so there is never a double full stop.
+  const then = extra => { text = tidySpeech(text); text = (/[.!?:;]$/.test(text) ? text : text + '.') + ' ' + extra; };
+  if (type === 'choice' && !revealAnswers) then(item.options.join('. '));
+  if (revealAnswers && !hasBlank && item.answers[0]) then('Answer: ' + firstAlternative(item.answers[0]));
+  return tidySpeech(text);
+}
+
+/** Splits a text at sentence ends into pieces of at most `maxChars` characters. */
+function splitForSpeech(text, maxChars) {
+  const pieces = String(text).match(/[^.!?;:\n]+[.!?;:]*/g) || [];
+  const chunks = [];
+  let current = '';
+  pieces.forEach(raw => {
+    const piece = raw.trim();
+    if (!piece) return;
+    if (piece.length > maxChars) {
+      if (current) { chunks.push(current); current = ''; }
+      let rest = piece;
+      while (rest.length > maxChars) {
+        let cut = rest.lastIndexOf(' ', maxChars);
+        if (cut < maxChars / 2) cut = maxChars;
+        chunks.push(rest.slice(0, cut).trim());
+        rest = rest.slice(cut).trim();
+      }
+      current = rest;
+    } else if (current && current.length + 1 + piece.length > maxChars) {
+      chunks.push(current);
+      current = piece;
+    } else {
+      current = current ? current + ' ' + piece : piece;
+    }
+  });
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+/** British English first, then Irish, then any English. A voice that runs on the device beats an online one. */
+function voiceRank(voice) {
+  const lang = String(voice.lang || '').replace('_', '-').toLowerCase();
+  let rank;
+  if (lang === 'en-gb') rank = 30;
+  else if (lang === 'en-ie') rank = 20;
+  else if (lang === 'en' || lang.indexOf('en-') === 0) rank = 10;
+  else return -1;
+  if (voice.localService) rank += 5;
+  if (voice.default) rank += 2;
+  return rank;
+}
+
+function pickVoice(voices) {
+  let best = null;
+  let bestRank = -1;
+  Array.prototype.forEach.call(voices || [], voice => {
+    const rank = voiceRank(voice);
+    if (rank > bestRank) { best = voice; bestRank = rank; }
+  });
+  return best;
+}
+
+/**
+ * `win` is the browser window (or a stand-in in tests).
+ * speak(text, button) reads the text and marks the button as playing; pressing the same button again stops it.
+ */
+function createSpeaker(win) {
+  const synth = win && win.speechSynthesis;
+  const Utterance = win && win.SpeechSynthesisUtterance;
+  const supported = Boolean(synth && Utterance);
+  let playing = null;   // the button that started the current speech
+  let run = 0;          // changes on every start and stop, so late events from a cancelled run are ignored
+  let pieces = [];      // the pieces being spoken. Safari and Chrome can drop a piece (and its "end" event) once nothing refers to it
+
+  function clearButton() {
+    if (!playing) return;
+    playing.classList.remove('speaking');
+    playing.setAttribute('aria-pressed', 'false');
+    playing = null;
+  }
+
+  function stop() {
+    run += 1;
+    clearButton();
+    pieces = [];
+    if (supported) synth.cancel();
+  }
+
+  function speak(text, button) {
+    if (!supported) return false;
+    const wasPlaying = button && button === playing;
+    stop();
+    if (wasPlaying || !text) return true;
+    const thisRun = run;
+    const voice = pickVoice(synth.getVoices());
+    const chunks = splitForSpeech(text, SPEECH_CHUNK_CHARS);
+    if (button) {
+      playing = button;
+      button.classList.add('speaking');
+      button.setAttribute('aria-pressed', 'true');
+    }
+    chunks.forEach((chunk, position) => {
+      const utterance = new Utterance(chunk);
+      utterance.lang = SPEECH_LANG;
+      utterance.rate = SPEECH_RATE;
+      if (voice) utterance.voice = voice;
+      const finished = () => { if (run === thisRun && position === chunks.length - 1) { clearButton(); pieces = []; } };
+      utterance.onend = finished;
+      utterance.onerror = finished;
+      pieces.push(utterance);
+      synth.speak(utterance);
+    });
+    return true;
+  }
+
+  if (supported && win.addEventListener) win.addEventListener('pagehide', stop);
+  return { supported, speak, stop };
+}
+
+/*
+ * The review deck: questions a student got wrong, kept on this device and asked again on later days.
+ * It uses Leitner boxes: a question moves up a box each time it is answered right first time, and the
+ * wait before it comes back grows (1, 3, 7, 14, then 30 days). A wrong answer sends it back to box 1.
+ *
+ * The functions here have no DOM and no storage access, and "today" is always passed in as a day number,
+ * so they are easy to test. They change the deck object they are given.
+ * The deck only exists once the student chooses to save it: no saved deck means nothing is kept.
+ */
+
+const DECK_KEY = 'vocabloom-deck1';
+const DECK_WAIT_DAYS = [1, 3, 7, 14, 30];   // days until a card comes back, by box (box 1 first)
+const DECK_MAX_CARDS = 300;
+const DECK_SESSION_SIZE = 10;               // a review round is kept short
+const DECK_TYPES = ['fill', 'short', 'choice', 'truefalse', 'match'];
+const DECK_LIMITS = { prompt: 600, answer: 200, answers: 12, option: 200, options: 12, text: 300, source: 80 };
+
+/** The student's calendar day as a whole number (local time), so "tomorrow" means tomorrow where they are. */
+const dayNumber = date => Math.floor((date.getTime() - date.getTimezoneOffset() * 60000) / 86400000);
+
+const emptyDeck = () => ({ cards: {}, mastered: 0 });
+
+const clip = (value, max) => String(value == null ? '' : value).slice(0, max);
+const clipList = (list, count, max) => (Array.isArray(list) ? list : []).slice(0, count).map(entry => clip(entry, max));
+
+/** The same question in two worksheets (or the same worksheet twice) is one card. */
+function cardId(type, prompt, answers) {
+  const text = [type, prompt, (answers || []).join('|')].join('\n');
+  return hash(text).toString(36) + hash('~' + text).toString(36);
+}
+
+/** Keeps the list short, but never drops the right answer from it. */
+function shortList(list, rightAnswer, max) {
+  const names = clipList(list, 200, DECK_LIMITS.option);
+  if (names.length <= max) return names;
+  const others = names.filter(name => norm(name) !== norm(rightAnswer)).slice(0, max - 1);
+  return rightAnswer ? others.concat(clip(rightAnswer, DECK_LIMITS.option)) : others;
+}
+
+/**
+ * A card from a worksheet question. `choices` are the drop-down answers of a matching exercise.
+ * A new card comes back tomorrow.
+ */
+function makeCard(type, item, source, choices, today) {
+  const answers = clipList(item.answers, DECK_LIMITS.answers, DECK_LIMITS.answer);
+  const prompt = clip(item.prompt, DECK_LIMITS.prompt);
+  return {
+    id: cardId(type, prompt, answers),
+    type,
+    prompt,
+    answers,
+    options: type === 'choice' || type === 'truefalse' ? shortList(item.options, answers[0], DECK_LIMITS.options) : [],
+    choices: type === 'match' ? shortList(choices, answers[0], DECK_LIMITS.options) : [],
+    hint: clip(item.hint, DECK_LIMITS.text),
+    explanation: clip(item.explanation, DECK_LIMITS.text),
+    from: clip(source, DECK_LIMITS.source),
+    box: 1,
+    due: today + DECK_WAIT_DAYS[0],
+    added: today,
+    seen: 0,
+    right: 0
+  };
+}
+
+/** When the deck is full, the cards that are best known (highest box, furthest away) make room. */
+function trimDeck(deck) {
+  const cards = Object.keys(deck.cards).map(id => deck.cards[id]);
+  if (cards.length <= DECK_MAX_CARDS) return deck;
+  cards.sort((a, b) => (b.box - a.box) || (b.due - a.due) || (a.id < b.id ? -1 : 1));
+  cards.slice(0, cards.length - DECK_MAX_CARDS).forEach(card => { delete deck.cards[card.id]; });
+  return deck;
+}
+
+/** Adds a card, or, when the student got a known question wrong again, sends it back to box 1. */
+function addCard(deck, card, today) {
+  const known = deck.cards[card.id];
+  if (known) {
+    Object.assign(known, card, { box: 1, due: today + DECK_WAIT_DAYS[0], added: known.added, seen: known.seen, right: known.right });
+  } else {
+    deck.cards[card.id] = card;
+  }
+  return trimDeck(deck);
+}
+
+/** Cards that are ready, weakest first, then the ones that have waited longest. */
+function dueCards(deck, today) {
+  return Object.keys(deck.cards).map(id => deck.cards[id])
+    .filter(card => card.due <= today)
+    .sort((a, b) => (a.box - b.box) || (a.due - b.due) || (a.id < b.id ? -1 : 1));
+}
+
+/** Records one answer. `correct` means right at the first try. A card right in the last box is "mastered" and leaves the deck. */
+function answerCard(deck, id, correct, today) {
+  const card = deck.cards[id];
+  if (!card) return deck;
+  card.seen += 1;
+  if (correct) {
+    card.right += 1;
+    if (card.box >= DECK_WAIT_DAYS.length) {
+      delete deck.cards[id];
+      deck.mastered += 1;
+      return deck;
+    }
+    card.box += 1;
+  } else {
+    card.box = 1;
+  }
+  card.due = today + DECK_WAIT_DAYS[card.box - 1];
+  return deck;
+}
+
+function deckStats(deck, today) {
+  const cards = Object.keys(deck.cards).map(id => deck.cards[id]);
+  const boxes = DECK_WAIT_DAYS.map((days, box) => cards.filter(card => card.box === box + 1).length);
+  const waiting = cards.filter(card => card.due > today).map(card => card.due - today);
+  return {
+    total: cards.length,
+    due: cards.length - waiting.length,
+    mastered: deck.mastered,
+    boxes,
+    nextInDays: waiting.length ? Math.min.apply(null, waiting) : null
+  };
+}
+
+/** The same shape the worksheet player uses, so the practice runner can ask deck cards too. */
+function deckIndex(cards) {
+  const items = {};
+  const matchOptions = {};
+  cards.forEach((card, position) => {
+    items[card.id] = {
+      id: card.id,
+      scored: true,
+      sectionIndex: position,
+      itemIndex: 0,
+      section: { type: card.type, title: card.from || 'Review' },
+      item: { prompt: card.prompt, answers: card.answers, options: card.options, hint: card.hint, explanation: card.explanation }
+    };
+    if (card.type === 'match') matchOptions[position] = card.choices;
+  });
+  return { items, matchOptions };
+}
+
+/* ---------- reading back what was stored ---------- */
+
+const wholeNumber = (value, fallback, min) => (Number.isFinite(value) && value >= min ? Math.floor(value) : fallback);
+
+/** Anything read from storage is checked: a damaged or edited deck must never break the page. */
+function cleanCard(raw, today) {
+  if (!raw || typeof raw !== 'object' || DECK_TYPES.indexOf(raw.type) === -1) return null;
+  const answers = clipList(raw.answers, DECK_LIMITS.answers, DECK_LIMITS.answer).filter(answer => answer.trim());
+  const prompt = clip(raw.prompt, DECK_LIMITS.prompt);
+  if (!prompt || !answers.length) return null;
+  let options = clipList(raw.options, DECK_LIMITS.options, DECK_LIMITS.option);
+  let choices = clipList(raw.choices, DECK_LIMITS.options, DECK_LIMITS.option);
+  if (raw.type === 'truefalse' && !options.length) options = ['True', 'False'];
+  if (raw.type === 'choice' && options.length < 2) return null;
+  if (raw.type === 'match' && choices.length < 2) return null;
+  const ensureAnswer = list => (list.some(entry => norm(entry) === norm(answers[0])) ? list : list.concat(answers[0]));
+  if (raw.type === 'choice' || raw.type === 'truefalse') options = ensureAnswer(options);
+  if (raw.type === 'match') choices = ensureAnswer(choices);
+  const id = typeof raw.id === 'string' && /^[a-z0-9]{2,24}$/.test(raw.id) ? raw.id : cardId(raw.type, prompt, answers);
+  return {
+    id,
+    type: raw.type,
+    prompt,
+    answers,
+    options: raw.type === 'choice' || raw.type === 'truefalse' ? options : [],
+    choices: raw.type === 'match' ? choices : [],
+    hint: clip(raw.hint, DECK_LIMITS.text),
+    explanation: clip(raw.explanation, DECK_LIMITS.text),
+    from: clip(raw.from, DECK_LIMITS.source),
+    box: Math.min(DECK_WAIT_DAYS.length, wholeNumber(raw.box, 1, 1)),
+    due: wholeNumber(raw.due, today, 0),
+    added: wholeNumber(raw.added, today, 0),
+    seen: wholeNumber(raw.seen, 0, 0),
+    right: wholeNumber(raw.right, 0, 0)
+  };
+}
+
+function sanitiseDeck(raw, today) {
+  const deck = emptyDeck();
+  if (!raw || typeof raw !== 'object' || !raw.cards || typeof raw.cards !== 'object') return deck;
+  deck.mastered = wholeNumber(raw.mastered, 0, 0);
+  Object.keys(raw.cards).forEach(key => {
+    const card = cleanCard(raw.cards[key], today);
+    if (card) deck.cards[card.id] = card;
+  });
+  return trimDeck(deck);
+}
+
+/* ---------- storage: the key only exists once the student has chosen to keep a deck ---------- */
+
+/** Returns the saved deck, or null when the student has not chosen to keep one. */
+function loadDeck(today, storage) {
+  storage = storage || localStorage;
+  let text = null;
+  try { text = storage.getItem(DECK_KEY); } catch (error) { return null; }
+  if (text === null) return null;
+  try { return sanitiseDeck(JSON.parse(text), today); } catch (error) { return emptyDeck(); }
+}
+
+/** Returns false when the browser would not store it (private mode or full storage). */
+function saveDeck(deck, storage) {
+  try { (storage || localStorage).setItem(DECK_KEY, JSON.stringify(deck)); return true; } catch (error) { return false; }
+}
+
+function deleteDeck(storage) {
+  try { (storage || localStorage).removeItem(DECK_KEY); } catch (error) { /* nothing to delete */ }
+}
+
+/*
+ * What Vocabloom keeps on a student's device besides their answers and the review deck:
+ * the worksheets they opened recently (a title and a link each), so the app can offer them again
+ * when it is opened from the home screen. Everything stays in this browser's local storage.
+ */
+
+const RECENT_KEY = 'vocabloom-recent1';
+const RECENT_MAX = 8;
+const RECENT_MAX_LINK_CHARS = 20000;
+const LOCAL_KEY_PREFIX = 'vocabloom';   // student answers (vocabloom3:...), the deck and the recent list
+
+/** Only worksheet links are ever kept or used as a link target: no other kind of address can get in. */
+const WORKSHEET_LINK = /^#(?:[sj]=[\w-]+|w=[A-Za-z0-9_-]{12})$/;
+
+/** Newest first, one entry per link, at most RECENT_MAX. Returns a new list. */
+function addRecent(list, title, link, now) {
+  if (!WORKSHEET_LINK.test(link) || link.length > RECENT_MAX_LINK_CHARS) return list.slice();
+  const entry = { title: String(title || 'Worksheet').slice(0, 120), link, at: now };
+  return [entry].concat(list.filter(known => known.link !== link)).slice(0, RECENT_MAX);
+}
+
+function cleanRecent(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(entry => entry && typeof entry.link === 'string' && WORKSHEET_LINK.test(entry.link) && entry.link.length <= RECENT_MAX_LINK_CHARS)
+    .map(entry => ({ title: String(entry.title || 'Worksheet').slice(0, 120), link: entry.link, at: Number.isFinite(entry.at) ? entry.at : 0 }))
+    .slice(0, RECENT_MAX);
+}
+
+function loadRecent(storage) {
+  try { return cleanRecent(JSON.parse((storage || localStorage).getItem(RECENT_KEY) || '[]')); } catch (error) { return []; }
+}
+
+function rememberRecent(title, link, now, storage) {
+  try { (storage || localStorage).setItem(RECENT_KEY, JSON.stringify(addRecent(loadRecent(storage), title, link, now))); } catch (error) { /* storage full or blocked */ }
+}
+
+/** "Clear everything on this device": answers, deck and recent list. Returns how many items were removed. */
+function clearLocalData(storage) {
+  storage = storage || localStorage;
+  const keys = [];
+  try {
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (key && key.indexOf(LOCAL_KEY_PREFIX) === 0) keys.push(key);
+    }
+    keys.forEach(key => storage.removeItem(key));
+  } catch (error) { /* storage blocked: nothing was kept */ }
+  return keys.length;
+}
+
+/** "Opened today", "Opened yesterday", "Opened 3 days ago". */
+function openedText(at, now) {
+  if (!at) return '';
+  const days = dayNumber(new Date(now)) - dayNumber(new Date(at));
+  if (days < 0) return '';
+  if (days === 0) return 'Opened today';
+  if (days === 1) return 'Opened yesterday';
+  return 'Opened ' + days + ' days ago';
+}
+
+/*
+ * Working offline. A service worker keeps the app and every worksheet a student has opened,
+ * and a bar at the bottom of the screen says so when the phone loses its connection.
+ */
+
+const OFFLINE_MESSAGES = {
+  student: 'You are offline. Your answers are still saved on this device.',
+  teacher: 'You are offline. Converting a PDF needs an internet connection.'
+};
+
+let offlineKind = 'student';
+let offlineBar = null;
+
+/** Service workers need a secure page (https), and localhost counts for testing. */
+function canUseServiceWorker() {
+  return 'serviceWorker' in navigator
+    && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+}
+
+function registerServiceWorker() {
+  if (!canUseServiceWorker()) return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* the app works without it */ });
+  });
+}
+
+function updateOfflineBar() {
+  if (!offlineBar) return;
+  offlineBar.textContent = OFFLINE_MESSAGES[offlineKind];
+  offlineBar.hidden = navigator.onLine !== false;
+}
+
+function watchConnection() {
+  offlineBar = document.createElement('div');
+  offlineBar.className = 'net';
+  offlineBar.setAttribute('role', 'status');
+  document.body.appendChild(offlineBar);
+  window.addEventListener('online', updateOfflineBar);
+  window.addEventListener('offline', updateOfflineBar);
+  updateOfflineBar();
+}
+
+/** kind: 'student' or 'teacher' */
+function setOfflineMessage(kind) {
+  offlineKind = kind;
+  updateOfflineBar();
+}
+
+/*
+ * What kind of device this is, used only to show the right tip. Nothing here is stored or sent anywhere.
+ * `win` is the browser window (or a stand-in in tests).
+ */
+
+/** iPhone, iPod and iPad. Since iPadOS 13 an iPad says it is a Mac, but it is the one "Mac" with a touch screen. */
+function isAppleTouchDevice(win) {
+  const nav = (win && win.navigator) || {};
+  const agent = String(nav.userAgent || '');
+  return /iPhone|iPad|iPod/.test(agent) || (/Macintosh/.test(agent) && Number(nav.maxTouchPoints) > 1);
+}
+
+/** True when the page was opened from the Home Screen icon and not from a browser tab. */
+function isInstalledApp(win) {
+  const nav = (win && win.navigator) || {};
+  if (nav.standalone === true) return true;
+  return Boolean(win && win.matchMedia && win.matchMedia('(display-mode: standalone)').matches);
+}
+
+/** iPhone and iPad have no "install" button, so a student has to be told about Share, then Add to Home Screen. */
+const needsHomeScreenHint = win => isAppleTouchDevice(win) && !isInstalledApp(win);
+
+const HOME_SCREEN_HINT = 'Tip: tap the Share button, then Add to Home Screen. Vocabloom then opens like an app, and Safari is less likely to clear your review deck if you do not visit for a while.';
+
+/*
  * Share links: the whole worksheet lives in the URL hash (compressed), so no database is needed.
  * The part after "#" is never sent to the server when a student opens the link.
  */
@@ -422,11 +1064,308 @@ async function unpack(hashText) {
 }
 
 /*
+ * QR code generator, written for Vocabloom (no libraries).
+ * Byte mode, error correction level M, versions 1 to 10: enough for a link of up to 213 characters.
+ * Pure functions: qrMatrix(text) gives a square list of rows (true = dark module), qrSvg(matrix) draws it.
+ * Layout and numbers follow ISO/IEC 18004; the tests check it against a known Reed-Solomon vector,
+ * and the output was decoded with an independent QR reader.
+ */
+
+const QR_MAX_VERSION = 10;
+const QR_ECC_PER_BLOCK = [10, 16, 26, 18, 24, 16, 18, 22, 22, 26];  // level M, versions 1..10
+const QR_BLOCKS = [1, 1, 1, 2, 2, 4, 4, 4, 5, 5];
+const QR_ALIGNMENT = [[], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]];
+const QR_FORMAT_LEVEL_M = 0;      // the two format bits that mean "level M"
+const QR_DARK = '#0B1D24';
+
+/* ---------- Reed-Solomon error correction over GF(256) ---------- */
+
+const GF_EXP = new Array(512);
+const GF_LOG = new Array(256);
+(function fillGaloisTables() {
+  let value = 1;
+  for (let i = 0; i < 255; i++) {
+    GF_EXP[i] = value;
+    GF_LOG[value] = i;
+    value <<= 1;
+    if (value & 0x100) value ^= 0x11D;
+  }
+  for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
+})();
+
+const gfMultiply = (a, b) => (a && b ? GF_EXP[GF_LOG[a] + GF_LOG[b]] : 0);
+
+/** The generator polynomial of the given degree: (x - a^0)(x - a^1)... with the leading 1 first. */
+function rsGenerator(degree) {
+  let poly = [1];
+  for (let i = 0; i < degree; i++) {
+    const next = new Array(poly.length + 1).fill(0);
+    poly.forEach((coefficient, j) => {
+      next[j] ^= coefficient;
+      next[j + 1] ^= gfMultiply(coefficient, GF_EXP[i]);
+    });
+    poly = next;
+  }
+  return poly;
+}
+
+/** The `ecLength` error correction codewords for a block of data codewords. */
+function rsRemainder(data, ecLength) {
+  const generator = rsGenerator(ecLength);
+  const work = data.concat(new Array(ecLength).fill(0));
+  for (let i = 0; i < data.length; i++) {
+    const factor = work[i];
+    if (!factor) continue;
+    for (let j = 1; j < generator.length; j++) work[i + j] ^= gfMultiply(generator[j], factor);
+  }
+  return work.slice(data.length);
+}
+
+/* ---------- sizes ---------- */
+
+/** Bits that can hold data or error correction in a version (everything except the fixed patterns). */
+function qrRawModules(version) {
+  let modules = (16 * version + 128) * version + 64;
+  if (version >= 2) {
+    const align = Math.floor(version / 7) + 2;
+    modules -= (25 * align - 10) * align - 55;
+    if (version >= 7) modules -= 36;
+  }
+  return modules;
+}
+
+const qrDataCodewords = version => Math.floor(qrRawModules(version) / 8) - QR_ECC_PER_BLOCK[version - 1] * QR_BLOCKS[version - 1];
+const qrCountBits = version => (version < 10 ? 8 : 16);
+
+function qrVersionFor(byteLength) {
+  for (let version = 1; version <= QR_MAX_VERSION; version++) {
+    if (4 + qrCountBits(version) + 8 * byteLength <= qrDataCodewords(version) * 8) return version;
+  }
+  throw new Error('Too long for a QR code');
+}
+
+/* ---------- data codewords ---------- */
+
+function qrDataBits(bytes, version) {
+  const bits = [];
+  const push = (value, count) => { for (let i = count - 1; i >= 0; i--) bits.push((value >>> i) & 1); };
+  push(0b0100, 4);                       // byte mode
+  push(bytes.length, qrCountBits(version));
+  bytes.forEach(byte => push(byte, 8));
+  const capacity = qrDataCodewords(version) * 8;
+  push(0, Math.min(4, capacity - bits.length));   // terminator
+  while (bits.length % 8) bits.push(0);
+  const codewords = [];
+  for (let i = 0; i < bits.length; i += 8) codewords.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+  for (let pad = 0xEC; codewords.length < qrDataCodewords(version); pad ^= 0xEC ^ 0x11) codewords.push(pad);
+  return codewords;
+}
+
+/** Splits the data into blocks, adds error correction to each, and interleaves them. */
+function qrInterleave(data, version) {
+  const blockCount = QR_BLOCKS[version - 1];
+  const ecLength = QR_ECC_PER_BLOCK[version - 1];
+  const rawCodewords = Math.floor(qrRawModules(version) / 8);
+  const shortBlocks = blockCount - (rawCodewords % blockCount);
+  const shortLength = Math.floor(rawCodewords / blockCount);
+  const dataBlocks = [];
+  let start = 0;
+  for (let i = 0; i < blockCount; i++) {
+    const length = shortLength - ecLength + (i < shortBlocks ? 0 : 1);
+    dataBlocks.push(data.slice(start, start + length));
+    start += length;
+  }
+  const ecBlocks = dataBlocks.map(block => rsRemainder(block, ecLength));
+  const out = [];
+  for (let i = 0; i < shortLength - ecLength + 1; i++) dataBlocks.forEach(block => { if (i < block.length) out.push(block[i]); });
+  for (let i = 0; i < ecLength; i++) ecBlocks.forEach(block => out.push(block[i]));
+  return out;
+}
+
+/* ---------- the grid ---------- */
+
+const bitOf = (value, index) => (value >>> index) & 1;
+
+const QR_MASKS = [
+  (x, y) => (x + y) % 2 === 0,
+  (x, y) => y % 2 === 0,
+  (x, y) => x % 3 === 0,
+  (x, y) => (x + y) % 3 === 0,
+  (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
+  (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+  (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0,
+  (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
+];
+
+function qrGrid(version, codewords) {
+  const size = 17 + 4 * version;
+  const dark = Array.from({ length: size }, () => new Array(size).fill(false));
+  const fixed = Array.from({ length: size }, () => new Array(size).fill(false));
+  const set = (x, y, value) => { dark[y][x] = !!value; fixed[y][x] = true; };
+
+  // Timing lines, finder patterns (with their white borders) and alignment patterns.
+  for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+  [[3, 3], [size - 4, 3], [3, size - 4]].forEach(([cx, cy]) => {
+    for (let dy = -4; dy <= 4; dy++) {
+      for (let dx = -4; dx <= 4; dx++) {
+        const x = cx + dx, y = cy + dy, ring = Math.max(Math.abs(dx), Math.abs(dy));
+        if (x >= 0 && x < size && y >= 0 && y < size) set(x, y, ring !== 2 && ring !== 4);
+      }
+    }
+  });
+  const places = QR_ALIGNMENT[version - 1];
+  places.forEach((cy, i) => places.forEach((cx, j) => {
+    const onFinder = (i === 0 && j === 0) || (i === 0 && j === places.length - 1) || (i === places.length - 1 && j === 0);
+    if (onFinder) return;
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(cx + dx, cy + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+  }));
+
+  // Version information (versions 7 and up).
+  if (version >= 7) {
+    let rest = version;
+    for (let i = 0; i < 12; i++) rest = (rest << 1) ^ ((rest >>> 11) * 0x1F25);
+    const bits = (version << 12) | rest;
+    for (let i = 0; i < 18; i++) {
+      const a = size - 11 + (i % 3), b = Math.floor(i / 3);
+      set(a, b, bitOf(bits, i));
+      set(b, a, bitOf(bits, i));
+    }
+  }
+
+  /** Writes the 15 format bits (error level + mask), twice, and the always-dark module. */
+  function drawFormat(mask) {
+    const data = (QR_FORMAT_LEVEL_M << 3) | mask;
+    let rest = data;
+    for (let i = 0; i < 10; i++) rest = (rest << 1) ^ ((rest >>> 9) * 0x537);
+    const bits = ((data << 10) | rest) ^ 0x5412;
+    for (let i = 0; i <= 5; i++) set(8, i, bitOf(bits, i));
+    set(8, 7, bitOf(bits, 6));
+    set(8, 8, bitOf(bits, 7));
+    set(7, 8, bitOf(bits, 8));
+    for (let i = 9; i < 15; i++) set(14 - i, 8, bitOf(bits, i));
+    for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bitOf(bits, i));
+    for (let i = 8; i < 15; i++) set(8, size - 15 + i, bitOf(bits, i));
+    set(8, size - 8, true);
+  }
+  drawFormat(0);   // reserves the format areas so the data skips them
+
+  // Data bits, in the zigzag order of the standard.
+  let bit = 0;
+  const totalBits = codewords.length * 8;
+  for (let right = size - 1; right >= 1; right -= 2) {
+    if (right === 6) right = 5;
+    for (let step = 0; step < size; step++) {
+      for (let side = 0; side < 2; side++) {
+        const x = right - side;
+        const y = ((right + 1) & 2) === 0 ? size - 1 - step : step;
+        if (!fixed[y][x] && bit < totalBits) {
+          dark[y][x] = bitOf(codewords[bit >>> 3], 7 - (bit & 7)) === 1;
+          bit++;
+        }
+      }
+    }
+  }
+
+  const applyMask = mask => {
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fixed[y][x] && QR_MASKS[mask](x, y)) dark[y][x] = !dark[y][x];
+  };
+
+  // Try all eight masks and keep the one the standard scores best (fewest hard-to-scan patterns).
+  let best = { mask: 0, penalty: Infinity };
+  for (let mask = 0; mask < 8; mask++) {
+    applyMask(mask);
+    drawFormat(mask);
+    const penalty = qrPenalty(dark);
+    if (penalty < best.penalty) best = { mask, penalty };
+    applyMask(mask);
+  }
+  applyMask(best.mask);
+  drawFormat(best.mask);
+  return dark;
+}
+
+/** The standard's four penalty rules: long runs, 2x2 blocks, finder-like patterns, and dark/light balance. */
+function qrPenalty(grid) {
+  const size = grid.length;
+  let score = 0;
+  const lines = [];
+  for (let i = 0; i < size; i++) {
+    lines.push(grid[i].slice());
+    lines.push(grid.map(row => row[i]));
+  }
+  lines.forEach(line => {
+    let run = 1;
+    for (let i = 1; i <= size; i++) {
+      if (i < size && line[i] === line[i - 1]) run++;
+      else { if (run >= 5) score += 3 + (run - 5); run = 1; }
+    }
+    // 1:1:3:1:1 with four light modules on one side (looks like a finder pattern).
+    for (let i = 0; i + 11 <= size; i++) {
+      const pattern = line.slice(i, i + 11).map(Number).join('');
+      if (pattern === '10111010000' || pattern === '00001011101') score += 40;
+    }
+  });
+  for (let y = 0; y + 1 < size; y++) {
+    for (let x = 0; x + 1 < size; x++) {
+      const colour = grid[y][x];
+      if (grid[y][x + 1] === colour && grid[y + 1][x] === colour && grid[y + 1][x + 1] === colour) score += 3;
+    }
+  }
+  const darkCount = grid.reduce((sum, row) => sum + row.filter(Boolean).length, 0);
+  score += (Math.ceil(Math.abs(darkCount * 20 - size * size * 10) / (size * size)) - 1) * 10;
+  return score;
+}
+
+/** The QR code for a text, as rows of booleans. Throws when the text is too long for versions 1 to 10. */
+function qrMatrix(text) {
+  const bytes = Array.from(new TextEncoder().encode(String(text)));
+  const version = qrVersionFor(bytes.length);
+  return qrGrid(version, qrInterleave(qrDataBits(bytes, version), version));
+}
+
+/* ---------- drawing ---------- */
+
+const QR_QUIET_ZONE = 4;   // the standard asks for four light modules all around
+
+/** A self-contained SVG: dark modules as one path, on a white square. */
+function qrSvg(matrix) {
+  const size = matrix.length;
+  const total = size + QR_QUIET_ZONE * 2;
+  let path = '';
+  matrix.forEach((row, y) => {
+    for (let x = 0; x < size;) {
+      if (!row[x]) { x++; continue; }
+      let end = x;
+      while (end < size && row[end]) end++;
+      path += 'M' + (x + QR_QUIET_ZONE) + ' ' + (y + QR_QUIET_ZONE) + 'h' + (end - x) + 'v1h-' + (end - x) + 'z';
+      x = end;
+    }
+  });
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + total + ' ' + total + '" shape-rendering="crispEdges" role="img" aria-label="QR code">'
+    + '<rect width="' + total + '" height="' + total + '" fill="#fff"/><path d="' + path + '" fill="' + QR_DARK + '"/></svg>';
+}
+
+/** Draws the code on a canvas (white background, quiet zone included) at roughly `pixels` wide. */
+function qrDrawCanvas(canvas, matrix, pixels) {
+  const total = matrix.length + QR_QUIET_ZONE * 2;
+  const scale = Math.max(1, Math.ceil(pixels / total));
+  canvas.width = canvas.height = total * scale;
+  const context = canvas.getContext('2d');
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = QR_DARK;
+  matrix.forEach((row, y) => row.forEach((on, x) => {
+    if (on) context.fillRect((x + QR_QUIET_ZONE) * scale, (y + QR_QUIET_ZONE) * scale, scale, scale);
+  }));
+}
+
+/*
  * Download a worksheet as one self-contained .html file.
  * The page re-reads its own source (captured before anything is drawn) and swaps in the worksheet data.
  */
 
-const PAGE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+// The app's install links are left out of a downloaded file: it is not part of the website.
+const PAGE_SOURCE = ('<!DOCTYPE html>\n' + document.documentElement.outerHTML).replace(/<link rel="(?:manifest|apple-touch-icon)"[^>]*>\n?/g, '');
 const DATA_TAG_OPEN = '<script id="ws-data" type="application/json">';
 const SCRIPT_CLOSE = '</' + 'script>';
 
@@ -439,8 +1378,12 @@ function buildStandalonePage(worksheet) {
 }
 
 function downloadTextFile(name, text) {
+  downloadBlob(name, new Blob([text], { type: 'text/html' }));
+}
+
+function downloadBlob(name, blob) {
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([text], { type: 'text/html' }));
+  link.href = URL.createObjectURL(blob);
   link.download = name;
   document.body.appendChild(link);
   link.click();
@@ -465,7 +1408,8 @@ function freshStudentState() {
     wrongAttempts: {},   // id -> number of different wrong answers
     everWrong: {},       // id -> true once a wrong answer was given
     lastWrongAnswer: {}, // id -> the last wrong answer, to avoid counting the same one twice
-    practiceSkipped: false
+    practiceSkipped: false,
+    deckDismissed: false   // "No thanks" to keeping the mistakes in the review deck
   };
 }
 
@@ -517,7 +1461,9 @@ function buildItemIndex(worksheet) {
 
 /* HTML for the student worksheet. Everything dynamic is escaped with esc(). */
 
-const NO_AUTOFILL = 'autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"';
+/* An answer field: no suggestions or auto-correction (it would change the answer), and the iPhone's return key reads "done"
+   because pressing it checks the answer and closes the keyboard. */
+const NO_AUTOFILL = 'autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"';
 
 const tipHtml = (icon, text) => (text ? '<div class="tip">' + icon + ' ' + esc(text) + '</div>' : '');
 
@@ -540,18 +1486,27 @@ function fillPromptHtml(item, fieldAttrs) {
 const shortInputHtml = (attrs, placeholder) =>
   '<input type="text" ' + attrs + ' ' + NO_AUTOFILL + ' placeholder="' + placeholder + '" aria-label="Your answer">';
 
+/** Short options (True / False, single words) are drawn side by side on wide screens. */
+const SHORT_OPTION_CHARS = 24;
+
 const choiceButtonsHtml = (item, attrs) =>
-  '<div class="opts">' + item.options.map(option => '<button class="opt" ' + attrs + ' data-v="' + esc(option) + '">' + esc(option) + '</button>').join('') + '</div>';
+  '<div class="opts' + (item.options.every(option => option.length <= SHORT_OPTION_CHARS) ? ' short' : '') + '">' + item.options.map(option => '<button class="opt" ' + attrs + ' data-v="' + esc(option) + '">' + esc(option) + '</button>').join('') + '</div>';
 
 const matchSelectHtml = (options, attrs) =>
   '<select ' + attrs + ' aria-label="Choose the match"><option value="">Choose&hellip;</option>' + options.map(option => '<option>' + esc(option) + '</option>').join('') + '</select>';
 
+/** The round "listen" button. It floats to the right of the text it reads. */
+const listenButtonHtml = (attrs, label) =>
+  '<button class="say" ' + attrs + ' aria-label="' + label + '" aria-pressed="false">&#128266;</button>';
+
 /* ---------- one question card ---------- */
 
-function questionCardHtml(entry, matchOptions) {
+/** `view.listen` is true when the browser can read text aloud. */
+function questionCardHtml(entry, matchOptions, view) {
   const { id, item, section, itemIndex, scored } = entry;
+  const say = view.listen ? listenButtonHtml('data-act="say" data-id="' + id + '"', 'Listen to the question') : '';
   const number = '<b>' + (itemIndex + 1) + '.</b> ';
-  const prompt = '<div class="q">' + number + esc(item.prompt) + '</div>';
+  const prompt = '<div class="q">' + say + number + esc(item.prompt) + '</div>';
   const feedback = '<div class="msg" id="m-' + id + '" aria-live="polite"></div>';
   const buttons = scored
     ? '<div class="row" style="margin-top:6px"><button data-act="check" data-id="' + id + '">&#10003; Check</button><button class="sec" data-act="hint" data-id="' + id + '" aria-label="Hint">&#128161;</button></div>'
@@ -560,7 +1515,7 @@ function questionCardHtml(entry, matchOptions) {
 
   switch (section.type) {
     case 'fill':
-      return card('<div class="q">' + number + fillPromptHtml(item, k => 'data-id="' + id + '" data-k="' + k + '"') + '</div>' + buttons + feedback);
+      return card('<div class="q">' + say + number + fillPromptHtml(item, k => 'data-id="' + id + '" data-k="' + k + '"') + '</div>' + buttons + feedback);
     case 'short':
       return card(prompt + shortInputHtml('data-id="' + id + '" data-k="0"', scored ? 'Type your answer' : 'Your answer') + buttons + feedback);
     case 'open':
@@ -577,77 +1532,112 @@ function questionCardHtml(entry, matchOptions) {
 
 /* ---------- sections and the whole page ---------- */
 
-function sectionHtml(section, sectionIndex, index) {
+/** With read-aloud, each word in the bank can be tapped to hear it. */
+function wordChipHtml(word, listen) {
+  const speak = listen ? ' data-act="say-word" role="button" tabindex="0" aria-pressed="false" aria-label="Listen to ' + esc(word) + '"' : '';
+  return '<span class="chip" data-w="' + esc(norm(word)) + '"' + speak + '>' + esc(word) + '</span>';
+}
+
+function sectionHtml(section, sectionIndex, index, view) {
   const wordBank = section.wordBank.length
-    ? '<details class="bank"><summary>Word bank (' + section.wordBank.length + ')</summary><div class="chips">'
-      + section.wordBank.map(word => '<span class="chip" data-w="' + esc(norm(word)) + '">' + esc(word) + '</span>').join('') + '</div></details>'
+    ? '<details class="bank"><summary>Word bank (' + section.wordBank.length + ')</summary>'
+      + (view.listen ? '<p class="sub" style="margin:8px 0 0">Tap a word to hear it.</p>' : '')
+      + '<div class="chips">' + section.wordBank.map(word => wordChipHtml(word, view.listen)).join('') + '</div></details>'
     : '';
-  const cards = section.items.map((item, itemIndex) => questionCardHtml(index.items[itemId(sectionIndex, itemIndex)], index.matchOptions)).join('');
+  const passageSay = view.listen ? listenButtonHtml('data-act="say-passage" data-s="' + sectionIndex + '"', 'Listen to the text') : '';
+  const cards = section.items.map((item, itemIndex) => questionCardHtml(index.items[itemId(sectionIndex, itemIndex)], index.matchOptions, view)).join('');
   return '<div class="pl" id="sec-' + sectionIndex + '"><h3>' + esc(section.title || ('Exercise ' + (sectionIndex + 1))) + '</h3>'
     + (section.instructions ? '<p class="sub">' + esc(section.instructions) + '</p>' : '')
-    + (section.passage ? '<div class="passage">' + esc(section.passage) + '</div>' : '')
+    + (section.passage ? '<div class="passage">' + passageSay + esc(section.passage) + '</div>' : '')
     + wordBank + cards + '</div>';
 }
 
-function playerHtml(worksheet, index) {
+/** `view` = { listen, home }: read-aloud is available / the student's home page can be linked to. */
+function playerHtml(worksheet, index, view) {
   const hasScore = index.scoredIds.length > 0;
   const privacyLink = location.protocol === 'file:' ? '' : ' &middot; <a href="privacy.html">Privacy</a>';
+  const homeLink = view.home ? ' &middot; <a href="#review">My review deck</a>' : '';
   return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(worksheet.title) + '</h1></div>'
-    + '<div class="namebar" style="max-width:720px;margin:0 auto"><input id="sname" type="text" placeholder="Your name" autocomplete="name" aria-label="Your name"><span class="date">' + new Date().toLocaleDateString('en-GB') + '</span></div>'
+    + '<div class="namebar"><input id="sname" type="text" placeholder="Your name" autocomplete="name" aria-label="Your name"><span class="date">' + new Date().toLocaleDateString('en-GB') + '</span></div>'
     + (hasScore ? '<div class="bar"><div class="t"><span>Score</span><span id="score"></span></div><div class="prog"><i id="pb"></i></div></div>' : '<div style="height:6px"></div>')
-    + worksheet.sections.map((section, sectionIndex) => sectionHtml(section, sectionIndex, index)).join('')
-    + '<div class="pl"><div id="mist"></div><div id="prac"></div>'
+    + worksheet.sections.map((section, sectionIndex) => sectionHtml(section, sectionIndex, index, view)).join('')
+    + '<div class="pl"><div id="mist"></div><div id="prac"></div><div id="deck"></div>'
     + '<div class="final" id="final" aria-live="polite"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
     + '<div class="actions"><button class="sec" data-act="reset">Start over</button>' + (hasScore ? '<button data-act="all">Check all</button>' : '') + '</div>'
-    + '<p class="foot">Made with Vocabloom' + privacyLink + '<br>Hints and explanations may be written with the help of AI.</p></div>';
+    + '<p class="foot">Made with Vocabloom' + privacyLink + homeLink + '<br>Hints and explanations may be written with the help of AI.</p></div>';
 }
 
 /*
- * Optional "Practise your mistakes".
- * Re-asks, one at a time, the same questions from the PDF that the student got wrong.
- * It never changes the score and the student can skip it at any moment.
+ * A one-question-at-a-time runner. It is used twice:
+ *   - "Practise your mistakes" on a worksheet: optional, and it never changes the score;
+ *   - the review deck (deck-panel.js): the same questions, kept on this device, asked again on later days.
+ * The student can skip or stop at any moment.
  *
  * ctx = {
- *   root, index,            where to draw, and the item index
- *   mistakeIds(),           ids the student got wrong at some point
+ *   root, panel, prefix,    where to draw, the container's selector, and the prefix of its action names and ids
+ *   index,                  the question index (or a function that builds it when a run starts)
+ *   ids(),                  the question ids to ask, in order
  *   hintFor(id),            hint text for an id
- *   isSkipped(), markSkipped()
+ *   idleHtml?(count),       what to show before a run (default: the "Practise your mistakes?" offer)
+ *   isClosed?(),            true when the student already said "no thanks"
+ *   onClose?(),             the student pressed the close / skip button
+ *   afterClose?,            mode to go to after that: 'closed' (default) or 'idle'
+ *   onResult?(id, right),   a question was settled: `right` is true only when it was right at the first try
+ *   speak?(text, button),   read-aloud; leave out to hide the listen button
+ *   copy?                   texts, see PRACTICE_COPY; copy.done receives { asked, right, firstTime }
  * }
  */
 
 const MAX_PRACTICE_TRIES = 3;
 
-function createPractice(ctx) {
-  const { root, index } = ctx;
-  const run = { mode: ctx.isSkipped() ? 'closed' : 'idle', ids: [], position: 0, fixed: 0, tries: 0, resolved: false, picked: '' };
+const PRACTICE_COPY = {
+  offerTitle: 'Practise your mistakes?',
+  offer: count => 'Optional. Try the ' + count + ' question' + (count === 1 ? '' : 's') + ' you got wrong again, one at a time. It will not change your score.',
+  start: 'Practise now',
+  skip: 'No thanks, skip',
+  running: 'Practice',
+  doneTitle: 'Practice complete',
+  done: result => result.right + ' of ' + result.asked + ' fixed. Well done for going back over them!',
+  close: 'Close'
+};
 
-  const panel = () => $('#prac', root);
-  const message = () => $('#pmsg', root);
-  const currentEntry = () => index.items[run.ids[run.position]];
+function createPractice(ctx) {
+  const { root, prefix } = ctx;
+  const copy = Object.assign({}, PRACTICE_COPY, ctx.copy || {});
+  const fieldAttr = 'data-' + prefix + 'k';
+  const act = name => prefix + '-' + name;
+  const run = { mode: ctx.isClosed && ctx.isClosed() ? 'closed' : 'idle', ids: [], index: null, position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '' };
+  const result = () => ({ asked: run.ids.length, right: run.fixed, firstTime: run.firstTime });
+
+  const panel = () => $(ctx.panel, root);
+  const message = () => $('#' + prefix + 'msg', root);
+  const currentEntry = () => run.index.items[run.ids[run.position]];
+  const buildIndex = () => (typeof ctx.index === 'function' ? ctx.index() : ctx.index);
 
   /* ---------- drawing ---------- */
 
   function offerHtml(count) {
-    return '<div class="card prac"><h3 style="margin:0 0 4px">Practise your mistakes?</h3>'
-      + '<p class="sub" style="margin:0 0 10px">Optional. Try the ' + count + ' question' + (count === 1 ? '' : 's') + ' you got wrong again, one at a time. It will not change your score.</p>'
-      + '<div class="actions" style="margin:0"><button data-act="p-start">Practise now</button><button class="sec" data-act="p-skip">No thanks, skip</button></div></div>';
+    return '<div class="card prac"><h3 style="margin:0 0 4px">' + esc(copy.offerTitle) + '</h3>'
+      + '<p class="sub" style="margin:0 0 10px">' + esc(copy.offer(count)) + '</p>'
+      + '<div class="actions" style="margin:0"><button data-act="' + act('start') + '">' + esc(copy.start) + '</button><button class="sec" data-act="' + act('skip') + '">' + esc(copy.skip) + '</button></div></div>';
   }
 
   function doneHtml() {
-    return '<div class="card prac ok"><h3 style="margin:0 0 4px">Practice complete</h3>'
-      + '<p style="margin:0 0 10px">' + run.fixed + ' of ' + run.ids.length + ' fixed. Well done for going back over them!</p>'
-      + '<div class="actions" style="margin:0"><button class="sec" data-act="p-skip">Close</button></div></div>';
+    return '<div class="card prac ok"><h3 style="margin:0 0 4px">' + esc(copy.doneTitle) + '</h3>'
+      + '<p style="margin:0 0 10px">' + esc(copy.done(result())) + '</p>'
+      + '<div class="actions" style="margin:0"><button class="sec" data-act="' + act('skip') + '">' + esc(copy.close) + '</button></div></div>';
   }
 
   function questionHtml(entry) {
     const { item, section } = entry;
-    const prompt = '<div class="q">' + esc(item.prompt) + '</div>';
+    const say = ctx.speak ? listenButtonHtml('data-act="' + act('say') + '"', 'Listen to the question') : '';
+    const prompt = '<div class="q">' + say + esc(item.prompt) + '</div>';
     switch (section.type) {
-      case 'fill': return '<div class="q">' + fillPromptHtml(item, k => 'data-pk="' + k + '"') + '</div>';
-      case 'short': return prompt + shortInputHtml('data-pk="0"', 'Type your answer');
+      case 'fill': return '<div class="q">' + say + fillPromptHtml(item, k => fieldAttr + '="' + k + '"') + '</div>';
+      case 'short': return prompt + shortInputHtml(fieldAttr + '="0"', 'Type your answer');
       case 'choice':
-      case 'truefalse': return prompt + choiceButtonsHtml(item, 'data-act="p-pick"');
-      case 'match': return prompt + matchSelectHtml(index.matchOptions[entry.sectionIndex], 'data-pk="0"');
+      case 'truefalse': return prompt + choiceButtonsHtml(item, 'data-act="' + act('pick') + '"');
+      case 'match': return prompt + matchSelectHtml(run.index.matchOptions[entry.sectionIndex], fieldAttr + '="0"');
       default: return '';
     }
   }
@@ -655,10 +1645,11 @@ function createPractice(ctx) {
   function runningHtml() {
     const entry = currentEntry();
     const where = entry.section.title || ('Exercise ' + (entry.sectionIndex + 1));
-    return '<div class="card prac"><div class="sub" style="margin:0 0 6px">Practice &middot; question ' + (run.position + 1) + ' of ' + run.ids.length + ' &middot; ' + esc(where) + '</div>'
-      + questionHtml(entry) + '<div class="msg" id="pmsg" aria-live="polite"></div>'
-      + '<div class="row" style="margin-top:8px"><button data-act="p-check" id="pchk">&#10003; Check</button><button class="sec" data-act="p-hint">&#128161; Hint</button><button data-act="p-next" id="pnext" style="display:none">Next &rarr;</button></div>'
-      + '<div class="actions" style="margin:10px 0 0"><button class="ghost" data-act="p-skipq">Skip this question</button><button class="ghost" data-act="p-end">Stop practice</button></div></div>';
+    return '<div class="card prac">'
+      + '<div class="sub" style="margin:0 0 6px">' + esc(copy.running) + ' &middot; question ' + (run.position + 1) + ' of ' + run.ids.length + ' &middot; ' + esc(where) + '</div>'
+      + questionHtml(entry) + '<div class="msg" id="' + prefix + 'msg" aria-live="polite"></div>'
+      + '<div class="row" style="margin-top:8px"><button data-act="' + act('check') + '" id="' + prefix + 'chk">&#10003; Check</button><button class="sec" data-act="' + act('hint') + '">&#128161; Hint</button><button data-act="' + act('next') + '" id="' + prefix + 'next" style="display:none">Next &rarr;</button></div>'
+      + '<div class="actions" style="margin:10px 0 0"><button class="ghost" data-act="' + act('skipq') + '">Skip this question</button><button class="ghost" data-act="' + act('end') + '">Stop</button></div></div>';
   }
 
   function render() {
@@ -668,24 +1659,26 @@ function createPractice(ctx) {
     else if (run.mode === 'done') box.innerHTML = doneHtml();
     else if (run.mode === 'run') box.innerHTML = runningHtml();
     else {
-      const count = ctx.mistakeIds().length;
-      box.innerHTML = count ? offerHtml(count) : '';
+      const count = ctx.ids().length;
+      box.innerHTML = ctx.idleHtml ? ctx.idleHtml(count) : (count ? offerHtml(count) : '');
     }
   }
 
   /* ---------- answering ---------- */
 
   function readValue() {
-    const fields = [].slice.call(panel().querySelectorAll('[data-pk]'));
+    const fields = [].slice.call(panel().querySelectorAll('[' + fieldAttr + ']'));
     const type = currentEntry().section.type;
     if (type === 'fill' || type === 'short') return fields.map(field => field.value);
     return fields.length ? fields[0].value : run.picked;
   }
 
-  function finishQuestion() {
+  /** The question is settled (right, or the answer was shown): show "Next" and tell the owner how it went. */
+  function finishQuestion(rightFirstTime) {
     run.resolved = true;
-    $('#pnext', root).style.display = '';
-    $('#pchk', root).style.display = 'none';
+    $('#' + prefix + 'next', root).style.display = '';
+    $('#' + prefix + 'chk', root).style.display = 'none';
+    if (ctx.onResult) ctx.onResult(currentEntry().id, rightFirstTime);
   }
 
   /** Returns true when the answer was right, false when wrong, null when nothing was entered. */
@@ -702,15 +1695,16 @@ function createPractice(ctx) {
     run.tries += 1;
     if (isCorrect(type, entry.item, value)) {
       run.fixed += 1;
+      if (run.tries === 1) run.firstTime += 1;
       box.className = 'msg ok';
       box.innerHTML = 'Correct, well done!' + tipHtml('📘', entry.item.explanation);
-      finishQuestion();
+      finishQuestion(run.tries === 1);
       return true;
     }
     box.className = 'msg bad';
     if (run.tries >= MAX_PRACTICE_TRIES) {
       box.innerHTML = 'Answer: <b>' + esc(answerText(type, entry.item)) + '</b>' + tipHtml('📘', entry.item.explanation);
-      finishQuestion();
+      finishQuestion(false);
     } else {
       box.innerHTML = 'Not quite. Have another go.' + tipHtml('💡', ctx.hintFor(entry.id)) + (run.tries >= 2 ? tipHtml('📘', entry.item.explanation) : '');
     }
@@ -727,8 +1721,9 @@ function createPractice(ctx) {
   }
 
   function start() {
-    run.ids = ctx.mistakeIds().slice();
-    Object.assign(run, { position: 0, fixed: 0, tries: 0, resolved: false, picked: '', mode: run.ids.length ? 'run' : 'idle' });
+    run.ids = ctx.ids().slice();
+    run.index = buildIndex();
+    Object.assign(run, { position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', mode: run.ids.length ? 'run' : 'idle' });
     render();
     const box = panel();
     if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -749,51 +1744,223 @@ function createPractice(ctx) {
     box.textContent = hint ? '💡 ' + hint : 'No hint for this one.';
   }
 
+  function listen(button) {
+    const entry = currentEntry();
+    ctx.speak(spokenText(entry.section.type, entry.item, run.resolved), button);
+  }
+
   /* ---------- events from the player ---------- */
 
   const actions = {
-    'p-start': start,
-    'p-skip': () => { run.mode = 'closed'; ctx.markSkipped(); render(); },
-    'p-end': () => { run.mode = 'idle'; render(); },
-    'p-check': () => check(readValue()),
-    'p-pick': pickOption,
-    'p-hint': showHint,
-    'p-next': nextQuestion,
-    'p-skipq': nextQuestion
+    start,
+    skip: () => { run.mode = ctx.afterClose || 'closed'; if (ctx.onClose) ctx.onClose(); render(); },
+    end: () => { run.mode = 'idle'; render(); },
+    check: () => check(readValue()),
+    pick: pickOption,
+    hint: showHint,
+    next: nextQuestion,
+    skipq: nextQuestion,
+    say: listen
   };
+  const own = {};
+  Object.keys(actions).forEach(name => { own[act(name)] = actions[name]; });
 
   return {
     render,
     isRunning: () => run.mode === 'run',
-    /** Returns true when the click belonged to the practice panel. */
+    /** Returns true when the click belonged to this panel. */
     handleAction(action, button) {
-      if (!actions[action]) return false;
-      actions[action](button);
+      if (!own[action]) return false;
+      own[action](button);
       return true;
     },
-    /** A drop-down inside the practice panel changed. Returns true when it was handled. */
+    /** A drop-down inside this panel changed. Returns true when it was handled. */
     handleChange(target) {
-      if (target.tagName !== 'SELECT' || target.dataset.pk === undefined) return false;
+      if (target.tagName !== 'SELECT' || target.getAttribute(fieldAttr) === null) return false;
       check(target.value);
       return true;
     },
-    /** Enter pressed inside a practice field. Returns true when it was handled. */
+    /** Enter pressed inside one of this panel's fields. Returns true when it was handled. */
     handleEnter(target) {
-      if (target.tagName !== 'INPUT' || target.dataset.pk === undefined) return false;
+      if (target.tagName !== 'INPUT' || target.getAttribute(fieldAttr) === null) return false;
       check(readValue());
       return true;
+    },
+    /** How the last run went. */
+    result
+  };
+}
+
+/*
+ * The review-deck panel. It is drawn under "Your mistakes" in a worksheet and on the student's home page.
+ *   - offers to keep the student's mistakes on this device (nothing is saved until they say yes);
+ *   - shows what is ready to review today;
+ *   - runs a review round with the same one-question-at-a-time runner as "Practise your mistakes".
+ * Nothing here is ever sent anywhere.
+ *
+ * options = {
+ *   root, panel,        where to draw (the panel's selector, for example '#deck')
+ *   enabled?,           false in the teacher's preview: nothing is offered, read or saved
+ *   source,             the worksheet title, kept with each card so students know where it came from
+ *   mistakes?(),        the questions answered wrongly right now, as [{ type, item, choices }] (worksheet only)
+ *   isDismissed?(), onDismiss?(),   remembers "No thanks" for this worksheet
+ *   speak?(text, button)            read-aloud
+ * }
+ */
+
+const CLEAR_CONFIRM_MS = 3000;
+
+const questionWord = count => (count === 1 ? 'question' : 'questions');
+
+function createDeckPanel(options) {
+  const { root } = options;
+  const today = () => dayNumber(new Date());
+  const enabled = options.enabled !== false;
+  let deck = enabled ? loadDeck(today()) : null;   // null until the student chooses to keep a deck
+  let snapshot = null;                   // the cards being asked in the current round
+  let clearArmedAt = 0;
+  let problem = '';
+
+  const inWorksheet = typeof options.mistakes === 'function';
+  const mistakes = () => (inWorksheet ? options.mistakes() : []);
+  const cardFor = source => makeCard(source.type, source.item, options.source || '', source.choices, today());
+
+  function persist() {
+    if (!deck || saveDeck(deck)) return true;
+    problem = 'Your browser would not save anything on this device, so the review deck could not be kept.';
+    return false;
+  }
+
+  /* ---------- what the panel shows when no round is running ---------- */
+
+  function offerHtml(count) {
+    return '<div class="card deck"><h3 style="margin:0 0 4px">Review these again later?</h3>'
+      + '<p class="sub" style="margin:0 0 10px">Vocabloom can keep the ' + count + ' ' + questionWord(count) + ' you got wrong on this device and bring ' + (count === 1 ? 'it' : 'them') + ' back tomorrow, then after 3, 7, 14 and 30 days as you get ' + (count === 1 ? 'it' : 'them') + ' right. Nothing is sent anywhere, and you can delete it at any time.</p>'
+      + (problem ? '<div class="msg bad">' + esc(problem) + '</div>' : '')
+      + '<div class="actions" style="margin:0"><button data-act="d-save">Save to my review deck</button><button class="sec" data-act="d-no">No thanks</button></div></div>';
+  }
+
+  function emptyHomeHtml() {
+    return '<div class="card deck"><h3 style="margin:0 0 4px">Your review deck</h3>'
+      + '<p class="sub" style="margin:0">Nothing here yet. When you get a question wrong on a worksheet, you can keep it here and practise it again on later days. It is saved only on this device.</p></div>';
+  }
+
+  function statusHtml() {
+    const stats = deckStats(deck, today());
+    const keptFromHere = mistakes().filter(source => deck.cards[cardFor(source).id]).length;
+    let line;
+    if (stats.due > 0) {
+      line = '<b>' + stats.due + '</b> ' + questionWord(stats.due) + ' ready to review today' + (stats.due > DECK_SESSION_SIZE ? ' (' + DECK_SESSION_SIZE + ' at a time).' : '.');
+    } else if (stats.total > 0) {
+      line = 'Nothing to review today. The next ' + (stats.nextInDays === 1 ? 'one comes back tomorrow.' : 'one comes back in ' + stats.nextInDays + ' days.');
+    } else {
+      line = 'Your deck is empty. Questions you get wrong on worksheets can be kept here.';
     }
+    const small = stats.total + ' in your deck' + (stats.mastered ? ' &middot; ' + stats.mastered + ' learned' : '')
+      + (keptFromHere ? ' &middot; ' + keptFromHere + ' from this worksheet' : '');
+    const armed = Date.now() - clearArmedAt < CLEAR_CONFIRM_MS;
+    return '<div class="card deck"><h3 style="margin:0 0 4px">Your review deck</h3>'
+      + '<p style="margin:0 0 4px">' + line + '</p><p class="sub" style="margin:0 0 10px">' + small + '</p>'
+      + (problem ? '<div class="msg bad">' + esc(problem) + '</div>' : '')
+      + (needsHomeScreenHint(window) ? '<div class="tip" style="margin:0 0 10px">&#128241; ' + esc(HOME_SCREEN_HINT) + '</div>' : '')
+      + '<div class="actions" style="margin:0">' + (stats.due > 0 ? '<button data-act="d-start">Review now</button>' : '')
+      + '<button class="ghost" data-act="d-clear">' + (armed ? 'Tap again to delete' : 'Delete my deck') + '</button></div></div>';
+  }
+
+  function idleHtml() {
+    if (!enabled) return '';
+    if (deck) return statusHtml();
+    if (!inWorksheet) return emptyHomeHtml();
+    const count = mistakes().length;
+    return count && !(options.isDismissed && options.isDismissed()) ? offerHtml(count) : '';
+  }
+
+  /* ---------- the review round ---------- */
+
+  const round = createPractice({
+    root,
+    panel: options.panel,
+    prefix: 'd',
+    ids: () => (deck ? dueCards(deck, today()).slice(0, DECK_SESSION_SIZE).map(card => card.id) : []),
+    index: () => { snapshot = deckIndex(dueCards(deck, today())); return snapshot; },
+    hintFor: id => {
+      const entry = snapshot && snapshot.items[id];
+      return entry ? (entry.item.hint || firstLetterHint(entry.section.type, entry.item)) : '';
+    },
+    idleHtml,
+    afterClose: 'idle',
+    onResult: (id, rightFirstTime) => { answerCard(deck, id, rightFirstTime, today()); persist(); },
+    speak: options.speak,
+    copy: {
+      running: 'Review',
+      doneTitle: 'Review complete',
+      done: result => result.firstTime + ' of ' + result.asked + ' right first time. Questions you got right come back later; the others tomorrow.',
+      close: 'Close'
+    }
+  });
+
+  /* ---------- buttons that belong to the deck itself ---------- */
+
+  const own = {
+    'd-save'() {
+      deck = emptyDeck();
+      mistakes().forEach(source => addCard(deck, cardFor(source), today()));
+      problem = '';
+      if (!persist()) deck = null;
+      round.render();
+    },
+    'd-no'() {
+      if (options.onDismiss) options.onDismiss();
+      round.render();
+    },
+    'd-clear'(button) {
+      if (Date.now() - clearArmedAt < CLEAR_CONFIRM_MS) {
+        deleteDeck();
+        deck = null;
+        clearArmedAt = 0;
+        problem = '';
+        round.render();
+        return;
+      }
+      clearArmedAt = Date.now();
+      round.render();
+      setTimeout(() => { if (button.isConnected && !round.isRunning()) round.render(); }, CLEAR_CONFIRM_MS);
+    }
+  };
+
+  return {
+    render: round.render,
+    isRunning: round.isRunning,
+    hasDeck: () => Boolean(deck),
+    /** The student got a question wrong. If they keep a deck, it goes in (or goes back to box 1). */
+    noteMistake(source) {
+      if (!deck) return;
+      addCard(deck, cardFor(source), today());
+      persist();
+    },
+    /** Returns true when the click belonged to the deck panel. */
+    handleAction(action, button) {
+      if (own[action]) { own[action](button); return true; }
+      return round.handleAction(action, button);
+    },
+    handleChange: round.handleChange,
+    handleEnter: round.handleEnter
   };
 }
 
 /*
  * The student worksheet: draws it, grades answers as they are given, shows feedback and the score.
- * Usage: renderPlayer(rootElement, worksheet, { persist: true|false })
+ * Usage: renderPlayer(rootElement, worksheet, { persist: true|false, home: true|false })
+ *   persist: keep the student's answers on this device;  home: link to the student's home page.
  */
 
 const INSTANT_TYPES = ['choice', 'truefalse', 'match'];   // graded as soon as the student picks
 const CONFETTI_COLOURS = ['#B4252A', '#388A9F', '#1B9A5A', '#E4B43A', '#CC3366'];
 const RESET_CONFIRM_MS = 3000;
+
+/** One speaker for the whole page, so only one thing is ever read aloud at a time. */
+let speakerInstance = null;
+const sharedSpeaker = () => speakerInstance || (speakerInstance = createSpeaker(window));
 
 function launchConfetti(container) {
   for (let i = 0; i < 34; i++) {
@@ -819,7 +1986,11 @@ function renderPlayer(root, rawWorksheet, options) {
   let state = options.persist ? loadStudentState(key) : freshStudentState();
   const save = () => { if (options.persist) saveStudentState(key, state); };
 
-  root.innerHTML = playerHtml(worksheet, index);
+  const speaker = sharedSpeaker();
+  const speak = speaker.supported ? (text, button) => speaker.speak(text, button) : null;
+  speaker.stop();
+
+  root.innerHTML = playerHtml(worksheet, index, { listen: speaker.supported, home: Boolean(options.home) });
 
   /* ---------- reading the state of one question ---------- */
 
@@ -828,6 +1999,7 @@ function renderPlayer(root, rawWorksheet, options) {
   const isAnswered = id => items[id].scored && hasAnswer(typeOf(id), state.values[id]);
   const hintFor = id => items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
   const mistakeIds = () => scoredIds.filter(id => state.everWrong[id]);
+  const sourceOf = id => ({ type: typeOf(id), item: items[id].item, choices: index.matchOptions[items[id].sectionIndex] || [] });
 
   /** none | ok (right first time) | fix (right after a mistake) | bad | rev (answer was shown) */
   function statusOf(id) {
@@ -840,6 +2012,13 @@ function renderPlayer(root, rawWorksheet, options) {
     return state.everWrong[id] ? 'fix' : 'ok';
   }
 
+  /** The first time a question goes wrong it becomes a mistake (and joins the review deck, if the student keeps one). */
+  function markMistake(id) {
+    if (state.everWrong[id]) return;
+    state.everWrong[id] = true;
+    deckPanel.noteMistake(sourceOf(id));
+  }
+
   /** Counts a wrong answer once, however many times the student presses Check on it. */
   function recordAttempt(id) {
     if (!isAnswered(id) || isRight(id)) return;
@@ -847,7 +2026,7 @@ function renderPlayer(root, rawWorksheet, options) {
     if (state.lastWrongAnswer[id] === snapshot) return;
     state.lastWrongAnswer[id] = snapshot;
     state.wrongAttempts[id] = (state.wrongAttempts[id] || 0) + 1;
-    state.everWrong[id] = true;
+    markMistake(id);
   }
 
   /* ---------- feedback on one question ---------- */
@@ -937,6 +2116,7 @@ function renderPlayer(root, rawWorksheet, options) {
     find('#pb').style.width = (results.right / total * 100) + '%';
     renderMistakes();
     if (!practice.isRunning()) practice.render();
+    if (!deckPanel.isRunning()) deckPanel.render();
 
     const final = find('#final');
     const allRight = results.right === total;
@@ -950,9 +2130,19 @@ function renderPlayer(root, rawWorksheet, options) {
   }
 
   const practice = createPractice({
-    root, index, mistakeIds, hintFor,
-    isSkipped: () => state.practiceSkipped,
-    markSkipped: () => { state.practiceSkipped = true; save(); }
+    root, panel: '#prac', prefix: 'p',
+    index, ids: mistakeIds, hintFor, speak,
+    isClosed: () => state.practiceSkipped,
+    onClose: () => { state.practiceSkipped = true; save(); }
+  });
+
+  const deckPanel = createDeckPanel({
+    root, panel: '#deck', speak,
+    enabled: Boolean(options.persist),
+    source: worksheet.title,
+    mistakes: () => mistakeIds().map(sourceOf),
+    isDismissed: () => state.deckDismissed,
+    onDismiss: () => { state.deckDismissed = true; save(); }
   });
 
   /* ---------- what each button does ---------- */
@@ -974,7 +2164,7 @@ function renderPlayer(root, rawWorksheet, options) {
         message.textContent = hint ? '💡 ' + hint : 'No hint for this one. Tap again to see the answer.';
       } else {
         state.revealed[id] = true;
-        state.everWrong[id] = true;
+        markMistake(id);
         paint(id); updateScore();
       }
       save();
@@ -995,6 +2185,16 @@ function renderPlayer(root, rawWorksheet, options) {
       const card = find('#w-' + id);
       if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     },
+    say(id, button) {
+      const settled = ['ok', 'fix', 'rev'].includes(statusOf(id));
+      speaker.speak(spokenText(typeOf(id), items[id].item, settled), button);
+    },
+    'say-passage'(id, button) {
+      speaker.speak(worksheet.sections[+button.dataset.s].passage, button);
+    },
+    'say-word'(id, button) {
+      speaker.speak(button.textContent, button);
+    },
     reset(id, button) {
       if (Date.now() - resetArmedAt < RESET_CONFIRM_MS) {
         state = freshStudentState();
@@ -1013,7 +2213,7 @@ function renderPlayer(root, rawWorksheet, options) {
     const button = event.target.closest('[data-act]');
     if (!button || !root.contains(button)) return;
     const action = button.dataset.act;
-    if (practice.handleAction(action, button)) return;
+    if (practice.handleAction(action, button) || deckPanel.handleAction(action, button)) return;
     if (actions[action]) actions[action](button.dataset.id, button);
   };
 
@@ -1031,7 +2231,7 @@ function renderPlayer(root, rawWorksheet, options) {
 
   root.onchange = event => {
     const field = event.target;
-    if (practice.handleChange(field)) return;
+    if (practice.handleChange(field) || deckPanel.handleChange(field)) return;
     if (field.tagName === 'SELECT' && field.dataset.id) {
       state.values[field.dataset.id] = field.value;
       recordAttempt(field.dataset.id);
@@ -1040,9 +2240,12 @@ function renderPlayer(root, rawWorksheet, options) {
   };
 
   root.onkeydown = event => {
+    if (moveBetweenOptions(event)) { event.preventDefault(); return; }
     const field = event.target;
+    // A word in the word bank is a button made from a span: Enter and Space press it like a real button.
+    if ((event.key === 'Enter' || event.key === ' ') && field.getAttribute('role') === 'button') { event.preventDefault(); field.click(); return; }
     if (event.key !== 'Enter' || field.tagName !== 'INPUT') return;
-    if (field.dataset.pk !== undefined) { event.preventDefault(); practice.handleEnter(field); return; }
+    if (practice.handleEnter(field) || deckPanel.handleEnter(field)) { event.preventDefault(); return; }
     if (!field.dataset.id) return;
     event.preventDefault();
     const checkButton = root.querySelector('[data-act="check"][data-id="' + field.dataset.id + '"]');
@@ -1062,6 +2265,70 @@ function renderPlayer(root, rawWorksheet, options) {
   updateScore();
 }
 
+/*
+ * The student's home page (#review): the review deck, the worksheets opened lately, and a button that
+ * clears everything Vocabloom keeps on this device. It is what opens when the app is started from the
+ * home screen, and it works offline.
+ */
+
+const FORGET_LABEL = 'Clear everything on this device';
+
+function recentListHtml(list, now) {
+  if (!list.length) return '<p class="sub">Worksheets you open will appear here, so you can find them again.</p>';
+  return list.map(entry => '<a class="recent" href="' + esc(entry.link) + '"><span>' + esc(entry.title) + '</span><small>' + esc(openedText(entry.at, now)) + '</small></a>').join('');
+}
+
+function homeHtml(now) {
+  return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>Welcome back</h1></div>'
+    + '<div class="pl home-top"><div id="deck"></div>'
+    + '<h3>Your worksheets</h3>' + recentListHtml(loadRecent(), now)
+    + '<div class="actions"><button class="ghost" data-act="forget">' + FORGET_LABEL + '</button></div>'
+    + '<p class="sub" style="text-align:center">Your answers, your review deck and this list are saved only on this device.</p>'
+    + '<p class="foot"><a href="./">Teacher? Create a worksheet</a> &middot; <a href="privacy.html">Privacy</a></p></div>';
+}
+
+function renderHome(root) {
+  const speaker = sharedSpeaker();
+  speaker.stop();
+  const speak = speaker.supported ? (text, button) => speaker.speak(text, button) : null;
+  document.title = 'Vocabloom';
+  let deckPanel = null;
+  let forgetArmedAt = 0;
+
+  function draw() {
+    root.innerHTML = homeHtml(Date.now());
+    deckPanel = createDeckPanel({ root, panel: '#deck', speak });
+    deckPanel.render();
+  }
+
+  function forget(button) {
+    if (Date.now() - forgetArmedAt < CLEAR_CONFIRM_MS) {
+      forgetArmedAt = 0;
+      clearLocalData();
+      draw();
+      toast('Cleared');
+      return;
+    }
+    forgetArmedAt = Date.now();
+    button.textContent = 'Tap again to clear';
+    setTimeout(() => { if (button.isConnected) button.textContent = FORGET_LABEL; }, CLEAR_CONFIRM_MS);
+  }
+
+  root.onclick = event => {
+    const button = event.target.closest('[data-act]');
+    if (!button || !root.contains(button)) return;
+    if (deckPanel.handleAction(button.dataset.act, button)) return;
+    if (button.dataset.act === 'forget') forget(button);
+  };
+  root.oninput = null;
+  root.onchange = event => { deckPanel.handleChange(event.target); };
+  root.onkeydown = event => {
+    if (moveBetweenOptions(event)) { event.preventDefault(); return; }
+    if (event.key === 'Enter' && event.target.tagName === 'INPUT' && deckPanel.handleEnter(event.target)) event.preventDefault();
+  };
+  draw();
+}
+
 /* Teacher step 1: choose a PDF, type the school access code, convert. */
 
 const MAX_PDF_BYTES = 3.1 * 1024 * 1024;
@@ -1076,14 +2343,19 @@ function rememberAccessCode(code) {
   try { sessionStorage.setItem(ACCESS_CODE_KEY, code); } catch (error) { /* private mode: nothing to remember */ }
 }
 
+/* Wording that fits the device: "Tap" on a phone, "Click" and "drop it here" where there is a mouse (see .touch-only and .mouse-only). */
+const TAP_OR_CLICK = '<span class="touch-only">tap</span><span class="mouse-only">click</span>';
+const DROP_BOX_TEXT = '<span class="ic">&#8593;</span><span class="touch-only">Tap</span><span class="mouse-only">Click</span> to choose a PDF<br>'
+  + '<small><span class="mouse-only">or drop it here &middot; </span>up to about 3 MB</small>';
+
 function uploadStepHtml() {
-  return '<section class="panel"><h2>Upload a PDF</h2><p class="lead">Any worksheet: vocabulary, grammar, reading, true/false, matching&hellip; The AI finds the exercises and turns them into questions students can answer on a phone.</p>'
-    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p>'
-    + '<label class="drop" id="drop"><input type="file" id="file" accept="application/pdf,.pdf"><span id="dropt"><span class="ic">&#8593;</span>Tap to choose a PDF<br><small>or drop it here &middot; up to about 3 MB</small></span></label>'
+  return '<section class="panel up"><div class="up-intro"><h2>Upload a PDF</h2><p class="lead">Any worksheet: vocabulary, grammar, reading, true/false, matching&hellip; The AI finds the exercises and turns them into questions students can answer on a phone.</p>'
+    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p></div>'
+    + '<div class="up-form"><label class="drop" id="drop"><input type="file" id="file" accept="application/pdf,.pdf"><span id="dropt">' + DROP_BOX_TEXT + '</span></label>'
     + '<label class="f" for="code">School access code</label><input type="password" id="code" autocomplete="current-password" placeholder="Ask your school admin">'
     + '<div class="err" id="err" role="alert" hidden></div>'
     + '<div class="btns"><button id="go" disabled>Convert to interactive page</button></div>'
-    + '<div class="btns"><button class="ghost" id="demo">Try the demo worksheet</button></div></section>';
+    + '<div class="btns"><button class="ghost" id="demo">Try the demo worksheet</button></div></div></section>';
 }
 
 function showUploadError(message) {
@@ -1123,17 +2395,35 @@ function showLoadingOverlay() {
   return () => { clearInterval(timer); overlay.remove(); };
 }
 
-async function requestConversion(file, accessCode) {
+/**
+ * Returns { worksheet, cached }. `cached` is true when the server already had a result for this exact PDF.
+ * `fresh` asks for a new conversion instead (it uses AI credit again and replaces the saved result).
+ */
+async function requestConversion(file, accessCode, fresh) {
   const pdf = await fileToBase64(file);
   const response = await fetch('/api/convert', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-access-code': accessCode },
-    body: JSON.stringify({ pdf })
+    body: JSON.stringify(fresh ? { pdf, fresh: true } : { pdf })
   });
   let body = {};
   try { body = await response.json(); } catch (error) { /* not JSON: fall through to the generic error */ }
   if (!response.ok) throw new Error(body.error || ('Server error (' + response.status + ')'));
-  return normaliseWorksheet(body.worksheet);
+  return { worksheet: normaliseWorksheet(body.worksheet), cached: Boolean(body.cached) };
+}
+
+/** "Convert again" in the review step. Errors are shown as a short message, since the upload screen is gone. */
+async function convertAgain(session, nav) {
+  const hideOverlay = showLoadingOverlay();
+  try {
+    const result = await requestConversion(session.file, rememberedAccessCode(), true);
+    Object.assign(session, { worksheet: result.worksheet, cached: result.cached, shortLink: null });
+    nav.go(2);
+  } catch (error) {
+    toast(error.message || 'Something went wrong. Please try again.');
+  } finally {
+    hideOverlay();
+  }
 }
 
 function renderUploadStep(session, nav) {
@@ -1147,7 +2437,7 @@ function renderUploadStep(session, nav) {
     if (problem) { showUploadError(problem); return; }
     session.file = file;
     $('#drop').classList.add('has');
-    $('#dropt').innerHTML = '<span class="ic">&#10003;</span>' + esc(file.name) + '<br><small>' + (file.size / 1024).toFixed(0) + ' KB &middot; tap to change</small>';
+    $('#dropt').innerHTML = '<span class="ic">&#10003;</span>' + esc(file.name) + '<br><small>' + (file.size / 1024).toFixed(0) + ' KB &middot; ' + TAP_OR_CLICK + ' to change</small>';
     $('#go').disabled = false;
   }
 
@@ -1160,7 +2450,8 @@ function renderUploadStep(session, nav) {
     rememberAccessCode(code);
     const hideOverlay = showLoadingOverlay();
     try {
-      session.worksheet = await requestConversion(session.file, code);
+      const result = await requestConversion(session.file, code);
+      Object.assign(session, { worksheet: result.worksheet, cached: result.cached, shortLink: null });
       nav.go(2);
     } catch (error) {
       showUploadError(error.message || 'Something went wrong. Please try again.');
@@ -1173,7 +2464,7 @@ function renderUploadStep(session, nav) {
     try {
       const response = await fetch('demo.json');
       if (!response.ok) throw new Error('demo missing');
-      session.worksheet = normaliseWorksheet(await response.json());
+      Object.assign(session, { worksheet: normaliseWorksheet(await response.json()), file: null, cached: false, shortLink: null });
       nav.go(2);
     } catch (error) {
       showUploadError('The demo needs the website to be running (it cannot load from a plain file).');
@@ -1181,9 +2472,22 @@ function renderUploadStep(session, nav) {
   }
 
   $('#file').onchange = event => chooseFile(event.target.files[0]);
+  // The whole panel accepts a dropped file, and the box lights up while one is over it.
   const dropZone = $('#drop');
-  ['dragover', 'dragenter'].forEach(name => dropZone.addEventListener(name, event => event.preventDefault()));
-  dropZone.addEventListener('drop', event => { event.preventDefault(); chooseFile(event.dataTransfer.files[0]); });
+  const panel = $('.up');
+  ['dragenter', 'dragover'].forEach(name => panel.addEventListener(name, event => {
+    if (!dragHasFiles(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    dropZone.classList.add('over');
+  }));
+  panel.addEventListener('dragleave', event => { if (!panel.contains(event.relatedTarget)) dropZone.classList.remove('over'); });
+  panel.addEventListener('drop', event => {
+    if (!dragHasFiles(event)) return;
+    event.preventDefault();
+    dropZone.classList.remove('over');
+    chooseFile(event.dataTransfer.files[0]);
+  });
   $('#go').onclick = convert;
   $('#demo').onclick = loadDemo;
 }
@@ -1191,6 +2495,8 @@ function renderUploadStep(session, nav) {
 /* Teacher step 2: check and edit what the AI built before sharing it. */
 
 const splitList = (text, separator) => text.split(separator).map(part => part.trim()).filter(Boolean);
+/* Answers are typed exactly as students will type them: no capital letter at the start, no automatic correction. */
+const PLAIN_TEXT = 'autocapitalize="off" autocorrect="off"';
 const answersAsText = (section, item) => item.answers.join(section.type === 'fill' ? ' ; ' : ' | ');
 
 const correctOptionHtml = item =>
@@ -1208,21 +2514,21 @@ function itemEditorHtml(section, item, itemIndex) {
   const header = '<div class="it" data-ii="' + itemIndex + '"><div class="top2"><span>' + (itemIndex + 1) + '.</span><button class="danger sm" data-del="item">Remove</button></div>';
   if (type === 'match') {
     return header
-      + '<input type="text" data-f="left" value="' + esc(item.left || item.prompt) + '" placeholder="Left item" aria-label="Left item">'
-      + '<input type="text" data-f="right" value="' + esc(item.right || item.answers[0] || '') + '" placeholder="Correct partner" aria-label="Correct partner">'
+      + '<input type="text" data-f="left" value="' + esc(item.left || item.prompt) + '" placeholder="Left item" aria-label="Left item" ' + PLAIN_TEXT + '>'
+      + '<input type="text" data-f="right" value="' + esc(item.right || item.answers[0] || '') + '" placeholder="Correct partner" aria-label="Correct partner" ' + PLAIN_TEXT + '>'
       + hintAndExplanationHtml(item) + '</div>';
   }
   let html = header + '<textarea data-f="prompt" aria-label="Question">' + esc(item.prompt) + '</textarea>';
   if (type === 'fill') {
-    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Answer for each blank, separated by ;" aria-label="Answers">'
+    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Answer for each blank, separated by ;" aria-label="Answers" ' + PLAIN_TEXT + '>'
       + '<small>Several blanks: separate with ; &middot; accepted alternatives for one blank: separate with |</small>';
   }
   if (type === 'short') {
-    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Accepted answers, separated by |" aria-label="Accepted answers">'
+    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Accepted answers, separated by |" aria-label="Accepted answers" ' + PLAIN_TEXT + '>'
       + '<small>Leave empty if there is no single right answer (it will not be scored).</small>';
   }
   if (type === 'choice') {
-    html += '<textarea data-f="options" placeholder="One option per line" aria-label="Options">' + esc(item.options.join('\n')) + '</textarea><select data-f="correct" aria-label="Correct option">' + correctOptionHtml(item) + '</select>';
+    html += '<textarea data-f="options" placeholder="One option per line" aria-label="Options" ' + PLAIN_TEXT + '>' + esc(item.options.join('\n')) + '</textarea><select data-f="correct" aria-label="Correct option">' + correctOptionHtml(item) + '</select>';
   }
   if (type === 'truefalse') {
     html += '<select data-f="tf" aria-label="Correct answer"><option value="">No answer</option><option' + (item.answers[0] === 'True' ? ' selected' : '') + '>True</option><option' + (item.answers[0] === 'False' ? ' selected' : '') + '>False</option></select>';
@@ -1237,15 +2543,19 @@ function sectionEditorHtml(section, sectionIndex) {
     + '<input class="e" type="text" data-sf="title" value="' + esc(section.title) + '" placeholder="Exercise title" aria-label="Exercise title">'
     + '<textarea class="e" data-sf="instructions" placeholder="Instructions for students" style="min-height:48px" aria-label="Instructions">' + esc(section.instructions) + '</textarea>'
     + (section.passage ? '<textarea class="e" data-sf="passage" placeholder="Reading text" aria-label="Reading text">' + esc(section.passage) + '</textarea>' : '')
-    + (showWordBank ? '<input class="e" type="text" data-sf="wordBank" value="' + esc(section.wordBank.join(', ')) + '" placeholder="Word bank (comma separated, optional)" aria-label="Word bank">' : '')
+    + (showWordBank ? '<input class="e" type="text" data-sf="wordBank" value="' + esc(section.wordBank.join(', ')) + '" placeholder="Word bank (comma separated, optional)" aria-label="Word bank" ' + PLAIN_TEXT + '>' : '')
     + section.items.map((item, itemIndex) => itemEditorHtml(section, item, itemIndex)).join('') + '</div>';
 }
 
-function reviewHtml(worksheet) {
+/** Shown when the server already had a conversion of this exact PDF. The teacher can ask for a new one. */
+const cachedNoteHtml = '<div class="note ok" id="cachednote"><b>Saved result.</b> This PDF was converted before, so you are seeing that result and no AI credit was used. '
+  + 'If it does not look right, <button class="ghost sm" id="again" style="margin-left:4px">Convert again</button></div>';
+
+function reviewHtml(worksheet, cached) {
   const keyNote = worksheet.answerKeyFound
     ? '<div class="note ok"><b>Answer key found.</b> The correct answers come from your PDF.</div>'
     : '<div class="note warn"><b>No answer key in the PDF.</b> The AI worked out the answers itself. Please check them before sharing.</div>';
-  return '<section class="panel"><h2>Review the exercises</h2>' + keyNote
+  return '<section class="panel"><h2>Review the exercises</h2>' + keyNote + (cached ? cachedNoteHtml : '')
     + '<p class="sub">The AI can make mistakes. Check the questions, answers, hints and explanations before you share the link.</p>'
     + '<label class="f">Worksheet title</label><input type="text" data-wf="title" value="' + esc(worksheet.title) + '">'
     + worksheet.sections.map(sectionEditorHtml).join('')
@@ -1269,7 +2579,7 @@ const ITEM_FIELD_UPDATERS = {
 
 function renderReviewStep(session, nav) {
   const stage = $('#stage');
-  stage.innerHTML = reviewHtml(session.worksheet);
+  stage.innerHTML = reviewHtml(session.worksheet, session.cached && session.file);
 
   const sectionOf = element => {
     const box = element.closest('.xsec');
@@ -1317,32 +2627,165 @@ function renderReviewStep(session, nav) {
   };
 
   $('#b1').onclick = () => nav.go(1);
+  if ($('#again')) $('#again').onclick = () => convertAgain(session, nav);
   $('#b3').onclick = () => {
     if (!session.worksheet.sections.length) { toast('Nothing left to share'); return; }
     nav.go(3);
   };
 }
 
-/* Teacher step 3: the link to give to students (the end of the flow). */
+/*
+ * Teacher step 3: the link to give to students (the end of the flow).
+ *   - the normal link carries the whole worksheet inside it, so nothing is stored anywhere;
+ *   - optionally, a short link plus a QR code: the worksheet is then kept on the server for a while.
+ */
 
 const LONG_LINK_CHARS = 6000;
 
-function shareHtml() {
-  return '<section class="panel"><h2>Share with your students</h2><p class="lead">Send them the link. It opens on any phone, no login needed.</p>'
+/** `canShare`: the device has its own share sheet (iPhone, Android, Windows), which is the easiest way to send a link. */
+function shareHtml(canShare) {
+  return '<section class="panel share"><div class="share-main"><h2>Share with your students</h2><p class="lead">Send them the link. It opens on any phone, no login needed.</p>'
     + '<div class="linkbox"><input type="text" id="lnk" readonly value="Preparing link..." aria-label="Link to share"><button id="cl">Copy</button></div>'
-    + '<div class="note warn" id="long" hidden>This link is very long. WhatsApp and some apps may cut it. If that happens, use <b>Download</b> and send the file instead.</div>'
-    + '<div class="btns"><button class="sec" id="dl">Download as a file</button><button class="ghost" id="op">Open student view</button></div>'
-    + '<p class="lead" style="margin:0">Paste the link into Google Classroom, WhatsApp or anywhere else. Answers stay on each student\'s phone, so there is nothing for you to collect.</p>'
-    + '<div class="phone"><div id="pv"></div></div>'
-    + '<div class="nav"><button class="sec" id="b2">&larr; Edit</button><button class="sec" id="b1">New PDF</button></div></section>';
+    + '<div class="note warn" id="long" hidden></div>'
+    + '<div class="btns">' + (canShare ? '<button class="wide" id="sh">Share&hellip;</button>' : '')
+    + '<button class="sec" id="dl">Download as a file</button><button class="ghost" id="op">Open student view</button></div>'
+    + '<div id="short"></div>'
+    + '<p class="lead" style="margin:0">Paste the link into Google Classroom, WhatsApp or anywhere else. Answers stay on each student\'s phone, so there is nothing for you to collect.</p></div>'
+    + '<aside class="share-preview" aria-label="What students see"><p class="sub">What students see</p><div class="phone"><div id="pv"></div></div></aside>'
+    + '<div class="nav share-nav"><button class="sec" id="b2">&larr; Edit</button><button class="sec" id="b1">New PDF</button></div></section>';
 }
+
+const shortLinkUrl = id => location.origin + location.pathname + '#w=' + id;
+
+/** The link to hand over right now: the short one if it was made for this exact worksheet, otherwise the long one. */
+function bestLink(session, longLink) {
+  const made = session.shortLink;
+  return made && made.key === hash(slimJSON(session.worksheet)) ? shortLinkUrl(made.id) : longLink;
+}
+
+/** The device's own share sheet (Messages, WhatsApp, Mail...). Closing it without choosing anything is not an error. */
+async function shareWithDevice(title, url) {
+  try {
+    await navigator.share({ title, url });
+  } catch (error) {
+    if (!error || error.name !== 'AbortError') copyText(url, 'Copy the link');
+  }
+}
+
+/* ---------- short link and QR code ---------- */
+
+/** Short links need the server to keep a copy, so they only exist when the school has switched that on. */
+async function shortLinksAvailable() {
+  if (location.protocol === 'file:') return false;
+  try {
+    const response = await fetch('/api/share');
+    return response.ok && Boolean((await response.json()).available);
+  } catch (error) {
+    return false;
+  }
+}
+
+/** Asks the server to keep the worksheet and returns { id, days }. */
+async function requestShortLink(worksheet, accessCode) {
+  const response = await fetch('/api/share', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-access-code': accessCode },
+    body: '{"worksheet":' + slimJSON(worksheet) + '}'
+  });
+  let body = {};
+  try { body = await response.json(); } catch (error) { /* not JSON: fall through to the generic error */ }
+  if (!response.ok) throw new Error(body.error || ('Server error (' + response.status + ')'));
+  return body;
+}
+
+function shortLinkHtml(needsCode) {
+  return '<div class="shortbox"><h3>Short link and QR code</h3>'
+    + '<p class="sub">Handy for the classroom screen or a printed sheet. To keep the link short, Vocabloom stores a copy of this worksheet on its server for a limited time. Student answers are never sent there.</p>'
+    + (needsCode ? '<label class="f" for="scode">School access code</label><input type="password" id="scode" autocomplete="current-password" placeholder="Ask your school admin">' : '')
+    + '<div class="err" id="serr" role="alert" hidden></div>'
+    + '<div class="btns"><button id="mk">Create short link and QR code</button></div>'
+    + '<div id="made" hidden>'
+    + '<div class="qr" id="qr"></div>'
+    + '<div class="linkbox"><input type="text" id="slnk" readonly aria-label="Short link"><button id="scopy">Copy</button></div>'
+    + '<div class="btns"><button class="sec" id="qbig">Show large</button><button class="sec" id="qpng">Download QR code</button></div>'
+    + '<p class="sub" id="sinfo"></p></div></div>';
+}
+
+/** Full-screen QR code, for a classroom projector. */
+function showQrLarge(matrix, link) {
+  const overlay = document.createElement('div');
+  overlay.className = 'ov';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', 'QR code');
+  overlay.innerHTML = '<div class="box qrbig"><div class="qr">' + qrSvg(matrix) + '</div><p class="qrlink">' + esc(link) + '</p><div class="nav"><button class="sec" id="qclose">Close</button></div></div>';
+  const close = showOverlay(overlay);
+  $('#qclose', overlay).onclick = close;
+  $('#qclose', overlay).focus();
+}
+
+function downloadQrPng(matrix, name) {
+  const canvas = document.createElement('canvas');
+  qrDrawCanvas(canvas, matrix, 1024);
+  canvas.toBlob(blob => {
+    if (blob) { downloadBlob(name, blob); toast('Downloaded'); } else toast('Could not make the image');
+  }, 'image/png');
+}
+
+/** Wires up the short-link box. `session.shortLink` remembers the link made for this exact worksheet. */
+function setUpShortLink(session, box) {
+  const worksheet = session.worksheet;
+  const worksheetKey = hash(slimJSON(worksheet));
+  const needsCode = !rememberedAccessCode();
+  box.innerHTML = shortLinkHtml(needsCode);
+
+  function showResult(result) {
+    const link = shortLinkUrl(result.id);
+    const matrix = qrMatrix(link);
+    $('#qr').innerHTML = qrSvg(matrix);
+    $('#slnk').value = link;
+    $('#sinfo').textContent = 'Students who open this link load the worksheet from Vocabloom, and their answers still stay on their own phones. The link stops working after ' + result.days + ' days.';
+    $('#made').hidden = false;
+    $('#scopy').onclick = () => copyText(link, 'Copy the link');
+    $('#qbig').onclick = () => showQrLarge(matrix, link);
+    $('#qpng').onclick = () => downloadQrPng(matrix, slug(worksheet.title) + '-qr.png');
+  }
+
+  async function create() {
+    $('#serr').hidden = true;
+    const typed = needsCode ? $('#scode').value : '';
+    if (typed) rememberAccessCode(typed);
+    const button = $('#mk');
+    button.disabled = true;
+    try {
+      const result = await requestShortLink(worksheet, rememberedAccessCode());
+      session.shortLink = { key: worksheetKey, id: result.id, days: result.days };
+      showResult(session.shortLink);
+      button.textContent = 'Create a new short link';
+    } catch (error) {
+      $('#serr').textContent = error.message || 'Something went wrong. Please try again.';
+      $('#serr').hidden = false;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  $('#mk').onclick = create;
+  if (session.shortLink && session.shortLink.key === worksheetKey) {
+    showResult(session.shortLink);
+    $('#mk').textContent = 'Create a new short link';
+  }
+}
+
+/* ---------- the step itself ---------- */
 
 async function renderShareStep(session, nav) {
   const worksheet = session.worksheet;
-  $('#stage').innerHTML = shareHtml();
+  const thisRender = session.shareRender = (session.shareRender || 0) + 1;
+  const canShare = typeof navigator.share === 'function';
+  $('#stage').innerHTML = shareHtml(canShare);
   renderPlayer($('#pv'), worksheet, { persist: false });
 
-  $('#b1').onclick = () => { session.worksheet = null; session.file = null; nav.go(1); };
+  $('#b1').onclick = () => { session.worksheet = null; session.file = null; session.shortLink = null; nav.go(1); };
   $('#b2').onclick = () => nav.go(2);
   $('#dl').onclick = () => { downloadTextFile(slug(worksheet.title) + '.html', buildStandalonePage(worksheet)); toast('Downloaded'); };
 
@@ -1350,12 +2793,22 @@ async function renderShareStep(session, nav) {
   try {
     link = location.origin + location.pathname + '#' + await pack(worksheet);
     $('#lnk').value = link;
-    $('#long').hidden = link.length < LONG_LINK_CHARS;
   } catch (error) {
     $('#lnk').value = 'Could not create a link. Use Download instead.';
   }
   $('#cl').onclick = () => { if (link) copyText(link, 'Copy the link'); };
   $('#op').onclick = () => { if (link) window.open(link, '_blank', 'noopener'); };
+  if (canShare) $('#sh').onclick = () => { if (link) shareWithDevice(worksheet.title, bestLink(session, link)); };
+
+  const canShorten = await shortLinksAvailable();
+  if (thisRender !== session.shareRender || !$('#short')) return;   // the teacher already moved on
+  if (canShorten) setUpShortLink(session, $('#short'));
+  if (link.length >= LONG_LINK_CHARS) {
+    const note = $('#long');
+    note.innerHTML = 'This link is very long. WhatsApp and some apps may cut it. '
+      + (canShorten ? 'Create a short link below, or use <b>Download</b> and send the file instead.' : 'Use <b>Download</b> and send the file instead.');
+    note.hidden = false;
+  }
 }
 
 /* The teacher app: three steps (upload, review, share) sharing one session. */
@@ -1363,6 +2816,8 @@ async function renderShareStep(session, nav) {
 function startTeacher() {
   const session = { worksheet: null, file: null };
   const steps = [null, renderUploadStep, renderReviewStep, renderShareStep];
+
+  $('#app').className = 'teacher';   // on a computer the teacher's tool uses a wider column than the student's page
 
   $('#app').innerHTML = '<div class="top"><div class="in">' + LOGO + '<div><h1>Vocabloom</h1><p>Turn any PDF worksheet into an interactive page</p></div></div></div>'
     + '<div class="steps" id="steps"><div><b>1</b>Upload</div><div><b>2</b>Review</div><div><b>3</b>Share</div></div><div class="wrap" id="stage"></div>';
@@ -1380,30 +2835,127 @@ function startTeacher() {
 }
 
 /*
- * Vocabloom: PDF -> interactive worksheet.
- * Two modes: teacher (upload, review, share) and student (worksheet only).
- * The worksheet for students comes from the link hash, or is embedded in a downloaded file.
+ * Vocabloom: PDF -> interactive worksheet. One page that shows a different view depending on its address:
+ *
+ *   a downloaded .html file   the worksheet that was saved inside it
+ *   #review                   the student's home: review deck and recently opened worksheets
+ *   #s=... or #j=...          a worksheet carried inside the link
+ *   #w=...                    a short link: the worksheet is fetched from the server
+ *   anything else             the teacher's tool: upload, review, share
  */
 
-async function findWorksheet() {
-  try {
-    const embedded = JSON.parse($('#ws-data').textContent);
-    if (embedded) return embedded;
-  } catch (error) { /* nothing embedded */ }
-  if (location.hash.length > 3) {
-    try { return await unpack(location.hash); } catch (error) { return null; }
+const SHORT_ID = /^[A-Za-z0-9_-]{12}$/;
+
+/** What a student sees when a link cannot be opened: [title, explanation]. */
+const LINK_PROBLEMS = {
+  incomplete: ['This link does not work', 'It looks incomplete. Ask your teacher to send it again.'],
+  expired: ['This link has expired', 'Ask your teacher to send you a new link.'],
+  busy: ['Please wait a moment', 'Too many worksheets are being opened right now. Try again in a minute.'],
+  offline: ['You are offline', 'This worksheet has not been opened on this phone yet. Connect to the internet and open the link once. After that it works offline.'],
+  unavailable: ['Could not open the worksheet', 'Check your connection and try again.']
+};
+
+class LinkProblem extends Error {
+  constructor(kind) {
+    super(kind);
+    this.kind = kind;
   }
-  return null;
 }
 
-(async function start() {
-  const worksheet = await findWorksheet();
-  if (worksheet && worksheet.sections) {
-    document.title = worksheet.title || 'Worksheet';
-    renderPlayer($('#app'), worksheet, { persist: true });
-  } else {
-    startTeacher();
+function readEmbeddedWorksheet() {
+  try {
+    const embedded = JSON.parse($('#ws-data').textContent);
+    return embedded && embedded.sections ? embedded : null;
+  } catch (error) {
+    return null;
   }
+}
+
+/** Fetches the worksheet behind a short link. A worksheet opened before is also served offline (see sw.js). */
+async function fetchShortLink(id) {
+  let response;
+  try {
+    response = await fetch('/api/share?id=' + encodeURIComponent(id));
+  } catch (error) {
+    throw new LinkProblem(navigator.onLine === false ? 'offline' : 'unavailable');
+  }
+  if (response.status === 404) throw new LinkProblem('expired');
+  if (response.status === 429) throw new LinkProblem('busy');
+  let body = null;
+  try { body = await response.json(); } catch (error) { /* not JSON */ }
+  if (!response.ok || !body || !body.worksheet) throw new LinkProblem('unavailable');
+  return body.worksheet;
+}
+
+/** The worksheet a link points to. Throws a LinkProblem when it cannot be opened. */
+async function worksheetFromHash(hash) {
+  if (/^#w=/.test(hash)) {
+    const id = hash.slice(3);
+    if (!SHORT_ID.test(id)) throw new LinkProblem('incomplete');
+    return fetchShortLink(id);
+  }
+  let worksheet = null;
+  try { worksheet = await unpack(hash); } catch (error) { /* damaged link */ }
+  if (!worksheet || !worksheet.sections) throw new LinkProblem('incomplete');
+  return worksheet;
+}
+
+function showLinkProblem(kind, retry) {
+  const [title, text] = LINK_PROBLEMS[kind] || LINK_PROBLEMS.unavailable;
+  $('#app').innerHTML = '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(title) + '</h1></div>'
+    + '<div class="pl home-top"><div class="card"><p style="margin:0 0 12px">' + esc(text) + '</p>'
+    + '<div class="actions" style="margin:0"><button id="retry">Try again</button></div></div>'
+    + '<p class="foot"><a href="#review">My review deck</a></p></div>';
+  $('#retry').onclick = retry;
+}
+
+function showWorksheet(worksheet, hash) {
+  document.title = worksheet.title || 'Worksheet';
+  // Only a worksheet opened from a link has a home page to go back to; a downloaded file is the whole app.
+  renderPlayer($('#app'), worksheet, { persist: true, home: Boolean(hash) && location.protocol !== 'file:' });
+  if (hash) rememberRecent(worksheet.title, hash, Date.now());
+}
+
+let navigation = 0;   // a newer navigation cancels an older one that is still loading
+
+async function route() {
+  const ticket = ++navigation;
+  const hash = location.hash;
+  window.scrollTo(0, 0);
+  $('#app').className = '';
+
+  if (hash === '#review') {
+    setOfflineMessage('student');
+    renderHome($('#app'));
+    return;
+  }
+  if (/^#(?:[sj]=|w=)/.test(hash)) {
+    setOfflineMessage('student');
+    $('#app').innerHTML = '<div class="wrap"><p class="sub" role="status" style="padding-top:24px">Opening your worksheet&hellip;</p></div>';
+    try {
+      const worksheet = await worksheetFromHash(hash);
+      if (ticket === navigation) showWorksheet(worksheet, hash);
+    } catch (error) {
+      if (ticket === navigation) showLinkProblem(error.kind || 'unavailable', route);
+    }
+    return;
+  }
+  setOfflineMessage('teacher');
+  startTeacher();
+}
+
+(function start() {
+  watchConnection();
+  // A file dropped anywhere but on the upload box would make the browser open it and leave the page.
+  ['dragover', 'drop'].forEach(name => window.addEventListener(name, event => { if (dragHasFiles(event)) event.preventDefault(); }));
+  const embedded = readEmbeddedWorksheet();
+  if (embedded) {
+    showWorksheet(embedded, '');
+    return;
+  }
+  registerServiceWorker();
+  window.addEventListener('hashchange', route);
+  route();
 })();
 
 })();

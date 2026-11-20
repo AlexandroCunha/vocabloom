@@ -1,0 +1,55 @@
+/* Adjustments for particular devices. Loaded last, so they override the phone-first rules above. */
+
+/* ---- A phone held sideways: very little height, so the header gives some of it back ---- */
+@media (orientation:landscape) and (max-height:500px){
+.top{padding-top:calc(10px + var(--sat));padding-bottom:36px}
+.top h1{font-size:22px}
+.top p{display:none}
+.hero{padding-top:calc(10px + var(--sat));padding-bottom:36px}
+.hero h1{font-size:22px;margin:2px 0 0}
+.brand-mini{font-size:13px}
+.steps div{padding-top:6px;padding-bottom:6px}
+.bar{padding-top:calc(6px + var(--sat));padding-bottom:8px;margin-top:8px}
+.pl h3{margin-top:20px}
+/* the large QR code has to fit above the Close button without scrolling */
+.qrbig .qr{max-width:46vh;max-width:46dvh}
+}
+
+/* ---- Touch screens: fields need 16px or more, or Safari on iPhone zooms the page when one is selected ---- */
+@media (pointer:coarse){
+.linkbox input,.ov textarea{font-size:16px}
+}
+
+/* ---- Wider screens ---- */
+@media (min-width:640px){
+/* short answers (True / False, single words) sit side by side */
+.opts.short{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}
+}
+@media (min-width:900px){
+:root{--col:760px}
+}
+
+/* ---- Computers: the teacher's tool uses the room ---- */
+@media (min-width:1000px){
+.teacher{--col:960px}
+.teacher .panel{padding:28px 32px}
+
+/* upload: what it is on the left, the form on the right */
+.up{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0 40px;align-items:start}
+.up-intro h2{font-size:30px}
+.up-form .drop{margin-top:2px}
+
+/* review: the fields of each question sit in two columns */
+.it{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.it>.top2,.it>[data-f=prompt]{grid-column:1/-1}
+.it>[data-f=hint]{grid-column:1}
+.it>[data-f=explanation]{grid-column:2}
+.it>small{align-self:center}
+
+/* share: link and QR code on the left, what students see on the right (it stays in view while the page scrolls) */
+.share{display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"main preview" "nav preview";gap:0 36px;align-items:start}
+.share-main{grid-area:main}
+.share-preview{grid-area:preview;position:sticky;top:16px}
+.share-nav{grid-area:nav}
+.share-preview .phone{margin-top:0;max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);overflow:auto;overscroll-behavior:contain}
+}

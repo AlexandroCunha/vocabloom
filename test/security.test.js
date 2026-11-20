@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { SECURITY_HEADERS, sameCode, createRateLimiter, clientIp } = require('../lib/security');
+const { SECURITY_HEADERS, CSP, sameCode, findTeacher, hashClient, clientIp } = require('../lib/security');
 const { resolvePublicFile } = require('../server');
 
 test('access code comparison', () => {
@@ -12,14 +12,22 @@ test('access code comparison', () => {
   assert.equal(sameCode('', 'secret'), false);
 });
 
-test('rate limiter blocks after the limit and recovers after the window', () => {
-  let time = 0;
-  const limiter = createRateLimiter({ limit: 2, windowMs: 1000, now: () => time });
-  limiter.hit('ip'); limiter.hit('ip');
-  assert.equal(limiter.isLimited('ip'), true);
-  assert.equal(limiter.isLimited('other'), false);
-  time = 1001;
-  assert.equal(limiter.isLimited('ip'), false);
+test('each teacher is found by their own code, and only by it', () => {
+  const teachers = [{ name: 'anna', code: 'anna-code' }, { name: 'ben', code: 'ben-code' }];
+  assert.equal(findTeacher('ben-code', teachers).name, 'ben');
+  assert.equal(findTeacher('anna-code', teachers).name, 'anna');
+  assert.equal(findTeacher('anna', teachers), null);
+  assert.equal(findTeacher('', teachers), null);
+  assert.equal(findTeacher('anything', []), null);
+});
+
+test('client fingerprints are stable, secret-dependent and never contain the address', () => {
+  const a = hashClient('203.0.113.7', 'secret-one');
+  assert.equal(a, hashClient('203.0.113.7', 'secret-one'));
+  assert.notEqual(a, hashClient('203.0.113.8', 'secret-one'));
+  assert.notEqual(a, hashClient('203.0.113.7', 'secret-two'));
+  assert.match(a, /^[0-9a-f]{32}$/);
+  assert.doesNotMatch(a, /203/);
 });
 
 test('client address comes from x-forwarded-for when present', () => {
@@ -32,6 +40,14 @@ test('vercel.json sends the same security headers as the code', () => {
   const configured = {};
   config.headers[0].headers.forEach(h => { configured[h.key] = h.value; });
   assert.deepEqual(configured, SECURITY_HEADERS);
+});
+
+test('the policy lets the page install its own service worker and manifest, and nothing else', () => {
+  const directives = Object.fromEntries(CSP.split('; ').map(part => [part.split(' ')[0], part.split(' ').slice(1).join(' ')]));
+  assert.equal(directives['worker-src'], "'self'");
+  assert.equal(directives['manifest-src'], "'self'");
+  assert.equal(directives['default-src'], "'none'");
+  assert.equal(directives['connect-src'], "'self'");
 });
 
 test('static files cannot escape the public folder', () => {

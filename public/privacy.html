@@ -7,7 +7,7 @@
 <style>
   body{margin:0;font-family:"Avenir Next",Avenir,-apple-system,"Segoe UI",system-ui,sans-serif;line-height:1.6;color:#1b2b27;background:#f4f8f7}
   main{max-width:720px;margin:0 auto;padding:32px 20px 64px}
-  h1{margin:0 0 8px}h2{margin-top:32px}
+  h1{margin:0 0 8px}h2{margin-top:32px}h3{margin:20px 0 4px;font-size:1.05em}
   .todo{background:#fff4d6;border:1px solid #e8c766;border-radius:10px;padding:12px 14px}
   a{color:#1f6e83}
 </style>
@@ -23,36 +23,58 @@
 <p>[School or organisation name], [address]. Contact for privacy questions: [email address].</p>
 
 <h2>What happens to your data</h2>
+<h3>On our server</h3>
 <ul>
-  <li><strong>PDF files (teachers).</strong> When a teacher converts a PDF, the file is sent through our server to an AI service (Anthropic) that reads it and returns the exercises. Vocabloom does not keep the PDF or the result: there is no database.</li>
-  <li><strong>Access code (teachers).</strong> The code is kept in the browser tab only while it is open (session storage) and is sent with each conversion to check that you may use the tool.</li>
-  <li><strong>Share links.</strong> The worksheet is stored inside the link itself, in the part after the <code>#</code>. That part is not sent to our server when a student opens the link.</li>
-  <li><strong>Students.</strong> A student can type a name and answer the exercises. Answers, name and progress stay in that device&rsquo;s browser (local storage) so the student can continue later. Nothing is sent to us, and teachers cannot see students&rsquo; answers.</li>
+  <li><strong>PDF files (teachers).</strong> When a teacher converts a PDF, the file is sent through our server to an AI service (Anthropic) that reads it and returns the exercises. Vocabloom does not keep the PDF.</li>
+  <li><strong>Converted worksheets.</strong> The exercises that come back from the AI (text only, never the PDF) are kept for [7] days under a fingerprint of the PDF, so converting the same file again does not use the AI again. They are kept in the shared storage if the school has switched it on, and otherwise only in the memory of a running server, where they disappear when that server stops. This can be switched off.</li>
+  <li><strong>Short links and QR codes (optional storage, teachers choose).</strong> Only if a teacher presses <em>Create short link and QR code</em>, a copy of that worksheet is kept for [90] days so the link can be short. When a student opens a short link, the phone asks our server for that worksheet, so the server and the hosting provider see that request (link, IP address and time). Normal links do not do this.</li>
+  <li><strong>Usage counters.</strong> To stop abuse and control costs, the server counts requests, wrong access codes and conversions per day (in the shared storage if there is one, otherwise in the server&rsquo;s memory). Counters are labelled with a scrambled form of the visitor&rsquo;s IP address (a keyed hash), never the address itself, and for conversions with the name the school gave to that teacher&rsquo;s code (for example &ldquo;anna&rdquo;). They expire after at most two days.</li>
+  <li><strong>Access code (teachers).</strong> The code is kept in the browser tab only while it is open (session storage) and is sent with each request to check that you may use the tool.</li>
   <li><strong>Hosting logs.</strong> Our hosting provider ([hosting provider]) may record technical data such as IP address and time of each request, for security and to keep the service running.</li>
 </ul>
+<p>Vocabloom never receives a student&rsquo;s name, answers, score, review deck or reading history.</p>
+
+<h3>Only on a student&rsquo;s own device</h3>
+<ul>
+  <li><strong>Worksheet links.</strong> A normal share link stores the worksheet inside the link itself, in the part after the <code>#</code>. That part is not sent to our server when a student opens the link.</li>
+  <li><strong>Answers.</strong> A student can type a name and answer the exercises. Name, answers and progress stay in that device&rsquo;s browser (local storage) so the student can continue later. Teachers cannot see them.</li>
+  <li><strong>Review deck (the student chooses).</strong> If a student presses <em>Save to my review deck</em>, the questions they got wrong are kept in that device&rsquo;s local storage, with the worksheet&rsquo;s title, and come back on later days. Nothing is sent. Without that choice nothing is kept.</li>
+  <li><strong>Recent worksheets.</strong> The app remembers the title and link of the last few worksheets opened, so they can be found again.</li>
+  <li><strong>Offline copy.</strong> The browser keeps a copy of the app, and of worksheets opened through short links, so they open without a connection.</li>
+  <li><strong>Listen buttons.</strong> The buttons that read a question aloud use the voices that come with the phone or browser. Only the worksheet&rsquo;s own text is read, never a student&rsquo;s name or answers, and Vocabloom prefers voices that run on the device. Some browsers offer an online voice run by the browser&rsquo;s maker: if the student&rsquo;s browser chooses one, the text of that question is processed by that company.</li>
+</ul>
+<p><strong>Deleting it.</strong> On the home page (<em>My review deck</em>), <em>Delete my deck</em> removes the deck and <em>Clear everything on this device</em> removes answers, deck and recent worksheets. Clearing the site data in the browser removes everything, including the offline copy. On a shared computer, please clear it when you finish.</p>
 <p>Vocabloom sets no cookies, uses no analytics or advertising, and loads no fonts or scripts from other companies.</p>
 
 <h2>Artificial intelligence</h2>
 <p>An AI service reads the teacher&rsquo;s PDF and builds the exercises. It may also write the hints and explanations that students see, and the student pages say so. The AI can make mistakes, so teachers are asked to check every exercise, answer, hint and explanation before sharing the link. Vocabloom makes no automated decisions about students: the score is feedback for practice and is not stored or sent anywhere.</p>
 
 <h2>Children and young people</h2>
-<p>Students may be under 16 or under 18. The school remains responsible for them and decides how the link is shared (for example inside its own virtual classroom). Vocabloom asks for no account, email address or other identifier: a name is optional and stays on the student&rsquo;s device. [Describe how the school informs students and parents or guardians.]</p>
+<p>Students may be under 16 or under 18. The school remains responsible for them and decides how the link is shared (for example inside its own virtual classroom). Vocabloom asks for no account, email address or other identifier: a name is optional and stays on the student&rsquo;s device, and so does the review deck. [Describe how the school informs students and parents or guardians.]</p>
 
 <h2>Please do not upload personal data</h2>
 <p>Worksheets should contain teaching material only. Do not upload files that contain names, photos, marks or other personal data of students or staff.</p>
 
 <h2>Why we process data and for how long</h2>
-<p>Purpose: to let teachers prepare interactive exercises. Legal basis: [for example, public task or legitimate interests, to be confirmed by the school]. Files are processed only while a conversion is running. Data kept in a student&rsquo;s browser can be removed at any time by clearing the site data for this website.</p>
+<p>Purpose: to let teachers prepare interactive exercises. Legal basis: [for example, public task or legitimate interests, to be confirmed by the school]. Files are processed only while a conversion is running.</p>
+<ul>
+  <li>Converted worksheets kept for repeat conversions: [7] days (set by the school).</li>
+  <li>Short links: [90] days (set by the school), then the worksheet is deleted.</li>
+  <li>Usage counters: at most two days.</li>
+  <li>Hosting logs: [period, per the hosting provider].</li>
+  <li>On a student&rsquo;s device: until the student deletes it, or clears the browser&rsquo;s site data.</li>
+</ul>
 
 <h2>Who else handles data</h2>
 <ul>
   <li><strong>AI provider:</strong> [name, for example Anthropic], receives the PDF during a conversion.</li>
   <li><strong>Hosting provider:</strong> [name, for example Vercel], region: [for example Dublin, Ireland], receives technical request data.</li>
+  <li><strong>Storage provider (only if shared storage is switched on):</strong> [name, for example Upstash], region: [for example Ireland or Frankfurt], keeps the converted worksheets, short links and usage counters described above.</li>
 </ul>
 <p>The school should keep a data processing agreement with each of them.</p>
 
 <h2>How the data is protected</h2>
-<p>Connections are encrypted (HTTPS). The tool uses strict browser security rules, limits repeated wrong access codes and conversions, checks everything the AI returns before showing it, and has no database to leak. Security problems can be reported as described in the project&rsquo;s security policy (see <code>/.well-known/security.txt</code>).</p>
+<p>Connections are encrypted (HTTPS). The tool uses strict browser security rules, limits repeated wrong access codes and conversions, checks everything the AI returns before showing it, keeps no student accounts and no student answers on any server, and stores IP addresses only in scrambled form. Security problems can be reported as described in the project&rsquo;s security policy (see <code>/.well-known/security.txt</code>).</p>
 
 <h2>Transfers outside the European Economic Area</h2>
 <p>The AI service provider may process data outside the EEA. Before using Vocabloom, the school should have a data processing agreement and appropriate safeguards (for example Standard Contractual Clauses) in place with that provider: [reference to the agreement].</p>

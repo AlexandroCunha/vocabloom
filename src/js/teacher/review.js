@@ -1,6 +1,8 @@
 /* Teacher step 2: check and edit what the AI built before sharing it. */
 
 const splitList = (text, separator) => text.split(separator).map(part => part.trim()).filter(Boolean);
+/* Answers are typed exactly as students will type them: no capital letter at the start, no automatic correction. */
+const PLAIN_TEXT = 'autocapitalize="off" autocorrect="off"';
 const answersAsText = (section, item) => item.answers.join(section.type === 'fill' ? ' ; ' : ' | ');
 
 const correctOptionHtml = item =>
@@ -18,21 +20,21 @@ function itemEditorHtml(section, item, itemIndex) {
   const header = '<div class="it" data-ii="' + itemIndex + '"><div class="top2"><span>' + (itemIndex + 1) + '.</span><button class="danger sm" data-del="item">Remove</button></div>';
   if (type === 'match') {
     return header
-      + '<input type="text" data-f="left" value="' + esc(item.left || item.prompt) + '" placeholder="Left item" aria-label="Left item">'
-      + '<input type="text" data-f="right" value="' + esc(item.right || item.answers[0] || '') + '" placeholder="Correct partner" aria-label="Correct partner">'
+      + '<input type="text" data-f="left" value="' + esc(item.left || item.prompt) + '" placeholder="Left item" aria-label="Left item" ' + PLAIN_TEXT + '>'
+      + '<input type="text" data-f="right" value="' + esc(item.right || item.answers[0] || '') + '" placeholder="Correct partner" aria-label="Correct partner" ' + PLAIN_TEXT + '>'
       + hintAndExplanationHtml(item) + '</div>';
   }
   let html = header + '<textarea data-f="prompt" aria-label="Question">' + esc(item.prompt) + '</textarea>';
   if (type === 'fill') {
-    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Answer for each blank, separated by ;" aria-label="Answers">'
+    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Answer for each blank, separated by ;" aria-label="Answers" ' + PLAIN_TEXT + '>'
       + '<small>Several blanks: separate with ; &middot; accepted alternatives for one blank: separate with |</small>';
   }
   if (type === 'short') {
-    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Accepted answers, separated by |" aria-label="Accepted answers">'
+    html += '<input type="text" data-f="answers" value="' + esc(answersAsText(section, item)) + '" placeholder="Accepted answers, separated by |" aria-label="Accepted answers" ' + PLAIN_TEXT + '>'
       + '<small>Leave empty if there is no single right answer (it will not be scored).</small>';
   }
   if (type === 'choice') {
-    html += '<textarea data-f="options" placeholder="One option per line" aria-label="Options">' + esc(item.options.join('\n')) + '</textarea><select data-f="correct" aria-label="Correct option">' + correctOptionHtml(item) + '</select>';
+    html += '<textarea data-f="options" placeholder="One option per line" aria-label="Options" ' + PLAIN_TEXT + '>' + esc(item.options.join('\n')) + '</textarea><select data-f="correct" aria-label="Correct option">' + correctOptionHtml(item) + '</select>';
   }
   if (type === 'truefalse') {
     html += '<select data-f="tf" aria-label="Correct answer"><option value="">No answer</option><option' + (item.answers[0] === 'True' ? ' selected' : '') + '>True</option><option' + (item.answers[0] === 'False' ? ' selected' : '') + '>False</option></select>';
@@ -47,15 +49,19 @@ function sectionEditorHtml(section, sectionIndex) {
     + '<input class="e" type="text" data-sf="title" value="' + esc(section.title) + '" placeholder="Exercise title" aria-label="Exercise title">'
     + '<textarea class="e" data-sf="instructions" placeholder="Instructions for students" style="min-height:48px" aria-label="Instructions">' + esc(section.instructions) + '</textarea>'
     + (section.passage ? '<textarea class="e" data-sf="passage" placeholder="Reading text" aria-label="Reading text">' + esc(section.passage) + '</textarea>' : '')
-    + (showWordBank ? '<input class="e" type="text" data-sf="wordBank" value="' + esc(section.wordBank.join(', ')) + '" placeholder="Word bank (comma separated, optional)" aria-label="Word bank">' : '')
+    + (showWordBank ? '<input class="e" type="text" data-sf="wordBank" value="' + esc(section.wordBank.join(', ')) + '" placeholder="Word bank (comma separated, optional)" aria-label="Word bank" ' + PLAIN_TEXT + '>' : '')
     + section.items.map((item, itemIndex) => itemEditorHtml(section, item, itemIndex)).join('') + '</div>';
 }
 
-function reviewHtml(worksheet) {
+/** Shown when the server already had a conversion of this exact PDF. The teacher can ask for a new one. */
+const cachedNoteHtml = '<div class="note ok" id="cachednote"><b>Saved result.</b> This PDF was converted before, so you are seeing that result and no AI credit was used. '
+  + 'If it does not look right, <button class="ghost sm" id="again" style="margin-left:4px">Convert again</button></div>';
+
+function reviewHtml(worksheet, cached) {
   const keyNote = worksheet.answerKeyFound
     ? '<div class="note ok"><b>Answer key found.</b> The correct answers come from your PDF.</div>'
     : '<div class="note warn"><b>No answer key in the PDF.</b> The AI worked out the answers itself. Please check them before sharing.</div>';
-  return '<section class="panel"><h2>Review the exercises</h2>' + keyNote
+  return '<section class="panel"><h2>Review the exercises</h2>' + keyNote + (cached ? cachedNoteHtml : '')
     + '<p class="sub">The AI can make mistakes. Check the questions, answers, hints and explanations before you share the link.</p>'
     + '<label class="f">Worksheet title</label><input type="text" data-wf="title" value="' + esc(worksheet.title) + '">'
     + worksheet.sections.map(sectionEditorHtml).join('')
@@ -79,7 +85,7 @@ const ITEM_FIELD_UPDATERS = {
 
 function renderReviewStep(session, nav) {
   const stage = $('#stage');
-  stage.innerHTML = reviewHtml(session.worksheet);
+  stage.innerHTML = reviewHtml(session.worksheet, session.cached && session.file);
 
   const sectionOf = element => {
     const box = element.closest('.xsec');
@@ -127,6 +133,7 @@ function renderReviewStep(session, nav) {
   };
 
   $('#b1').onclick = () => nav.go(1);
+  if ($('#again')) $('#again').onclick = () => convertAgain(session, nav);
   $('#b3').onclick = () => {
     if (!session.worksheet.sections.length) { toast('Nothing left to share'); return; }
     nav.go(3);

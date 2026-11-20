@@ -15,7 +15,8 @@ function freshStudentState() {
     wrongAttempts: {},   // id -> number of different wrong answers
     everWrong: {},       // id -> true once a wrong answer was given
     lastWrongAnswer: {}, // id -> the last wrong answer, to avoid counting the same one twice
-    practiceSkipped: false
+    practiceSkipped: false,
+    deckDismissed: false   // "No thanks" to keeping the mistakes in the review deck
   };
 }
 
