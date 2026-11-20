@@ -15,6 +15,10 @@ Only the latest version on the default branch receives security fixes.
 
 ## Practices in this project
 
+<p align="center">
+  <img src="docs/images/security.svg" alt="Security in layers: eight checks on every conversion request, and protections in the browser, on the server and in the data" width="100%">
+</p>
+
 **Secrets and access**
 - No secrets in the repository: `.env` is ignored, `.env.example` holds placeholders only.
 - One access code per teacher (`ACCESS_CODES`), so a single code can be withdrawn without touching the others. Codes are checked in constant time.

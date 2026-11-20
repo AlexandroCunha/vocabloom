@@ -4,6 +4,12 @@ Vocabloom is deliberately small: **no accounts, no runtime dependencies, and not
 
 ## The big picture
 
+<p align="center">
+  <img src="images/architecture.svg" alt="Vocabloom architecture: the teacher's browser, a Vercel function in Dublin, the Claude API, optional Upstash Redis, and the students' phones" width="100%">
+</p>
+
+The same flow, as a diagram you can edit:
+
 ```mermaid
 flowchart LR
   T[Teacher's browser] -- "PDF + access code" --> API["/api/convert (Vercel function, Dublin)"]
@@ -193,6 +199,10 @@ Rules that exist for one device, and the reason:
 `test/devices.test.js` reads the style sheets and fails if one of these rules is removed (for example a `:hover` outside `@media (hover:hover)`, a `vh` without `dvh`, or a bar without its safe-area padding). How the screens look was checked in Chrome at 320 to 2560px wide, as an iPhone (touch, no hover), sideways, and with a notch simulated by setting the `--sa*` settings in the console, for example `document.documentElement.style.setProperty('--sal', '59px')`. The iPhone Duo layer was checked in Chrome at the five sizes Safari 27.1 reports (listed at the top of `05-iphone-duo.css`), and its fold rules with Chrome's own fold emulation: `Emulation.setDeviceMetricsOverride` with a `displayFeature`, in a browser started with `--enable-experimental-web-platform-features`, once with a vertical fold (book) and once with a horizontal fold (laptop). The place-keeping was checked by resizing the window between those sizes while a question was at the top. None of this was run on a real iPhone, an iPhone Duo or in Safari, whose fold features are off by default (Settings, Apps, Safari, Advanced, Feature Flags) and may change: check there before a release.
 
 ## Security design
+
+<p align="center">
+  <img src="images/security.svg" alt="Security in layers: eight checks on every conversion request, and protections in the browser, on the server and in the data" width="100%">
+</p>
 
 | Threat | Defence |
 |---|---|
