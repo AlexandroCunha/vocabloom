@@ -10,6 +10,7 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.json': 'application/json',
+  '.webmanifest': 'application/manifest+json',
   '.js': 'text/javascript',
   '.css': 'text/css',
   '.svg': 'image/svg+xml',
@@ -27,7 +28,11 @@ function loadEnvFile() {
 }
 loadEnvFile();
 
-const handler = require('./api/convert.js');
+// Same routes as the files in api/ on Vercel.
+const API_ROUTES = {
+  '/api/convert': require('./api/convert.js'),
+  '/api/share': require('./api/share.js')
+};
 
 function reply(res, code, text) {
   applySecurityHeaders(res);
@@ -43,7 +48,7 @@ function resolvePublicFile(urlPath) {
   return file.startsWith(PUBLIC_DIR + path.sep) ? file : null;
 }
 
-function handleApi(req, res) {
+function handleApi(handler, req, res) {
   const chunks = [];
   let size = 0;
   req.on('data', chunk => {
@@ -74,7 +79,7 @@ if (require.main === module) {
   const port = process.env.PORT || 3000;
   http.createServer((req, res) => {
     const urlPath = req.url.split('?')[0];
-    if (urlPath === '/api/convert') return handleApi(req, res);
+    if (API_ROUTES[urlPath]) return handleApi(API_ROUTES[urlPath], req, res);
     handleStatic(req, res, urlPath);
   }).listen(port, () => console.log('Vocabloom running on http://localhost:' + port));
 }

@@ -71,3 +71,21 @@ test('fails clearly when no exercises were found', async () => {
   const error = await failure(toolReply({ title: 'T', sections: [] }));
   assert.equal(error.status, 422);
 });
+
+test('says so, in plain words, when the monthly spend limit has been reached', async () => {
+  const custom = await failure(reply(400, { type: 'error', error: { type: 'invalid_request_error', message: 'You have reached your specified API usage limits. You will regain access on 2026-12-01 at 00:00 UTC.' } }));
+  assert.equal(custom.status, 503);
+  assert.match(custom.publicMessage, /budget/);
+  assert.doesNotMatch(custom.publicMessage, /2026|UTC|specified/);   // the provider's own words stay in the log
+
+  const cap = await failure(reply(429, { type: 'error', error: { type: 'rate_limit_error', error_code: 'enforced_spend_limit_reached', message: 'secret provider detail' } }));
+  assert.equal(cap.status, 503);
+  assert.match(cap.publicMessage, /budget/);
+  assert.doesNotMatch(cap.publicMessage, /secret/);
+});
+
+test('an ordinary bad request is still a generic error, not a budget message', async () => {
+  const error = await failure(reply(400, { error: { type: 'invalid_request_error', message: 'messages: text content blocks must be non-empty' } }));
+  assert.equal(error.status, 502);
+  assert.doesNotMatch(error.publicMessage, /budget/);
+});

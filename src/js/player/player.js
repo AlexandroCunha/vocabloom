@@ -1,11 +1,16 @@
 /*
  * The student worksheet: draws it, grades answers as they are given, shows feedback and the score.
- * Usage: renderPlayer(rootElement, worksheet, { persist: true|false })
+ * Usage: renderPlayer(rootElement, worksheet, { persist: true|false, home: true|false })
+ *   persist: keep the student's answers on this device;  home: link to the student's home page.
  */
 
 const INSTANT_TYPES = ['choice', 'truefalse', 'match'];   // graded as soon as the student picks
 const CONFETTI_COLOURS = ['#B4252A', '#388A9F', '#1B9A5A', '#E4B43A', '#CC3366'];
 const RESET_CONFIRM_MS = 3000;
+
+/** One speaker for the whole page, so only one thing is ever read aloud at a time. */
+let speakerInstance = null;
+const sharedSpeaker = () => speakerInstance || (speakerInstance = createSpeaker(window));
 
 function launchConfetti(container) {
   for (let i = 0; i < 34; i++) {
@@ -31,7 +36,11 @@ function renderPlayer(root, rawWorksheet, options) {
   let state = options.persist ? loadStudentState(key) : freshStudentState();
   const save = () => { if (options.persist) saveStudentState(key, state); };
 
-  root.innerHTML = playerHtml(worksheet, index);
+  const speaker = sharedSpeaker();
+  const speak = speaker.supported ? (text, button) => speaker.speak(text, button) : null;
+  speaker.stop();
+
+  root.innerHTML = playerHtml(worksheet, index, { listen: speaker.supported, home: Boolean(options.home) });
 
   /* ---------- reading the state of one question ---------- */
 
@@ -40,6 +49,7 @@ function renderPlayer(root, rawWorksheet, options) {
   const isAnswered = id => items[id].scored && hasAnswer(typeOf(id), state.values[id]);
   const hintFor = id => items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
   const mistakeIds = () => scoredIds.filter(id => state.everWrong[id]);
+  const sourceOf = id => ({ type: typeOf(id), item: items[id].item, choices: index.matchOptions[items[id].sectionIndex] || [] });
 
   /** none | ok (right first time) | fix (right after a mistake) | bad | rev (answer was shown) */
   function statusOf(id) {
@@ -52,6 +62,13 @@ function renderPlayer(root, rawWorksheet, options) {
     return state.everWrong[id] ? 'fix' : 'ok';
   }
 
+  /** The first time a question goes wrong it becomes a mistake (and joins the review deck, if the student keeps one). */
+  function markMistake(id) {
+    if (state.everWrong[id]) return;
+    state.everWrong[id] = true;
+    deckPanel.noteMistake(sourceOf(id));
+  }
+
   /** Counts a wrong answer once, however many times the student presses Check on it. */
   function recordAttempt(id) {
     if (!isAnswered(id) || isRight(id)) return;
@@ -59,7 +76,7 @@ function renderPlayer(root, rawWorksheet, options) {
     if (state.lastWrongAnswer[id] === snapshot) return;
     state.lastWrongAnswer[id] = snapshot;
     state.wrongAttempts[id] = (state.wrongAttempts[id] || 0) + 1;
-    state.everWrong[id] = true;
+    markMistake(id);
   }
 
   /* ---------- feedback on one question ---------- */
@@ -149,6 +166,7 @@ function renderPlayer(root, rawWorksheet, options) {
     find('#pb').style.width = (results.right / total * 100) + '%';
     renderMistakes();
     if (!practice.isRunning()) practice.render();
+    if (!deckPanel.isRunning()) deckPanel.render();
 
     const final = find('#final');
     const allRight = results.right === total;
@@ -162,9 +180,19 @@ function renderPlayer(root, rawWorksheet, options) {
   }
 
   const practice = createPractice({
-    root, index, mistakeIds, hintFor,
-    isSkipped: () => state.practiceSkipped,
-    markSkipped: () => { state.practiceSkipped = true; save(); }
+    root, panel: '#prac', prefix: 'p',
+    index, ids: mistakeIds, hintFor, speak,
+    isClosed: () => state.practiceSkipped,
+    onClose: () => { state.practiceSkipped = true; save(); }
+  });
+
+  const deckPanel = createDeckPanel({
+    root, panel: '#deck', speak,
+    enabled: Boolean(options.persist),
+    source: worksheet.title,
+    mistakes: () => mistakeIds().map(sourceOf),
+    isDismissed: () => state.deckDismissed,
+    onDismiss: () => { state.deckDismissed = true; save(); }
   });
 
   /* ---------- what each button does ---------- */
@@ -186,7 +214,7 @@ function renderPlayer(root, rawWorksheet, options) {
         message.textContent = hint ? '💡 ' + hint : 'No hint for this one. Tap again to see the answer.';
       } else {
         state.revealed[id] = true;
-        state.everWrong[id] = true;
+        markMistake(id);
         paint(id); updateScore();
       }
       save();
@@ -207,6 +235,16 @@ function renderPlayer(root, rawWorksheet, options) {
       const card = find('#w-' + id);
       if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     },
+    say(id, button) {
+      const settled = ['ok', 'fix', 'rev'].includes(statusOf(id));
+      speaker.speak(spokenText(typeOf(id), items[id].item, settled), button);
+    },
+    'say-passage'(id, button) {
+      speaker.speak(worksheet.sections[+button.dataset.s].passage, button);
+    },
+    'say-word'(id, button) {
+      speaker.speak(button.textContent, button);
+    },
     reset(id, button) {
       if (Date.now() - resetArmedAt < RESET_CONFIRM_MS) {
         state = freshStudentState();
@@ -225,7 +263,7 @@ function renderPlayer(root, rawWorksheet, options) {
     const button = event.target.closest('[data-act]');
     if (!button || !root.contains(button)) return;
     const action = button.dataset.act;
-    if (practice.handleAction(action, button)) return;
+    if (practice.handleAction(action, button) || deckPanel.handleAction(action, button)) return;
     if (actions[action]) actions[action](button.dataset.id, button);
   };
 
@@ -243,7 +281,7 @@ function renderPlayer(root, rawWorksheet, options) {
 
   root.onchange = event => {
     const field = event.target;
-    if (practice.handleChange(field)) return;
+    if (practice.handleChange(field) || deckPanel.handleChange(field)) return;
     if (field.tagName === 'SELECT' && field.dataset.id) {
       state.values[field.dataset.id] = field.value;
       recordAttempt(field.dataset.id);
@@ -252,9 +290,12 @@ function renderPlayer(root, rawWorksheet, options) {
   };
 
   root.onkeydown = event => {
+    if (moveBetweenOptions(event)) { event.preventDefault(); return; }
     const field = event.target;
+    // A word in the word bank is a button made from a span: Enter and Space press it like a real button.
+    if ((event.key === 'Enter' || event.key === ' ') && field.getAttribute('role') === 'button') { event.preventDefault(); field.click(); return; }
     if (event.key !== 'Enter' || field.tagName !== 'INPUT') return;
-    if (field.dataset.pk !== undefined) { event.preventDefault(); practice.handleEnter(field); return; }
+    if (practice.handleEnter(field) || deckPanel.handleEnter(field)) { event.preventDefault(); return; }
     if (!field.dataset.id) return;
     event.preventDefault();
     const checkButton = root.querySelector('[data-act="check"][data-id="' + field.dataset.id + '"]');

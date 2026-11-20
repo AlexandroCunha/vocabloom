@@ -3,7 +3,8 @@
  * The page re-reads its own source (captured before anything is drawn) and swaps in the worksheet data.
  */
 
-const PAGE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+// The app's install links are left out of a downloaded file: it is not part of the website.
+const PAGE_SOURCE = ('<!DOCTYPE html>\n' + document.documentElement.outerHTML).replace(/<link rel="(?:manifest|apple-touch-icon)"[^>]*>\n?/g, '');
 const DATA_TAG_OPEN = '<script id="ws-data" type="application/json">';
 const SCRIPT_CLOSE = '</' + 'script>';
 
@@ -16,8 +17,12 @@ function buildStandalonePage(worksheet) {
 }
 
 function downloadTextFile(name, text) {
+  downloadBlob(name, new Blob([text], { type: 'text/html' }));
+}
+
+function downloadBlob(name, blob) {
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([text], { type: 'text/html' }));
+  link.href = URL.createObjectURL(blob);
   link.download = name;
   document.body.appendChild(link);
   link.click();

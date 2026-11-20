@@ -2,7 +2,7 @@
 /**
  * Builds public/index.html from src/ (no dependencies).
  *
- *   node scripts/build.js           write public/index.html, lib/csp-hashes.json and the vercel.json CSP
+ *   node scripts/build.js           write public/index.html, public/sw.js, lib/csp-hashes.json and the vercel.json CSP
  *   node scripts/build.js --check   exit 1 if any of them is out of date (the tests run this)
  *
  * Why a single file? A worksheet can be downloaded as one self-contained .html file, and the app
@@ -19,25 +19,49 @@ const PUBLIC = path.join(ROOT, 'public');
 const OUTPUT = path.join(PUBLIC, 'index.html');
 const HASH_FILE = path.join(ROOT, 'lib', 'csp-hashes.json');
 const VERCEL_FILE = path.join(ROOT, 'vercel.json');
+const SW_TEMPLATE = path.join(SRC, 'sw.template.js');
+const SW_OUTPUT = path.join(PUBLIC, 'sw.js');
+
+/** Everything the service worker keeps for offline use. '/' is the built page itself. */
+const APP_FILES = [
+  '/',
+  '/manifest.webmanifest',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
+  '/icons/apple-touch-icon.png',
+  '/privacy.html'
+];
 
 /** Order matters: scripts share one scope, and later files use what earlier files define. */
 const STYLES = [
   'styles/01-base.css',
   'styles/02-shell-and-teacher.css',
-  'styles/03-player.css'
+  'styles/03-player.css',
+  'styles/04-devices.css',
+  'styles/05-iphone-duo.css'
 ];
 const SCRIPTS = [
   'js/core/ui.js',
   'js/core/text.js',
   'js/core/worksheet.js',
   'js/core/grading.js',
+  'js/core/speech.js',
+  'js/core/deck.js',
+  'js/core/local-data.js',
+  'js/core/offline.js',
+  'js/core/platform.js',
   'js/share/codec.js',
+  'js/share/qr.js',
   'js/share/standalone.js',
   'js/player/state.js',
   'js/player/items.js',
   'js/player/markup.js',
   'js/player/practice.js',
+  'js/player/deck-panel.js',
+  'js/player/keep-place.js',
   'js/player/player.js',
+  'js/player/home.js',
   'js/teacher/upload.js',
   'js/teacher/review.js',
   'js/teacher/share.js',
@@ -58,6 +82,20 @@ function build() {
     .replace('/*{{STYLES}}*/', () => styles.trimEnd())
     .replace('/*{{SCRIPT}}*/', () => script);
   return html;
+}
+
+/**
+ * The service worker, with its version and file list filled in. The version changes whenever the page,
+ * an icon, the manifest or the worker itself changes, which is what makes browsers install the update.
+ */
+function buildServiceWorker(indexHtml) {
+  const template = fs.readFileSync(SW_TEMPLATE, 'utf8');
+  const digest = crypto.createHash('sha256').update(template);
+  APP_FILES.forEach(url => digest.update(url + '\0').update(url === '/' ? indexHtml : fs.readFileSync(path.join(PUBLIC, url))));
+  const version = digest.digest('hex').slice(0, 12);
+  return template
+    .replace('{{VERSION}}', () => version)
+    .replace('{{APP_FILES}}', () => JSON.stringify(APP_FILES));
 }
 
 /** sha256 (base64) of every inline script that runs. JSON data blocks never execute and are skipped. */
@@ -89,6 +127,7 @@ function expectedFiles() {
   csp.value = buildCsp(hashes);
   return [
     { file: OUTPUT, content: html },
+    { file: SW_OUTPUT, content: buildServiceWorker(html) },
     { file: HASH_FILE, content: JSON.stringify({ scripts: hashes }, null, 2) + '\n' },
     { file: VERCEL_FILE, content: JSON.stringify(vercel, null, 2) + '\n' }
   ];
@@ -108,8 +147,8 @@ if (require.main === module) {
     console.log('Generated files are up to date.');
   } else {
     expectedFiles().forEach(({ file, content }) => fs.writeFileSync(file, content));
-    console.log('Built public/index.html, lib/csp-hashes.json and the vercel.json CSP.');
+    console.log('Built public/index.html, public/sw.js, lib/csp-hashes.json and the vercel.json CSP.');
   }
 }
 
-module.exports = { build, outOfDate, inlineScriptHashes, SCRIPTS, STYLES, SRC };
+module.exports = { build, buildServiceWorker, outOfDate, inlineScriptHashes, SCRIPTS, STYLES, SRC, APP_FILES, PUBLIC };

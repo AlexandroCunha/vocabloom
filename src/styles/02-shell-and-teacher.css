@@ -1,11 +1,11 @@
 /* Header, steps, upload / review / share screens, loading overlay. */
 /* hero / header */
 .top,.hero{color:#fff;background:radial-gradient(circle at 92% -10%,rgba(255,255,255,.22),transparent 42%),radial-gradient(circle at 0% 105%,rgba(255,255,255,.12),transparent 45%),linear-gradient(135deg,#3F95AB 0%,#1F7790 50%,#14586B 100%)}
-.top{padding:22px 16px 46px;border-radius:0 0 30px 30px}
-.top .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.top{padding:calc(22px + var(--sat)) max(16px,var(--sar)) 46px max(16px,var(--sal));border-radius:0 0 30px 30px}
+.top .in{max-width:var(--col);margin:0 auto;display:flex;align-items:center;gap:12px}
 .top h1{margin:0;font-size:28px;letter-spacing:-.3px;color:#fff;line-height:1.1}
 .top p{margin:2px 0 0;font-size:13px;font-weight:300;opacity:.92}
-.steps{display:flex;gap:8px;max-width:720px;margin:-26px auto 16px;padding:0 14px;position:relative}
+.steps{display:flex;gap:8px;max-width:var(--col);margin:-26px auto 16px;padding:0 max(14px,var(--sar)) 0 max(14px,var(--sal));position:relative}
 .steps div{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:var(--mute);border-radius:16px;font-size:13px;padding:10px 6px;font-weight:600;box-shadow:var(--shadow);transition:all .2s}
 .steps div b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--tealbg);color:var(--teal3);font-size:12px}
 .steps div.on{background:var(--teal3);color:#fff}
@@ -16,10 +16,16 @@
 .panel h2{margin:0 0 4px;font-size:24px;letter-spacing:-.2px}
 .lead{margin:0 0 16px;color:var(--mute);font-size:14px}
 label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:var(--ink)}
-.drop{display:block;border:2px dashed #9CCAD6;border-radius:var(--r);background:linear-gradient(180deg,#F4FAFB,#E9F5F8);text-align:center;padding:30px 14px;cursor:pointer;font-weight:600;color:var(--teal3);transition:all .2s}
-.drop:hover{border-color:var(--teal);transform:translateY(-1px)}
+.drop{position:relative;display:block;border:2px dashed #9CCAD6;border-radius:var(--r);background:linear-gradient(180deg,#F4FAFB,#E9F5F8);text-align:center;padding:30px 14px;cursor:pointer;font-weight:600;color:var(--teal3);transition:all .2s}
+@media (hover:hover){.drop:hover{border-color:var(--teal);transform:translateY(-1px)}}
+/* a file is being dragged over the box */
+.drop.over{border-style:solid;border-color:var(--teal);background:var(--tealbg);box-shadow:0 0 0 4px rgba(56,138,159,.18)}
+.drop:has(input:focus-visible){outline:3px solid rgba(56,138,159,.55);outline-offset:2px}
 .drop.has{border-style:solid;border-color:var(--teal);background:var(--tealbg)}
-.drop input{display:none}
+/* The file input stays in the page (not display:none) so the keyboard can reach it. */
+.drop input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.mouse-only{display:none}
+@media (hover:hover) and (pointer:fine){.touch-only{display:none}.mouse-only{display:inline}}
 .drop small{font-weight:400;color:var(--mute)}
 .drop .ic{display:block;margin:0 auto 8px;width:46px;height:46px;border-radius:14px;background:var(--red);color:#fff;font-size:24px;line-height:46px;box-shadow:0 8px 18px rgba(180,37,42,.25)}
 .err{background:var(--badbg);color:#A5302A;border-radius:14px;padding:11px 14px;margin:14px 0;font-size:14px}
@@ -28,9 +34,10 @@ label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:v
 .note.warn{background:var(--revbg);color:#7A5400}
 .btns{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
 .btns button{flex:1 1 150px}
+.btns button.wide{flex-basis:100%}
 .nav{display:flex;gap:10px;margin-top:16px}
 .nav button{flex:1}
-.load{position:fixed;inset:0;background:rgba(242,248,249,.96);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px}
+.load{position:fixed;inset:0;background:rgba(242,248,249,.96);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:max(20px,var(--sat)) max(20px,var(--sar)) max(20px,var(--sab)) max(20px,var(--sal))}
 .spin{width:58px;height:58px;border-radius:50%;border:6px solid #D2E8EE;border-top-color:var(--red);animation:sp .9s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -48,3 +55,11 @@ label.f{display:block;font-weight:600;font-size:13.5px;margin:14px 0 6px;color:v
 .linkbox{display:flex;gap:8px}
 .linkbox input{flex:1;font-size:13px}
 
+/* short link and QR code */
+.shortbox{border:1.5px solid var(--line);border-radius:18px;padding:14px;margin:14px 0;background:#FAFDFD}
+.shortbox h3{margin:0 0 4px;font-size:18px}
+.qr{max-width:260px;margin:12px auto}
+.qr svg{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.box.qrbig{text-align:center}
+.qrbig .qr{max-width:min(78vw,60vh);max-width:min(78vw,60dvh)}
+.qrlink{word-break:break-all;font-size:14px;color:var(--mute);margin:10px 0 0}

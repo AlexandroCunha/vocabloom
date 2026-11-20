@@ -17,17 +17,56 @@ function toast(message) {
   setTimeout(() => element.remove(), 1900);
 }
 
+/**
+ * Shows an overlay (a dark backdrop holding a box). Escape or a click on the backdrop closes it,
+ * and focus goes back to what had it before. Returns the function that closes the overlay.
+ */
+function showOverlay(overlay) {
+  const opener = document.activeElement;
+  document.body.appendChild(overlay);
+  const onKey = event => { if (event.key === 'Escape') close(); };
+  function close() {
+    overlay.remove();
+    document.removeEventListener('keydown', onKey);
+    if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus();
+  }
+  document.addEventListener('keydown', onKey);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+  return close;
+}
+
 /** Fallback when the clipboard is blocked: shows the text so the user can copy it by hand. */
 function showText(title, text) {
   const overlay = document.createElement('div');
   overlay.className = 'ov';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', title);
   overlay.innerHTML = '<div class="box"><h3 style="margin:0 0 8px">' + esc(title) + '</h3><textarea readonly></textarea><div class="nav"><button class="sec">Close</button></div></div>';
-  document.body.appendChild(overlay);
+  const close = showOverlay(overlay);
   const field = $('textarea', overlay);
   field.value = text;
   field.focus();
   field.select();
-  $('button', overlay).onclick = () => overlay.remove();
+  $('button', overlay).onclick = close;
+}
+
+/** True when a drag carries files (and not, say, selected text). */
+const dragHasFiles = event => Array.from((event.dataTransfer && event.dataTransfer.types) || []).indexOf('Files') !== -1;
+
+const ARROW_STEPS = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+
+/**
+ * Arrow keys move between the answer buttons of one question, so a keyboard user does not have to Tab through
+ * every one. Returns true when the key was used.
+ */
+function moveBetweenOptions(event) {
+  const step = ARROW_STEPS[event.key];
+  const current = event.target;
+  if (!step || !current.classList || !current.classList.contains('opt')) return false;
+  const group = Array.from(current.parentNode.querySelectorAll('.opt'));
+  const next = group[(group.indexOf(current) + step + group.length) % group.length];
+  if (next) next.focus();
+  return true;
 }
 
 async function copyText(text, title) {
