@@ -19,7 +19,8 @@ const DROP_BOX_TEXT = '<span class="ic">&#8593;</span><span class="touch-only">T
 
 function uploadStepHtml() {
   return '<section class="panel up"><div class="up-intro"><h2>Upload a PDF</h2><p class="lead">Any worksheet: vocabulary, grammar, reading, true/false, matching&hellip; The AI finds the exercises and turns them into questions students can answer on a phone.</p>'
-    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p></div>'
+    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p>'
+    + '<p class="sub">Student? <a href="#review">Open my review deck</a>.</p></div>'
     + '<div class="up-form"><label class="drop" id="drop"><input type="file" id="file" accept="application/pdf,.pdf"><span id="dropt">' + DROP_BOX_TEXT + '</span></label>'
     + '<label class="f" for="code">School access code</label><input type="password" id="code" autocomplete="current-password" placeholder="Ask your school admin">'
     + '<div class="err" id="err" role="alert" hidden></div>'

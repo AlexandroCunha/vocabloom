@@ -37,7 +37,7 @@ function createPractice(ctx) {
   const copy = Object.assign({}, PRACTICE_COPY, ctx.copy || {});
   const fieldAttr = 'data-' + prefix + 'k';
   const act = name => prefix + '-' + name;
-  const run = { mode: ctx.isClosed && ctx.isClosed() ? 'closed' : 'idle', ids: [], index: null, position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '' };
+  const run = { mode: ctx.isClosed && ctx.isClosed() ? 'closed' : 'idle', ids: [], index: null, position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', last: null };
   const result = () => ({ asked: run.ids.length, right: run.fixed, firstTime: run.firstTime });
 
   const panel = () => $(ctx.panel, root);
@@ -124,20 +124,22 @@ function createPractice(ctx) {
       return null;
     }
     run.tries += 1;
+    run.last = value;
+    const slips = diagnose(type, entry.item, value) || [];   // what the student actually got wrong, if it is a slip
     if (isCorrect(type, entry.item, value)) {
       run.fixed += 1;
       if (run.tries === 1) run.firstTime += 1;
       box.className = 'msg ok';
-      box.innerHTML = 'Correct, well done!' + tipHtml('📘', entry.item.explanation);
+      box.innerHTML = 'Correct, well done!' + tipHtml('📘', entry.item.explanation) + tipHtml('💡', capitalReminder(slips));
       finishQuestion(run.tries === 1);
       return true;
     }
     box.className = 'msg bad';
     if (run.tries >= MAX_PRACTICE_TRIES) {
-      box.innerHTML = 'Answer: <b>' + esc(answerText(type, entry.item)) + '</b>' + tipHtml('📘', entry.item.explanation);
+      box.innerHTML = 'Answer: <b>' + esc(answerText(type, entry.item)) + '</b>' + (slips.length ? tipHtml('💡', slipReveal(slips)) : tipHtml('📘', entry.item.explanation));
       finishQuestion(false);
     } else {
-      box.innerHTML = 'Not quite. Have another go.' + tipHtml('💡', ctx.hintFor(entry.id)) + (run.tries >= 2 ? tipHtml('📘', entry.item.explanation) : '');
+      box.innerHTML = 'Not quite. Have another go.' + tipHtml('💡', slips.length ? slipHint(slips) : ctx.hintFor(entry.id)) + (run.tries >= 2 && !slips.length ? tipHtml('📘', entry.item.explanation) : '');
     }
     return false;
   }
@@ -147,6 +149,7 @@ function createPractice(ctx) {
     run.tries = 0;
     run.resolved = false;
     run.picked = '';
+    run.last = null;
     run.mode = run.position >= run.ids.length ? 'done' : 'run';
     render();
   }
@@ -154,7 +157,7 @@ function createPractice(ctx) {
   function start() {
     run.ids = ctx.ids().slice();
     run.index = buildIndex();
-    Object.assign(run, { position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', mode: run.ids.length ? 'run' : 'idle' });
+    Object.assign(run, { position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', last: null, mode: run.ids.length ? 'run' : 'idle' });
     render();
     const box = panel();
     if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -169,7 +172,8 @@ function createPractice(ctx) {
   }
 
   function showHint() {
-    const hint = ctx.hintFor(run.ids[run.position]);
+    const slips = run.last ? diagnose(currentEntry().section.type, currentEntry().item, run.last) : null;
+    const hint = (slips && slips.length ? slipHint(slips) : '') || ctx.hintFor(run.ids[run.position]);
     const box = message();
     box.className = 'msg h';
     box.textContent = hint ? '💡 ' + hint : 'No hint for this one.';

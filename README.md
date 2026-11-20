@@ -66,6 +66,14 @@ Each question has a speaker button. In a word bank, tap a word to hear it. The v
   <img src="docs/images/listen.png" alt="A question being read aloud" width="260">
 </p>
 
+### Feedback that names the real mistake
+
+When a typed answer is close, the hint talks about what the student actually got wrong, not about the grammar point. If a student writes *I am brazillian* for *I am Brazilian.*, the hint is *Check the spelling and the capital letter of "brazillian".* It never gives the answer away; once the answer is shown, it says exactly what was different. When the answer is only a slip, the stored explanation is left out, because the student understood the grammar. Answers that are far off still get the teacher's (or the AI's) own hint and explanation. Grading itself ignores capital letters, so an answer such as *i live in dublin* is correct, with a gentle reminder about the capital letters.
+
+### After "Check all"
+
+The result card comes first, then the student's mistakes, the optional practice and the offer to keep a review deck, so nothing is missed below the fold. The card has a button that jumps to the first question still to fix, and a link to **My review deck**.
+
 ### Mistakes and optional practice
 
 <p align="center">
@@ -78,7 +86,7 @@ Each question has a speaker button. In a word bank, tap a word to hear it. The v
 
 Practice is for now. The review deck is for later: after a mistake the student is offered **Save to my review deck**, and nothing is saved until they say yes. Saved questions come back after 1, 3, 7, 14 and 30 days.
 
-The home page (**My review deck**, or the installed app) shows what is ready to review today and the worksheets the student opened recently. **Clear everything on this device** removes it all, which is useful on a shared computer.
+Students find their deck from the **My review deck** button at the top of every worksheet opened from a link, from the result card, and from the deck card once it is saved. The teacher's page links to it too (**Student? Open my review deck**). The home page (**My review deck**, or the installed app) shows what is ready to review today and the worksheets the student opened recently. **Clear everything on this device** removes it all, which is useful on a shared computer.
 
 <p align="center">
   <img src="docs/images/deck.png" alt="The offer to keep mistakes in a review deck" width="260">

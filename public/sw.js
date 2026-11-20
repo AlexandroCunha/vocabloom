@@ -9,7 +9,7 @@
  *   3. everything else is left alone. Uploads and conversions (anything that is not a plain GET) never
  *      go through this file, and student answers never leave the page, so there is nothing of theirs to keep.
  */
-const VERSION = '41d25dc07cbe';
+const VERSION = '4e87cfea82dd';
 const APP_CACHE = 'vocabloom-app-' + VERSION;
 const WORKSHEET_CACHE = 'vocabloom-worksheets';   // kept when a new version of the app is installed
 const APP_FILES = ["/","/manifest.webmanifest","/icons/icon-192.png","/icons/icon-512.png","/icons/icon-maskable-512.png","/icons/apple-touch-icon.png","/privacy.html"];
