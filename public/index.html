@@ -189,7 +189,7 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .recent small{color:var(--mute);font-weight:400;white-space:nowrap}
 .net{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--ink);color:#fff;text-align:center;font-size:13.5px;padding:10px max(14px,var(--sar)) calc(10px + var(--sab)) max(14px,var(--sal))}
 .net[hidden]{display:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 
 /* Adjustments for particular devices. Loaded last, so they override the phone-first rules above. */
 
@@ -211,7 +211,11 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 /* ---- Touch screens: fields need 16px or more, or Safari on iPhone zooms the page when one is selected ---- */
 @media (pointer:coarse){
 .linkbox input,.ov textarea{font-size:16px}
+.say{width:44px;height:44px;min-height:44px}
 }
+
+/* ---- Share step on a phone: the preview of the whole worksheet scrolls inside its frame, so Edit and New PDF stay within reach ---- */
+.share-preview .phone{max-height:60dvh;overflow:auto}
 
 /* ---- Wider screens ---- */
 @media (min-width:640px){
@@ -222,8 +226,8 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 :root{--col:760px}
 }
 
-/* ---- Computers: the teacher's tool uses the room ---- */
-@media (min-width:1000px){
+/* ---- Computers, and the iPhone Duo open sideways: the teacher's tool uses the room ---- */
+@media (min-width:900px){
 .teacher{--col:960px}
 .teacher .panel{padding:28px 32px}
 
@@ -245,6 +249,91 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .share-preview{grid-area:preview;position:sticky;top:16px}
 .share-nav{grid-area:nav}
 .share-preview .phone{margin-top:0;max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);overflow:auto;overscroll-behavior:contain}
+}
+
+/* iPhone Duo, Apple's foldable iPhone (Safari 27.1). Loaded last, so it overrides everything above.
+ *
+ * What Safari reports, in CSS px (width x height, toolbars showing):
+ *   outer display ........ 382 x 580 held upright     594 x 368 held sideways
+ *   inner display ........ 669 x 867 upright          951 x 585 sideways (the "book" pose)
+ *   two Safari windows side by side on the inner display ... 385 x 571 each
+ *
+ * Nothing here looks for the device. Every rule follows the size and shape of the window, so the same rules
+ * also suit other foldables, small tablets and short browser windows, and no other device is affected badly.
+ *
+ * The two fold features (device-posture and viewport-segments) are off by default in Safari 27.1
+ * (Settings > Apps > Safari > Advanced > Feature Flags). The page does not need them: with them off the
+ * layout below still works. With them on it also keeps text away from the crease.
+ */
+
+/* Three sizes the rules below share. They stay 0 (or the plain default) unless a fold is reported. */
+:root{--fold:0px;--lower:0px;--gutter:32px}
+
+/* ---- Outer display upright (382 x 580) and a half-width window (385 x 571): little height, so the header and the cards are tighter ---- */
+@media (max-width:480px) and (max-height:640px) and (orientation:portrait){
+.top{padding-top:calc(14px + var(--sat));padding-bottom:40px}
+.top h1{font-size:24px}
+.hero{padding-top:calc(14px + var(--sat));padding-bottom:40px}
+.hero h1{font-size:25px;margin:4px 0 0}
+.steps div{padding-top:8px;padding-bottom:8px}
+.bar{padding-top:calc(6px + var(--sat));padding-bottom:9px;margin-top:10px}
+.pl h3{font-size:19px;margin-top:22px}
+.card{padding:12px 12px 10px;margin-bottom:10px}
+.q{margin-bottom:8px}
+}
+
+/* ---- Any short window held sideways (the outer display on its side, the inner display open): the score bar becomes one line ---- */
+@media (orientation:landscape) and (max-height:700px){
+:root{--barh:calc(40px + var(--sat))}
+/* score and progress share one line; --barh is its height, which the reading text below uses to sit under it */
+.bar{display:flex;align-items:center;gap:12px;min-height:var(--barh);padding-top:var(--sat);padding-bottom:0;margin-top:8px}
+.bar .t{flex:none;justify-content:flex-start;gap:8px;max-width:none;margin:0}
+.prog{flex:1;max-width:none;margin:0}
+.pl h3{margin-top:20px}
+}
+
+/* ---- On a touch screen the header also gives height back (a short computer window keeps its header as it is) ---- */
+@media (orientation:landscape) and (max-height:700px) and (hover:none){
+.top{padding-top:calc(12px + var(--sat));padding-bottom:36px}
+.top h1{font-size:24px}
+.top p{display:none}
+.hero{padding-top:calc(12px + var(--sat));padding-bottom:36px}
+.hero h1{font-size:24px;margin:2px 0 0}
+.brand-mini{font-size:13px}
+.steps div{padding-top:7px;padding-bottom:7px}
+}
+
+/* ---- The inner display open sideways (951 x 585): a book. Two pages side by side, the gutter on the fold ---- */
+@media (orientation:landscape) and (min-width:900px) and (max-height:700px){
+:root{--col:940px;--col-one:720px;--gutter:max(32px,calc(var(--fold) + 28px))}
+/* Both sides get the larger of the two insets, so the gutter stays in the middle of the screen, where the fold is. */
+.pl[id^=sec-]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gutter);row-gap:0;align-items:start;
+  padding-left:max(14px,var(--sal),var(--sar));padding-right:max(14px,var(--sal),var(--sar))}
+.pl[id^=sec-]>h3,.pl[id^=sec-]>.sub,.pl[id^=sec-]>details.bank{grid-column:1/-1}
+/* A reading text takes the left page and stays in view while the questions run down the right page. */
+.pl[id^=sec-]:has(>.passage)>.passage{grid-column:1;grid-row:auto/span 200;align-self:start;position:sticky;top:calc(var(--barh) + 10px);
+  max-height:calc(100dvh - var(--barh) - 28px);overflow:auto;overscroll-behavior:contain;margin-bottom:0}
+.pl[id^=sec-]:has(>.passage)>details.bank,.pl[id^=sec-]:has(>.passage)>.card{grid-column:2}
+/* The name field and the closing area (mistakes, practice, results) stay one column, in the middle. */
+.pl:not([id^=sec-]),.namebar{max-width:var(--col-one)}
+}
+
+/* ---- Half open like a book (fold down the middle, two segments side by side): leave room for the crease ---- */
+@media (horizontal-viewport-segments:2){
+:root{--fold:calc(env(viewport-segment-left 1 0,0px) - env(viewport-segment-right 0 0,0px))}
+}
+/* With the two pages on the two halves, headings, instructions and the word bank stay on the left page: no text runs across the crease. */
+@media (horizontal-viewport-segments:2) and (orientation:landscape) and (min-width:900px) and (max-height:700px){
+.pl[id^=sec-]>h3,.pl[id^=sec-]>.sub,.pl[id^=sec-]>details.bank{max-width:calc(50% - var(--gutter) / 2)}
+}
+
+/* ---- Half open like a laptop (fold across the middle, one segment above the other): everything stays in the upper half ---- */
+@media (vertical-viewport-segments:2){
+:root{--lower:calc(100dvh - env(viewport-segment-bottom 0 0,100dvh))}
+html{scroll-padding-bottom:calc(var(--lower) + 16px)}
+.toast{bottom:calc(26px + max(var(--sab),var(--lower)))}
+.ov{padding-bottom:max(16px,var(--sab),var(--lower))}
+.load{padding-bottom:max(20px,var(--sab),var(--lower))}
 }
 </style>
 </head>
@@ -1949,6 +2038,89 @@ function createDeckPanel(options) {
 }
 
 /*
+ * Keeps the student's place when the window changes shape: a phone turned sideways, an iPhone Duo opening or closing,
+ * a window split in two. The page re-flows (one column becomes two), but Safari leaves the scroll position where it was
+ * in pixels, so afterwards the student can be many questions away from the one they were answering.
+ * keepPlace(root, win) remembers which question is at the top of the screen and puts it back after the change.
+ */
+
+const PLACE_MIN_WIDTH_CHANGE = 40;   // px: a smaller change is a scroll bar coming and going, not a new shape
+const PLACE_SETTLE_MS = 150;         // wait for the new layout, and for Safari to finish turning, before measuring
+
+const PLACE_EDGE_SLACK = 24;         // px of a question that may hide under the score bar and still count as the one in view
+
+/**
+ * What the student is looking at: the first item that starts at or just above `top` (the foot of the score bar) and still
+ * reaches below it. When a question is cut off by the bar, the next one is the anchor. When two sit side by side, the left
+ * one comes first. `rects` are { top, bottom } in document order. Returns -1 when nothing is in view.
+ */
+function pickAnchor(rects, top) {
+  const inView = rect => rect.bottom > top + 1;
+  const whole = rects.findIndex(rect => inView(rect) && rect.top >= top - PLACE_EDGE_SLACK);
+  return whole >= 0 ? whole : rects.findIndex(inView);
+}
+
+let placeKeeper = null;   // one at a time: showing another worksheet replaces the listeners of the one before
+
+function keepPlace(root, win) {
+  if (placeKeeper) placeKeeper.stop();
+  let place = null;             // { element, offset }: the question at the top, and how far below the score bar it sits
+  let width = win.innerWidth;   // the width the remembered place belongs to
+  let frame = 0;
+  let timer = 0;
+
+  const marks = () => Array.from(root.querySelectorAll('.pl h3, .pl .card, .pl .mk, .final'));
+  const barBottom = () => { const bar = root.querySelector('.bar'); return bar ? bar.getBoundingClientRect().bottom : 0; };
+
+  function remember() {
+    frame = 0;
+    // The shape has just changed: keep the old place until restore() has put it back.
+    if (Math.abs(win.innerWidth - width) >= PLACE_MIN_WIDTH_CHANGE) return;
+    const list = marks();
+    const top = barBottom();
+    const at = pickAnchor(list.map(element => element.getBoundingClientRect()), top);
+    place = at < 0 ? null : { element: list[at], offset: list[at].getBoundingClientRect().top - top };
+  }
+
+  function restore() {
+    timer = 0;
+    if (Math.abs(win.innerWidth - width) < PLACE_MIN_WIDTH_CHANGE) return;
+    width = win.innerWidth;
+    if (place && place.element.isConnected) {
+      const shift = place.element.getBoundingClientRect().top - barBottom() - place.offset;
+      if (Math.abs(shift) > 1) {
+        // 'instant': the page scrolls smoothly otherwise. Browsers that do not know the word get a plain scroll.
+        try { win.scrollBy({ top: shift, behavior: 'instant' }); } catch (error) { win.scrollBy(0, shift); }
+      }
+    }
+    remember();
+  }
+
+  const onScroll = () => { if (!frame) frame = win.requestAnimationFrame(remember); };
+  const onResize = () => { win.clearTimeout(timer); timer = win.setTimeout(restore, PLACE_SETTLE_MS); };
+
+  placeKeeper = {
+    stop() {
+      win.removeEventListener('scroll', onScroll);
+      win.removeEventListener('resize', onResize);
+      win.removeEventListener('orientationchange', onResize);
+      win.clearTimeout(timer);
+      if (frame) win.cancelAnimationFrame(frame);
+    }
+  };
+  win.addEventListener('scroll', onScroll, { passive: true });
+  win.addEventListener('resize', onResize);
+  win.addEventListener('orientationchange', onResize);
+  remember();
+}
+
+/** Called when the page leaves the worksheet (the teacher's tool and the home page have nothing to keep). */
+function stopKeepingPlace() {
+  if (placeKeeper) placeKeeper.stop();
+  placeKeeper = null;
+}
+
+/*
  * The student worksheet: draws it, grades answers as they are given, shows feedback and the score.
  * Usage: renderPlayer(rootElement, worksheet, { persist: true|false, home: true|false })
  *   persist: keep the student's answers on this device;  home: link to the student's home page.
@@ -2913,6 +3085,7 @@ function showWorksheet(worksheet, hash) {
   document.title = worksheet.title || 'Worksheet';
   // Only a worksheet opened from a link has a home page to go back to; a downloaded file is the whole app.
   renderPlayer($('#app'), worksheet, { persist: true, home: Boolean(hash) && location.protocol !== 'file:' });
+  keepPlace($('#app'), window);   // a turn, a split window or an iPhone Duo opening must not lose the student's place
   if (hash) rememberRecent(worksheet.title, hash, Date.now());
 }
 
@@ -2921,6 +3094,7 @@ let navigation = 0;   // a newer navigation cancels an older one that is still l
 async function route() {
   const ticket = ++navigation;
   const hash = location.hash;
+  stopKeepingPlace();
   window.scrollTo(0, 0);
   $('#app').className = '';
 

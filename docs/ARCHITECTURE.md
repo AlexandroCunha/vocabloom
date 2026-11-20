@@ -102,6 +102,7 @@ player/items.js        index of questions by id
 player/markup.js       HTML for the worksheet (everything escaped)
 player/practice.js     one-question-at-a-time runner, used for practice and for review
 player/deck-panel.js   the review-deck card (offer, status, review round, delete)
+player/keep-place.js   puts the student back on the same question after a turn, a split window or a fold
 player/player.js       wires it together: feedback, score, listening, events
 player/home.js         the student's home page: review deck and recent worksheets
 teacher/upload.js      step 1
@@ -165,10 +166,10 @@ A new version installs itself, replaces the old one, and deletes the old app cac
 
 ### Phones and computers
 
-The style sheets load in this order: `01-base` (colours, controls and the settings below), `02-shell-and-teacher`, `03-player`, and `04-devices`, which overrides the phone-first rules for particular devices. Two groups of settings live in `:root` of `01-base`:
+The style sheets load in this order: `01-base` (colours, controls and the settings below), `02-shell-and-teacher`, `03-player`, `04-devices`, which overrides the phone-first rules for particular devices, and `05-iphone-duo`, for foldable phones (see below). Two groups of settings live in `:root` of `01-base`:
 
 - `--sat --sar --sab --sal`: the space the notch, the home indicator and the rounded corners take on an iPhone (`env(safe-area-inset-*)`, 0 everywhere else). The page asks to be drawn edge to edge (`viewport-fit=cover`), so every full-width bar adds these to its padding: `max(14px, var(--sal))` for the sides, `calc(10px + var(--sab))` at the bottom.
-- `--col`: the width of the page column. 720px on a phone, 760px from 900px wide, and 960px for the teacher's tool (`#app.teacher`) from 1000px wide. Nothing else hard-codes a column width.
+- `--col`: the width of the page column. 720px on a phone, 760px from 900px wide, 960px for the teacher's tool (`#app.teacher`) from 900px wide, and 940px for the two-page worksheet (below), whose one-column parts use `--col-one` (720px). Nothing else hard-codes a column width.
 
 Rules that exist for one device, and the reason:
 
@@ -179,11 +180,17 @@ Rules that exist for one device, and the reason:
 | `100dvh`, never `100vh` alone | The iPhone's toolbars change the height of the screen as they hide and show. |
 | `touch-action: manipulation`, `format-detection`, `text-size-adjust` | No double-tap zoom, no numbers turned into phone links, no enlarged text when turned sideways. |
 | Sideways phone (`orientation:landscape` and `max-height:500px`) | The header shrinks so the questions get the room. |
+| Short window held sideways (`orientation:landscape` and `max-height:700px`) | Score and progress share one line. `--barh` is the height of that line, so a reading text can sit just below it. |
+| Wide and short (`min-width:900px`, landscape, `max-height:700px`): the iPhone Duo's inner display open sideways, 951 × 585 | A worksheet is two pages. Each section (`.pl[id^=sec-]`) becomes a two-column grid with a gutter (`--gutter`) in the middle, where the fold is. Both sides take the larger safe-area inset, so the gutter stays centred. A reading text takes the left page and is sticky below the score bar; its questions run down the right page. The closing area (mistakes, practice, results) stays one column. |
+| Tighter header and cards when held upright with `max-height:640px` | The outer display (382 × 580) and a half-width window (385 × 571) have little height. |
+| `(horizontal-viewport-segments: 2)` | Half open like a book. `--fold` is the width of the hinge, from `env(viewport-segment-left 1 0, 0px) - env(viewport-segment-right 0 0, 0px)`; the gutter is at least that wide plus 28px; headings, instructions and the word bank stay on the left page so no text crosses the crease. |
+| `(vertical-viewport-segments: 2)` | Half open like a laptop. `--lower` is the height of the lower half: scroll padding, the toast and pop-ups stay in the upper half. |
+| `keepPlace()` (`player/keep-place.js`) | Safari keeps the scroll position in pixels when the page re-flows, so after the phone is opened a student could be many questions away. The question at the top of the screen is remembered while scrolling and put back after a change of width of 40px or more. |
 | The file input is hidden visually, not with `display:none` | The keyboard can reach the upload box. |
 | `Share…` button only if `navigator.share` exists | iPhone, Android and Windows have a share sheet; other browsers do not. |
 | A file dropped outside the upload box is ignored (`main.js`) | Otherwise the browser opens the PDF and the teacher loses the session. |
 
-`test/devices.test.js` reads the style sheets and fails if one of these rules is removed (for example a `:hover` outside `@media (hover:hover)`, a `vh` without `dvh`, or a bar without its safe-area padding). How the screens look was checked in Chrome at 320 to 2560px wide, as an iPhone (touch, no hover), sideways, and with a notch simulated by setting the `--sa*` settings in the console, for example `document.documentElement.style.setProperty('--sal', '59px')`. It was not run on a real iPhone or in Safari: check there before a release.
+`test/devices.test.js` reads the style sheets and fails if one of these rules is removed (for example a `:hover` outside `@media (hover:hover)`, a `vh` without `dvh`, or a bar without its safe-area padding). How the screens look was checked in Chrome at 320 to 2560px wide, as an iPhone (touch, no hover), sideways, and with a notch simulated by setting the `--sa*` settings in the console, for example `document.documentElement.style.setProperty('--sal', '59px')`. The iPhone Duo layer was checked in Chrome at the five sizes Safari 27.1 reports (listed at the top of `05-iphone-duo.css`), and its fold rules with Chrome's own fold emulation: `Emulation.setDeviceMetricsOverride` with a `displayFeature`, in a browser started with `--enable-experimental-web-platform-features`, once with a vertical fold (book) and once with a horizontal fold (laptop). The place-keeping was checked by resizing the window between those sizes while a question was at the top. None of this was run on a real iPhone, an iPhone Duo or in Safari, whose fold features are off by default (Settings, Apps, Safari, Advanced, Feature Flags) and may change: check there before a release.
 
 ## Security design
 

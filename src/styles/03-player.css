@@ -70,4 +70,4 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .recent small{color:var(--mute);font-weight:400;white-space:nowrap}
 .net{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--ink);color:#fff;text-align:center;font-size:13.5px;padding:10px max(14px,var(--sar)) calc(10px + var(--sab)) max(14px,var(--sal))}
 .net[hidden]{display:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}

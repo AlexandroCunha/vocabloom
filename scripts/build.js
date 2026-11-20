@@ -38,7 +38,8 @@ const STYLES = [
   'styles/01-base.css',
   'styles/02-shell-and-teacher.css',
   'styles/03-player.css',
-  'styles/04-devices.css'
+  'styles/04-devices.css',
+  'styles/05-iphone-duo.css'
 ];
 const SCRIPTS = [
   'js/core/ui.js',
@@ -58,6 +59,7 @@ const SCRIPTS = [
   'js/player/markup.js',
   'js/player/practice.js',
   'js/player/deck-panel.js',
+  'js/player/keep-place.js',
   'js/player/player.js',
   'js/player/home.js',
   'js/teacher/upload.js',

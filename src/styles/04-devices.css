@@ -18,7 +18,11 @@
 /* ---- Touch screens: fields need 16px or more, or Safari on iPhone zooms the page when one is selected ---- */
 @media (pointer:coarse){
 .linkbox input,.ov textarea{font-size:16px}
+.say{width:44px;height:44px;min-height:44px}
 }
+
+/* ---- Share step on a phone: the preview of the whole worksheet scrolls inside its frame, so Edit and New PDF stay within reach ---- */
+.share-preview .phone{max-height:60dvh;overflow:auto}
 
 /* ---- Wider screens ---- */
 @media (min-width:640px){
@@ -29,8 +33,8 @@
 :root{--col:760px}
 }
 
-/* ---- Computers: the teacher's tool uses the room ---- */
-@media (min-width:1000px){
+/* ---- Computers, and the iPhone Duo open sideways: the teacher's tool uses the room ---- */
+@media (min-width:900px){
 .teacher{--col:960px}
 .teacher .panel{padding:28px 32px}
 

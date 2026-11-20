@@ -14,7 +14,7 @@ const { SCRIPTS, SRC } = require('../scripts/build');
 
 const PURE_FILES = [
   'js/core/text.js', 'js/core/worksheet.js', 'js/core/grading.js', 'js/core/speech.js', 'js/core/deck.js',
-  'js/core/local-data.js', 'js/core/platform.js', 'js/share/codec.js', 'js/share/qr.js'
+  'js/core/local-data.js', 'js/core/platform.js', 'js/share/codec.js', 'js/share/qr.js', 'js/player/keep-place.js'
 ];
 const EXPORTED = ['norm', 'alts', 'hash', 'seededRandom', 'shuffle', 'slug', 'normaliseWorksheet', 'slimJSON', 'isScored',
   'isCorrect', 'hasAnswer', 'answerText', 'firstLetterHint', 'pack', 'unpack', 'MAX_UNPACKED_BYTES',
@@ -22,7 +22,8 @@ const EXPORTED = ['norm', 'alts', 'hash', 'seededRandom', 'shuffle', 'slug', 'no
   'dayNumber', 'emptyDeck', 'cardId', 'makeCard', 'addCard', 'dueCards', 'answerCard', 'deckStats', 'deckIndex',
   'sanitiseDeck', 'loadDeck', 'saveDeck', 'deleteDeck', 'DECK_KEY', 'DECK_MAX_CARDS', 'DECK_WAIT_DAYS', 'DECK_SESSION_SIZE',
   'addRecent', 'cleanRecent', 'loadRecent', 'rememberRecent', 'clearLocalData', 'openedText', 'RECENT_KEY', 'RECENT_MAX',
-  'qrMatrix', 'qrSvg', 'rsRemainder', 'isAppleTouchDevice', 'isInstalledApp', 'needsHomeScreenHint', 'HOME_SCREEN_HINT'];
+  'qrMatrix', 'qrSvg', 'rsRemainder', 'isAppleTouchDevice', 'isInstalledApp', 'needsHomeScreenHint', 'HOME_SCREEN_HINT',
+  'pickAnchor', 'keepPlace', 'stopKeepingPlace', 'PLACE_MIN_WIDTH_CHANGE', 'PLACE_SETTLE_MS', 'PLACE_EDGE_SLACK'];
 
 function load() {
   const code = PURE_FILES.map(file => fs.readFileSync(path.join(SRC, file), 'utf8')).join('\n')
@@ -630,4 +631,102 @@ test('the Home Screen tip shows in an iPhone browser tab but not once the app is
   assert.equal(f.needsHomeScreenHint(deviceWindow(WINDOWS_CHROME)), false);
   assert.equal(f.isInstalledApp({ navigator: {} }), false, 'no matchMedia: assume a browser tab');
   assert.match(f.HOME_SCREEN_HINT, /Add to Home Screen/);
+});
+
+/* ---------- keeping the student's place when the window changes shape (iPhone Duo, turning the phone) ---------- */
+
+test('the place to keep is the first whole question in view, and the left one of a pair', () => {
+  const rect = (top, bottom) => ({ top, bottom });
+  assert.equal(f.pickAnchor([], 0), -1);
+  assert.equal(f.pickAnchor([rect(-400, -190), rect(-175, 21), rect(33, 229), rect(241, 437)], 0), 2, 'a question cut off by the bar is skipped');
+  assert.equal(f.pickAnchor([rect(-20, 176), rect(188, 384)], 0), 0, 'a little hidden under the bar still counts as in view');
+  assert.equal(f.pickAnchor([rect(33, 229), rect(33, 235), rect(247, 443)], 0), 0, 'two side by side: the left one');
+  assert.equal(f.pickAnchor([rect(-300, 900)], 0), 0, 'one very tall question fills the screen: it is the place');
+  assert.equal(f.pickAnchor([rect(-500, -300), rect(-290, -90)], 0), -1, 'everything is above the screen');
+  assert.equal(f.pickAnchor([rect(40, 236), rect(248, 444)], 60), 0, 'the bar is measured from its foot, not from the top of the page');
+  assert.ok(f.PLACE_MIN_WIDTH_CHANGE >= 20 && f.PLACE_MIN_WIDTH_CHANGE <= 100, 'a scroll bar is not a new shape, a turned phone is');
+});
+
+function placeStage(width) {
+  const listeners = {};
+  const win = {
+    innerWidth: width, scrolls: [], frames: [], timers: [], listeners,
+    addEventListener(name, fn) { (listeners[name] = listeners[name] || []).push(fn); },
+    removeEventListener(name, fn) { listeners[name] = (listeners[name] || []).filter(other => other !== fn); },
+    requestAnimationFrame(fn) { win.frames.push(fn); return win.frames.length; },
+    cancelAnimationFrame() { win.frames.length = 0; },
+    setTimeout(fn) { win.timers.push(fn); return win.timers.length; },
+    clearTimeout() { win.timers.length = 0; },
+    scrollBy(options) { win.scrolls.push(options); },
+    fire(name) { (listeners[name] || []).slice().forEach(fn => fn()); },
+    runFrames() { win.frames.splice(0).forEach(fn => fn()); },
+    runTimers() { win.timers.splice(0).forEach(fn => fn()); }
+  };
+  const card = (top, height) => ({ top, height, isConnected: true, getBoundingClientRect() { return { top: this.top, bottom: this.top + this.height }; } });
+  const bar = card(0, 40);
+  const cards = [card(-380, 196), card(-170, 196), card(40, 196), card(250, 196)];
+  const root = { querySelectorAll: () => cards, querySelector: selector => (selector === '.bar' ? bar : null) };
+  return { win, root, cards };
+}
+
+test('after the window changes shape, the question that was at the top is put back at the top', () => {
+  const { win, root, cards } = placeStage(382);
+  f.keepPlace(root, win);                        // remembers cards[2], 0px below the score bar
+  cards.forEach((card, i) => { card.top = 1000 + i * 100; });   // the page re-flows (two columns): everything moves
+  win.innerWidth = 951;
+  win.fire('resize');
+  assert.equal(win.scrolls.length, 0, 'it waits for the new layout to settle');
+  win.runTimers();
+  assert.deepEqual(JSON.parse(JSON.stringify(win.scrolls)), [{ top: 1200 - 40, behavior: 'instant' }]);
+});
+
+test('a scroll bar appearing, or a keyboard, does not move the page', () => {
+  const { win, root, cards } = placeStage(382);
+  f.keepPlace(root, win);
+  cards.forEach(card => { card.top += 500; });
+  win.innerWidth = 372;                          // 10px narrower
+  win.fire('resize'); win.runTimers();
+  assert.equal(win.scrolls.length, 0);
+});
+
+test('scrolling updates the remembered place, and a layout change does not overwrite it before it is used', () => {
+  const { win, root, cards } = placeStage(382);
+  f.keepPlace(root, win);
+  cards.forEach(card => { card.top -= 210; });   // the student scrolls one question down
+  win.fire('scroll'); win.runFrames();
+  cards.forEach((card, i) => { card.top = 5000 + i * 100; });   // the window is turned: the browser clamps the scroll first
+  win.innerWidth = 951;
+  win.fire('scroll'); win.runFrames();           // a scroll event from the new layout must not become "the place"
+  win.fire('resize'); win.runTimers();
+  assert.deepEqual(JSON.parse(JSON.stringify(win.scrolls)), [{ top: 5300 - 40, behavior: 'instant' }], 'cards[3] was the first whole question after the scroll');
+});
+
+test('a question that has left the page is not chased, and a new worksheet replaces the old listeners', () => {
+  const { win, root, cards } = placeStage(382);
+  f.keepPlace(root, win);
+  cards[2].isConnected = false;
+  win.innerWidth = 951;
+  win.fire('resize'); win.runTimers();
+  assert.equal(win.scrolls.length, 0);
+  f.keepPlace(root, win);
+  assert.equal(win.listeners.scroll.length, 1, 'one scroll listener');
+  assert.equal(win.listeners.resize.length, 1, 'one resize listener');
+  assert.equal(win.listeners.orientationchange.length, 1, 'one turn listener');
+  f.stopKeepingPlace();
+  assert.equal(win.listeners.scroll.length + win.listeners.resize.length + win.listeners.orientationchange.length, 0, 'leaving the worksheet removes them all');
+  f.stopKeepingPlace();   // stopping twice is harmless
+});
+
+test('a browser that does not know the scroll word "instant" still gets the page put back', () => {
+  const { win, root, cards } = placeStage(382);
+  win.scrollBy = function (first, second) {
+    if (first && first.behavior) throw new TypeError('not a valid enum value');
+    win.scrolls.push({ x: first, y: second });
+  };
+  f.keepPlace(root, win);
+  cards.forEach((card, i) => { card.top = 800 + i * 100; });
+  win.innerWidth = 951;
+  win.fire('resize'); win.runTimers();
+  assert.deepEqual(JSON.parse(JSON.stringify(win.scrolls)), [{ x: 0, y: 1000 - 40 - 0 }]);
+  f.stopKeepingPlace();
 });

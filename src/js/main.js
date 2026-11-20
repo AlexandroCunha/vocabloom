@@ -77,6 +77,7 @@ function showWorksheet(worksheet, hash) {
   document.title = worksheet.title || 'Worksheet';
   // Only a worksheet opened from a link has a home page to go back to; a downloaded file is the whole app.
   renderPlayer($('#app'), worksheet, { persist: true, home: Boolean(hash) && location.protocol !== 'file:' });
+  keepPlace($('#app'), window);   // a turn, a split window or an iPhone Duo opening must not lose the student's place
   if (hash) rememberRecent(worksheet.title, hash, Date.now());
 }
 
@@ -85,6 +86,7 @@ let navigation = 0;   // a newer navigation cancels an older one that is still l
 async function route() {
   const ticket = ++navigation;
   const hash = location.hash;
+  stopKeepingPlace();
   window.scrollTo(0, 0);
   $('#app').className = '';
 
