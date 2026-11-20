@@ -47,6 +47,13 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .final{display:none;position:relative;overflow:hidden;text-align:center;background:linear-gradient(160deg,#fff,#EAF5F8);border:2px solid var(--teal);border-radius:24px;padding:22px 16px;margin:18px 0;box-shadow:var(--shadow)}
 .final.show{display:block;animation:up .4s both}
 .final .big{font-family:"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif;font-size:52px;font-weight:700;color:var(--teal3);line-height:1}
+.final .next{display:flex;flex-direction:column;gap:10px;margin-top:14px;text-align:center}
+.final .next .sub{margin:0}
+.final .next button{width:100%}
+.next-link{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border:1.5px solid var(--teal);border-radius:14px;background:#fff;color:var(--teal3);font-weight:600;text-decoration:none}
+@media (hover:hover){.next-link:hover{background:var(--tealbg)}}
+.hero-link{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;padding:0 16px;border:1.5px solid rgba(255,255,255,.6);border-radius:999px;color:#fff;font-size:14px;font-weight:600;text-decoration:none}
+@media (hover:hover){.hero-link:hover{background:rgba(255,255,255,.16)}}
 .foot{text-align:center;color:var(--mute);font-size:12px;margin:18px 0 6px;padding-bottom:var(--sab)}
 .toast{position:fixed;left:50%;bottom:calc(26px + var(--sab));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;box-shadow:var(--shadow)}
 .ov{position:fixed;inset:0;background:rgba(10,30,38,.55);z-index:70;display:flex;justify-content:center;overflow-y:auto;overscroll-behavior:contain;padding:max(16px,var(--sat)) max(16px,var(--sar)) max(16px,var(--sab)) max(16px,var(--sal))}

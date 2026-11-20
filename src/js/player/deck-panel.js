@@ -8,6 +8,7 @@
  * options = {
  *   root, panel,        where to draw (the panel's selector, for example '#deck')
  *   enabled?,           false in the teacher's preview: nothing is offered, read or saved
+ *   home?,              the worksheet was opened from a link, so the student's home page can be linked to
  *   source,             the worksheet title, kept with each card so students know where it came from
  *   mistakes?(),        the questions answered wrongly right now, as [{ type, item, choices }] (worksheet only)
  *   isDismissed?(), onDismiss?(),   remembers "No thanks" for this worksheet
@@ -71,7 +72,8 @@ function createDeckPanel(options) {
       + (problem ? '<div class="msg bad">' + esc(problem) + '</div>' : '')
       + (needsHomeScreenHint(window) ? '<div class="tip" style="margin:0 0 10px">&#128241; ' + esc(HOME_SCREEN_HINT) + '</div>' : '')
       + '<div class="actions" style="margin:0">' + (stats.due > 0 ? '<button data-act="d-start">Review now</button>' : '')
-      + '<button class="ghost" data-act="d-clear">' + (armed ? 'Tap again to delete' : 'Delete my deck') + '</button></div></div>';
+      + '<button class="ghost" data-act="d-clear">' + (armed ? 'Tap again to delete' : 'Delete my deck') + '</button></div>'
+      + (inWorksheet && options.home ? '<p class="sub" style="margin:10px 0 0">Find this deck again any time under <a href="#review">My review deck</a>, at the top of the worksheet.</p>' : '') + '</div>';
   }
 
   function idleHtml() {

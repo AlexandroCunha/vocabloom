@@ -166,6 +166,13 @@ input.blk{display:inline-block;width:10ch;max-width:100%;padding:3px 9px;margin:
 .final{display:none;position:relative;overflow:hidden;text-align:center;background:linear-gradient(160deg,#fff,#EAF5F8);border:2px solid var(--teal);border-radius:24px;padding:22px 16px;margin:18px 0;box-shadow:var(--shadow)}
 .final.show{display:block;animation:up .4s both}
 .final .big{font-family:"Avenir Next",Avenir,"Segoe UI",system-ui,sans-serif;font-size:52px;font-weight:700;color:var(--teal3);line-height:1}
+.final .next{display:flex;flex-direction:column;gap:10px;margin-top:14px;text-align:center}
+.final .next .sub{margin:0}
+.final .next button{width:100%}
+.next-link{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border:1.5px solid var(--teal);border-radius:14px;background:#fff;color:var(--teal3);font-weight:600;text-decoration:none}
+@media (hover:hover){.next-link:hover{background:var(--tealbg)}}
+.hero-link{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;padding:0 16px;border:1.5px solid rgba(255,255,255,.6);border-radius:999px;color:#fff;font-size:14px;font-weight:600;text-decoration:none}
+@media (hover:hover){.hero-link:hover{background:rgba(255,255,255,.16)}}
 .foot{text-align:center;color:var(--mute);font-size:12px;margin:18px 0 6px;padding-bottom:var(--sab)}
 .toast{position:fixed;left:50%;bottom:calc(26px + var(--sab));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;box-shadow:var(--shadow)}
 .ov{position:fixed;inset:0;background:rgba(10,30,38,.55);z-index:70;display:flex;justify-content:center;overflow-y:auto;overscroll-behavior:contain;padding:max(16px,var(--sat)) max(16px,var(--sar)) max(16px,var(--sab)) max(16px,var(--sal))}
@@ -586,6 +593,123 @@ function firstLetterHint(type, item) {
   const answers = type === 'fill' ? item.answers.map(firstAlternative) : [answerText(type, item)];
   const masked = answers.map(word => word.split('').map((char, i) => (char === ' ' ? '  ' : (i === 0 ? char : '•'))).join(' '));
   return 'Starts with: ' + masked.join('   |   ');
+}
+
+/* ---------- what exactly went wrong in a typed answer ---------- */
+
+/** Number of single-letter changes (add, remove, swap for another) between two strings. */
+function editDistance(a, b) {
+  let previous = [];
+  for (let j = 0; j <= b.length; j++) previous.push(j);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j++) {
+      row.push(Math.min(previous[j] + 1, row[j - 1] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)));
+    }
+    previous = row;
+  }
+  return previous[b.length];
+}
+
+/** The words of an answer, without the punctuation around each one. */
+const wordsOf = text => String(text || '').split(/\s+/).map(word => word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '')).filter(Boolean);
+
+const isLowerLetter = char => char !== '' && char === char.toLowerCase() && char !== char.toUpperCase();
+const isUpperLetter = char => char !== '' && char === char.toUpperCase() && char !== char.toLowerCase();
+
+/** How many wrong letters still count as "a spelling slip" for a word of this length (short words must be exact). */
+const slipAllowance = length => (length <= 3 ? 0 : (length <= 5 ? 1 : 2));
+
+/**
+ * Compares what the student typed with one accepted answer, word by word.
+ * Returns the slips as [{ typed, expected, spelling, capital }], an empty list when nothing is wrong,
+ * or null when the two are too different to call it a slip (a different word, or a different number of words).
+ */
+function compareAnswer(typed, accepted) {
+  const written = wordsOf(typed);
+  const wanted = wordsOf(accepted);
+  if (!written.length || written.length !== wanted.length) return null;
+  const slips = [];
+  for (let i = 0; i < wanted.length; i++) {
+    const spelling = norm(written[i]) !== norm(wanted[i]);
+    if (spelling && editDistance(norm(written[i]), norm(wanted[i])) > slipAllowance(norm(wanted[i]).length)) return null;
+    const capital = isUpperLetter(wanted[i].charAt(0)) && isLowerLetter(written[i].charAt(0));
+    if (spelling || capital) slips.push({ typed: written[i], expected: wanted[i], spelling, capital });
+  }
+  return slips;
+}
+
+/** The accepted answer the student came closest to: the one with the fewest slips, or null when none is close. */
+function closestSlips(typed, accepted) {
+  let best = null;
+  accepted.forEach(answer => {
+    const slips = compareAnswer(typed, answer);
+    if (slips && (!best || slips.length < best.length)) best = slips;
+  });
+  return best;
+}
+
+/**
+ * The student's slips in a typed answer (fill-in and short answers only), so feedback can name the real
+ * mistake: a missing capital letter, a spelling error, or both.
+ * Returns a list (empty when the answer is exactly right), or null when it is wrong in a way that is more
+ * than a slip, or when nothing was typed: then the teacher's own hint and explanation apply.
+ * A right answer can still have slips: grading ignores capital letters, but the student can be reminded.
+ */
+function diagnose(type, item, value) {
+  if (!hasAnswer(type, value)) return null;
+  let found = [];
+  if (type === 'short') {
+    const accepted = [].concat.apply([], item.answers.map(alts));
+    const slips = closestSlips(value[0], accepted);
+    if (!slips) return null;
+    found = slips;
+  } else if (type === 'fill') {
+    for (let k = 0; k < blankCount(item); k++) {
+      const typed = (value || [])[k];
+      if (!String(typed || '').trim()) return null;
+      const slips = closestSlips(typed, alts(item.answers[k] || ''));
+      if (!slips) return null;
+      found = found.concat(slips);
+    }
+  } else {
+    return null;
+  }
+  return found;
+}
+
+const quoteWords = slips => {
+  const names = slips.map(slip => '“' + slip.typed + '”');
+  return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+};
+
+/** A hint about the student's slip that does not give the answer away. */
+function slipHint(slips) {
+  const both = slips.filter(slip => slip.spelling && slip.capital);
+  const spellingOnly = slips.filter(slip => slip.spelling && !slip.capital);
+  const capitalOnly = slips.filter(slip => !slip.spelling && slip.capital);
+  const parts = [];
+  if (both.length) parts.push('Check the spelling and the capital letter of ' + quoteWords(both) + '.');
+  if (spellingOnly.length) parts.push('Check the spelling of ' + quoteWords(spellingOnly) + '.');
+  if (capitalOnly.length === 1) parts.push('Does ' + quoteWords(capitalOnly) + ' need a capital letter?');
+  else if (capitalOnly.length > 1) parts.push('Check the capital letters in ' + quoteWords(capitalOnly) + '.');
+  return parts.join(' ');
+}
+
+const slipReason = slip => (slip.spelling && slip.capital ? 'spelling and capital letter' : (slip.spelling ? 'spelling' : 'capital letter'));
+
+/** Once the answer is shown, say exactly what was different. */
+function slipReveal(slips) {
+  return slips.map(slip => 'You wrote “' + slip.typed + '”: it is “' + slip.expected + '” (' + slipReason(slip) + ').').join(' ');
+}
+
+/** A reminder for an answer that was accepted, but not written with the capital letter it needs. */
+function capitalReminder(slips) {
+  const missing = slips.filter(slip => slip.capital);
+  if (!missing.length) return '';
+  const names = missing.map(slip => '“' + slip.expected + '”');
+  const list = names.length < 2 ? names[0] : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  return 'Remember the capital letter: ' + list + '.';
 }
 
 /*
@@ -1646,12 +1770,14 @@ function playerHtml(worksheet, index, view) {
   const hasScore = index.scoredIds.length > 0;
   const privacyLink = location.protocol === 'file:' ? '' : ' &middot; <a href="privacy.html">Privacy</a>';
   const homeLink = view.home ? ' &middot; <a href="#review">My review deck</a>' : '';
-  return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(worksheet.title) + '</h1></div>'
+  const deckLink = view.home ? '<a class="hero-link" href="#review">My review deck</a>' : '';
+  return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(worksheet.title) + '</h1>' + deckLink + '</div>'
     + '<div class="namebar"><input id="sname" type="text" placeholder="Your name" autocomplete="name" aria-label="Your name"><span class="date">' + new Date().toLocaleDateString('en-GB') + '</span></div>'
     + (hasScore ? '<div class="bar"><div class="t"><span>Score</span><span id="score"></span></div><div class="prog"><i id="pb"></i></div></div>' : '<div style="height:6px"></div>')
     + worksheet.sections.map((section, sectionIndex) => sectionHtml(section, sectionIndex, index, view)).join('')
-    + '<div class="pl"><div id="mist"></div><div id="prac"></div><div id="deck"></div>'
-    + '<div class="final" id="final" aria-live="polite"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
+    + '<div class="pl">'
+    + '<div class="final" id="final" aria-live="polite"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div><div class="next" id="fnext"></div></div>'
+    + '<div id="mist"></div><div id="prac"></div><div id="deck"></div>'
     + '<div class="actions"><button class="sec" data-act="reset">Start over</button>' + (hasScore ? '<button data-act="all">Check all</button>' : '') + '</div>'
     + '<p class="foot">Made with Vocabloom' + privacyLink + homeLink + '<br>Hints and explanations may be written with the help of AI.</p></div>';
 }
@@ -1695,7 +1821,7 @@ function createPractice(ctx) {
   const copy = Object.assign({}, PRACTICE_COPY, ctx.copy || {});
   const fieldAttr = 'data-' + prefix + 'k';
   const act = name => prefix + '-' + name;
-  const run = { mode: ctx.isClosed && ctx.isClosed() ? 'closed' : 'idle', ids: [], index: null, position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '' };
+  const run = { mode: ctx.isClosed && ctx.isClosed() ? 'closed' : 'idle', ids: [], index: null, position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', last: null };
   const result = () => ({ asked: run.ids.length, right: run.fixed, firstTime: run.firstTime });
 
   const panel = () => $(ctx.panel, root);
@@ -1782,20 +1908,22 @@ function createPractice(ctx) {
       return null;
     }
     run.tries += 1;
+    run.last = value;
+    const slips = diagnose(type, entry.item, value) || [];   // what the student actually got wrong, if it is a slip
     if (isCorrect(type, entry.item, value)) {
       run.fixed += 1;
       if (run.tries === 1) run.firstTime += 1;
       box.className = 'msg ok';
-      box.innerHTML = 'Correct, well done!' + tipHtml('📘', entry.item.explanation);
+      box.innerHTML = 'Correct, well done!' + tipHtml('📘', entry.item.explanation) + tipHtml('💡', capitalReminder(slips));
       finishQuestion(run.tries === 1);
       return true;
     }
     box.className = 'msg bad';
     if (run.tries >= MAX_PRACTICE_TRIES) {
-      box.innerHTML = 'Answer: <b>' + esc(answerText(type, entry.item)) + '</b>' + tipHtml('📘', entry.item.explanation);
+      box.innerHTML = 'Answer: <b>' + esc(answerText(type, entry.item)) + '</b>' + (slips.length ? tipHtml('💡', slipReveal(slips)) : tipHtml('📘', entry.item.explanation));
       finishQuestion(false);
     } else {
-      box.innerHTML = 'Not quite. Have another go.' + tipHtml('💡', ctx.hintFor(entry.id)) + (run.tries >= 2 ? tipHtml('📘', entry.item.explanation) : '');
+      box.innerHTML = 'Not quite. Have another go.' + tipHtml('💡', slips.length ? slipHint(slips) : ctx.hintFor(entry.id)) + (run.tries >= 2 && !slips.length ? tipHtml('📘', entry.item.explanation) : '');
     }
     return false;
   }
@@ -1805,6 +1933,7 @@ function createPractice(ctx) {
     run.tries = 0;
     run.resolved = false;
     run.picked = '';
+    run.last = null;
     run.mode = run.position >= run.ids.length ? 'done' : 'run';
     render();
   }
@@ -1812,7 +1941,7 @@ function createPractice(ctx) {
   function start() {
     run.ids = ctx.ids().slice();
     run.index = buildIndex();
-    Object.assign(run, { position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', mode: run.ids.length ? 'run' : 'idle' });
+    Object.assign(run, { position: 0, fixed: 0, firstTime: 0, tries: 0, resolved: false, picked: '', last: null, mode: run.ids.length ? 'run' : 'idle' });
     render();
     const box = panel();
     if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1827,7 +1956,8 @@ function createPractice(ctx) {
   }
 
   function showHint() {
-    const hint = ctx.hintFor(run.ids[run.position]);
+    const slips = run.last ? diagnose(currentEntry().section.type, currentEntry().item, run.last) : null;
+    const hint = (slips && slips.length ? slipHint(slips) : '') || ctx.hintFor(run.ids[run.position]);
     const box = message();
     box.className = 'msg h';
     box.textContent = hint ? '💡 ' + hint : 'No hint for this one.';
@@ -1890,6 +2020,7 @@ function createPractice(ctx) {
  * options = {
  *   root, panel,        where to draw (the panel's selector, for example '#deck')
  *   enabled?,           false in the teacher's preview: nothing is offered, read or saved
+ *   home?,              the worksheet was opened from a link, so the student's home page can be linked to
  *   source,             the worksheet title, kept with each card so students know where it came from
  *   mistakes?(),        the questions answered wrongly right now, as [{ type, item, choices }] (worksheet only)
  *   isDismissed?(), onDismiss?(),   remembers "No thanks" for this worksheet
@@ -1953,7 +2084,8 @@ function createDeckPanel(options) {
       + (problem ? '<div class="msg bad">' + esc(problem) + '</div>' : '')
       + (needsHomeScreenHint(window) ? '<div class="tip" style="margin:0 0 10px">&#128241; ' + esc(HOME_SCREEN_HINT) + '</div>' : '')
       + '<div class="actions" style="margin:0">' + (stats.due > 0 ? '<button data-act="d-start">Review now</button>' : '')
-      + '<button class="ghost" data-act="d-clear">' + (armed ? 'Tap again to delete' : 'Delete my deck') + '</button></div></div>';
+      + '<button class="ghost" data-act="d-clear">' + (armed ? 'Tap again to delete' : 'Delete my deck') + '</button></div>'
+      + (inWorksheet && options.home ? '<p class="sub" style="margin:10px 0 0">Find this deck again any time under <a href="#review">My review deck</a>, at the top of the worksheet.</p>' : '') + '</div>';
   }
 
   function idleHtml() {
@@ -2169,7 +2301,19 @@ function renderPlayer(root, rawWorksheet, options) {
   const typeOf = id => items[id].section.type;
   const isRight = id => items[id].scored && isCorrect(typeOf(id), items[id].item, state.values[id]);
   const isAnswered = id => items[id].scored && hasAnswer(typeOf(id), state.values[id]);
-  const hintFor = id => items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
+  /** The student's slips in what they typed (a missing capital letter, a spelling error), or null when there is no clear slip. */
+  const slipsOf = id => (items[id].scored ? diagnose(typeOf(id), items[id].item, state.values[id]) : null);
+  /** A hint about what the student actually got wrong comes first; the stored hint is for everything else. */
+  const hintFor = id => {
+    const slips = isRight(id) ? null : slipsOf(id);
+    return (slips && slips.length ? slipHint(slips) : '') || items[id].item.hint || firstLetterHint(typeOf(id), items[id].item);
+  };
+  /** After the answer is shown: what was different in the student's own answer, or else the stored explanation. */
+  function lessonTip(id) {
+    const slips = slipsOf(id);
+    return slips && slips.length ? tipHtml('💡', slipReveal(slips)) : tipHtml('📘', items[id].item.explanation);
+  }
+  const reminderTip = id => tipHtml('💡', capitalReminder(slipsOf(id) || []));
   const mistakeIds = () => scoredIds.filter(id => state.everWrong[id]);
   const sourceOf = id => ({ type: typeOf(id), item: items[id].item, choices: index.matchOptions[items[id].sectionIndex] || [] });
 
@@ -2214,10 +2358,13 @@ function renderPlayer(root, rawWorksheet, options) {
   function feedbackHtml(id, status) {
     const item = items[id].item;
     switch (status) {
-      case 'ok': return 'Correct, well done!';
-      case 'fix': return 'Corrected! You got this wrong at first, then fixed it.' + tipHtml('📘', item.explanation);
-      case 'rev': return 'Answer: <b>' + esc(answerText(typeOf(id), item)) + '</b>' + tipHtml('📘', item.explanation);
-      case 'bad': return 'Not quite. Have another go.' + tipHtml('💡', hintFor(id)) + ((state.wrongAttempts[id] || 0) >= 2 ? tipHtml('📘', item.explanation) : '');
+      case 'ok': return 'Correct, well done!' + reminderTip(id);
+      case 'fix': return 'Corrected! You got this wrong at first, then fixed it.' + tipHtml('📘', item.explanation) + reminderTip(id);
+      case 'rev': return 'Answer: <b>' + esc(answerText(typeOf(id), item)) + '</b>' + lessonTip(id);
+      case 'bad': {
+        const slipped = (slipsOf(id) || []).length > 0;   // a slip is not a gap in understanding, so the explanation would not help
+        return 'Not quite. Have another go.' + tipHtml('💡', hintFor(id)) + ((state.wrongAttempts[id] || 0) >= 2 && !slipped ? tipHtml('📘', item.explanation) : '');
+      }
       default: return '';
     }
   }
@@ -2257,7 +2404,7 @@ function renderPlayer(root, rawWorksheet, options) {
       const entry = items[id];
       const status = statusOf(id);
       const pill = MISTAKE_LABELS[status] ? status : 'bad';
-      const explanation = (status === 'fix' || status === 'rev') ? tipHtml('📘', entry.item.explanation) : '';
+      const explanation = status === 'rev' ? lessonTip(id) : (status === 'fix' ? tipHtml('📘', entry.item.explanation) : '');
       return '<div class="mk" data-act="goto" data-id="' + id + '"><div><b>' + esc(entry.section.title || ('Exercise ' + (entry.sectionIndex + 1))) + ' &middot; Q' + (entry.itemIndex + 1) + '</b>'
         + '<span class="pill ' + pill + '">' + (MISTAKE_LABELS[status] || MISTAKE_LABELS.bad) + '</span></div>'
         + '<div class="mkp">' + esc(entry.item.prompt.replace(/___/g, '_____')) + '</div>' + explanation + '</div>';
@@ -2281,6 +2428,25 @@ function renderPlayer(root, rawWorksheet, options) {
     return 'Keep practising, you are getting there!';
   }
 
+  /** What the student can do now that the answers are checked: fix what is left, practise, keep a deck. */
+  function nextStepsHtml() {
+    const toFix = scoredIds.filter(id => !['ok', 'fix'].includes(statusOf(id)));
+    const mistakes = mistakeIds().length;
+    const lines = [];
+    if (toFix.length) {
+      const unanswered = toFix.filter(id => !isAnswered(id)).length;
+      lines.push('<button data-act="goto" data-id="' + toFix[0] + '">' + (toFix.length === 1 ? 'Go to the question still to fix' : 'Go to the first of ' + toFix.length + ' still to fix') + '</button>');
+      if (unanswered) lines.push('<p class="sub">' + unanswered + ' ' + (unanswered === 1 ? 'question has' : 'questions have') + ' no answer yet.</p>');
+    }
+    if (mistakes) {
+      lines.push('<p class="sub">Your mistakes, a chance to practise them and your review deck are just below.</p>');
+    } else if (!toFix.length) {
+      lines.push('<p class="sub">Nothing to practise this time.</p>');
+    }
+    if (options.home) lines.push('<a class="next-link" href="#review">My review deck</a>');
+    return lines.join('');
+  }
+
   function updateScore(showFinal) {
     if (!total) return;
     const results = countResults();
@@ -2298,6 +2464,7 @@ function renderPlayer(root, rawWorksheet, options) {
     find('#fscore').textContent = results.right + ' / ' + total;
     find('#fdetail').textContent = 'Right first time: ' + results.firstTime + ' · Corrected after a mistake: ' + results.fixed + ' · Not yet correct: ' + (total - results.right);
     find('#fmsg').textContent = finalMessage(results);
+    find('#fnext').innerHTML = nextStepsHtml();
     if (showFinal === true) final.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -2311,6 +2478,7 @@ function renderPlayer(root, rawWorksheet, options) {
   const deckPanel = createDeckPanel({
     root, panel: '#deck', speak,
     enabled: Boolean(options.persist),
+    home: Boolean(options.home),
     source: worksheet.title,
     mistakes: () => mistakeIds().map(sourceOf),
     isDismissed: () => state.deckDismissed,
@@ -2522,7 +2690,8 @@ const DROP_BOX_TEXT = '<span class="ic">&#8593;</span><span class="touch-only">T
 
 function uploadStepHtml() {
   return '<section class="panel up"><div class="up-intro"><h2>Upload a PDF</h2><p class="lead">Any worksheet: vocabulary, grammar, reading, true/false, matching&hellip; The AI finds the exercises and turns them into questions students can answer on a phone.</p>'
-    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p></div>'
+    + '<p class="sub">Privacy: the PDF is sent to an AI service to be converted. Please do not upload files that contain students&rsquo; personal data. <a href="privacy.html" target="_blank" rel="noopener">Privacy notice</a></p>'
+    + '<p class="sub">Student? <a href="#review">Open my review deck</a>.</p></div>'
     + '<div class="up-form"><label class="drop" id="drop"><input type="file" id="file" accept="application/pdf,.pdf"><span id="dropt">' + DROP_BOX_TEXT + '</span></label>'
     + '<label class="f" for="code">School access code</label><input type="password" id="code" autocomplete="current-password" placeholder="Ask your school admin">'
     + '<div class="err" id="err" role="alert" hidden></div>'

@@ -96,12 +96,14 @@ function playerHtml(worksheet, index, view) {
   const hasScore = index.scoredIds.length > 0;
   const privacyLink = location.protocol === 'file:' ? '' : ' &middot; <a href="privacy.html">Privacy</a>';
   const homeLink = view.home ? ' &middot; <a href="#review">My review deck</a>' : '';
-  return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(worksheet.title) + '</h1></div>'
+  const deckLink = view.home ? '<a class="hero-link" href="#review">My review deck</a>' : '';
+  return '<div class="hero"><div class="brand-mini">' + LOGO + '<span>Vocabloom</span></div><h1>' + esc(worksheet.title) + '</h1>' + deckLink + '</div>'
     + '<div class="namebar"><input id="sname" type="text" placeholder="Your name" autocomplete="name" aria-label="Your name"><span class="date">' + new Date().toLocaleDateString('en-GB') + '</span></div>'
     + (hasScore ? '<div class="bar"><div class="t"><span>Score</span><span id="score"></span></div><div class="prog"><i id="pb"></i></div></div>' : '<div style="height:6px"></div>')
     + worksheet.sections.map((section, sectionIndex) => sectionHtml(section, sectionIndex, index, view)).join('')
-    + '<div class="pl"><div id="mist"></div><div id="prac"></div><div id="deck"></div>'
-    + '<div class="final" id="final" aria-live="polite"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div></div>'
+    + '<div class="pl">'
+    + '<div class="final" id="final" aria-live="polite"><div class="big" id="fscore"></div><div id="fdetail" style="margin:4px 0;font-size:14px"></div><div id="fmsg"></div><div class="next" id="fnext"></div></div>'
+    + '<div id="mist"></div><div id="prac"></div><div id="deck"></div>'
     + '<div class="actions"><button class="sec" data-act="reset">Start over</button>' + (hasScore ? '<button data-act="all">Check all</button>' : '') + '</div>'
     + '<p class="foot">Made with Vocabloom' + privacyLink + homeLink + '<br>Hints and explanations may be written with the help of AI.</p></div>';
 }
