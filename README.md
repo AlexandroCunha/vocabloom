@@ -1,243 +1,254 @@
+<div align="center">
+
 # Vocabloom
 
 **Turn any PDF worksheet into an interactive page that students answer on their phone.**
 
-A teacher uploads a PDF, an AI (Claude) reads it and builds the exercises, the teacher checks them, and gets one link (or a QR code) to share in Google Classroom, WhatsApp, email, anywhere. Students open it on their phone, answer, get instant feedback, listen to the questions, and keep the ones they got wrong in a small review deck. No student accounts, and nothing about students is ever sent to a server.
+[![CI](https://github.com/AlexandroCunha/vocabloom/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexandroCunha/vocabloom/actions/workflows/ci.yml)
+![Runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-1B9A5A)
+![Node 18+](https://img.shields.io/badge/node-%E2%89%A5%2018-388A9F)
+![Student accounts: none](https://img.shields.io/badge/student%20accounts-none-B4252A)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-lightgrey)](LICENSE)
 
-<p align="center">
-  <img src="docs/images/upload.png" alt="Step 1: upload a PDF" width="720">
-</p>
+<img src="docs/images/upload.png" alt="Step 1: upload a PDF" width="720">
 
-## What it does
+</div>
+
+A teacher uploads a PDF. An AI (Claude) reads it and builds the exercises. The teacher checks them and gets one link, or a QR code, to share in Google Classroom, WhatsApp, email, anywhere. Students open it on their phone, answer, get feedback that names their real mistake, listen to the questions, and keep the ones they got wrong in a small review deck.
+
+**No student accounts, and nothing about students is ever sent to a server.**
+
+## Contents
+
+1. [At a glance](#at-a-glance)
+2. [How it works](#how-it-works)
+3. [Screens](#screens)
+4. [Architecture](#architecture)
+5. [Security and privacy](#security-and-privacy)
+6. [Before you go live](#before-you-go-live)
+7. [Run it locally](#run-it-locally)
+8. [Deploy on Vercel](#deploy-on-vercel)
+9. [Phones, computers and foldables](#phones-computers-and-foldables)
+10. [Project structure](#project-structure)
+11. [Documentation map](#documentation-map)
+12. [Limits to know](#limits-to-know)
+
+## At a glance
 
 | | |
 |---|---|
-| **Any PDF** | Vocabulary, grammar, reading, true/false, matching, open writing. The AI finds the exercises. |
-| **Faithful to the PDF** | The AI only uses what is in the PDF. It never invents questions or vocabulary, and keeps the original wording and order. |
-| **Instant feedback** | Students check each answer, see a score and a progress bar, and get confetti when everything is right. |
-| **Hints and explanations** | When a student gets something wrong, a hint appears. After a second mistake, a short explanation in British English. |
-| **Mistake tracking** | The page shows which questions were wrong at some point and which were corrected afterwards. |
-| **Optional practice** | After making mistakes, students can choose **Practise now** or **No thanks, skip**. Practice re-asks the same questions from the PDF and never changes the score. |
-| **Listen** | A speaker button on every question, and every word in a word bank, reads it aloud in British English using the phone's own voices. Nothing is recorded or sent. |
-| **Review deck** | If the student chooses to, wrong answers come back after 1, 3, 7, 14 and 30 days, across worksheets. It lives only on the student's phone. |
-| **Link or QR code** | The normal link holds the whole worksheet. For the classroom screen or a printed sheet, one click makes a short link and a QR code. |
-| **Phones and computers** | Phone first, with care for the iPhone: the page keeps clear of the notch and home indicator, never makes Safari zoom in on a field, and the teacher's **Share…** button opens the iPhone's own share sheet. On a computer the teacher's tool has a wider layout, takes a PDF dropped on it and works from the keyboard. On a folding iPhone Duo, the open screen shows a worksheet as two pages. |
-| **Install and offline** | Students can add Vocabloom to their home screen. The app and every worksheet they have opened still work without a connection. |
-| **Cost control** | One access code per teacher, daily limits, and a cache so the same PDF is never paid for twice. |
+| **Any PDF** | Vocabulary, grammar, reading, true/false, matching, open writing. The AI finds the exercises and uses only what is in the PDF: no invented questions, original wording and order. |
+| **Feedback that names the mistake** | A hint says what the student actually got wrong (*Check the spelling and the capital letter of "brazillian"*), never the answer. After a second mistake, a short explanation in British English. |
+| **Mistakes, practice, review deck** | The page lists what was wrong and what was corrected. Practice is optional and never changes the score. If the student chooses, wrong answers come back after 1, 3, 7, 14 and 30 days, kept only on the phone. |
+| **After "Check all"** | A result card, a button to the first question still to fix, then mistakes, practice and the review deck. |
+| **Listen** | A speaker on every question and word-bank word, in British English, using the phone's own voice. Nothing is recorded or sent. |
+| **Link or QR code** | The normal link holds the whole worksheet. One click makes a short link and a QR code for the classroom screen or a printed sheet. |
+| **Install and offline** | Add it to the home screen. The app and every worksheet already opened work without a connection. |
+| **Cost control** | One access code per teacher, daily limits, a cache so the same PDF is never paid for twice, and a monthly spend limit at the AI provider. |
+| **Every screen** | Phone first, with care for the iPhone and the iPhone Duo. A wide layout on a computer. |
 
-**Exercise types:** fill in the blanks, short answer, multiple choice, true/false, matching, open writing (with word banks and reading texts).
+**Exercise types:** fill in the blanks, short answer, multiple choice, true/false, matching and open writing, with word banks and reading texts.
 
 ## How it works
 
-### 1. Upload
-Pick a PDF and type your access code. If the same PDF was converted recently, you get the earlier result at no cost, with a **Convert again** button if you want a fresh one.
-
-### 2. Review
-The AI shows the exercises it built. If the PDF has no answer key, the AI works out the answers itself, so the teacher checks and edits them (answers, hints and explanations) before sharing.
+| 1. Upload | 2. Review | 3. Share |
+|---|---|---|
+| Pick a PDF and type your access code. The same PDF converted recently comes back at no cost (**Convert again** if you want a fresh one). | The AI shows the exercises it built. With no answer key in the PDF, it works the answers out, so the teacher checks and edits answers, hints and explanations. | Copy the link into Classroom or WhatsApp. Answers stay on each student's phone: nothing to collect. With the database on, **Create short link and QR code** makes a link of about 50 characters. |
 
 <p align="center">
-  <img src="docs/images/review.png" alt="Step 2: review and edit the exercises" width="720">
+  <img src="docs/images/review.png" alt="Step 2: review and edit the exercises" width="49%">
+  <img src="docs/images/share.png" alt="Step 3: share the link, with a short link and a QR code" width="49%">
 </p>
 
-### 3. Share
-The teacher copies the link and pastes it into Google Classroom, WhatsApp or anywhere else. Answers stay on each student's phone, so there is nothing for the teacher to collect.
+## Screens
 
-With a database switched on (see [Short links and QR codes](#short-links-and-qr-codes)), **Create short link and QR code** makes a link of about 50 characters and a QR code that can be shown large for a projector or downloaded as a PNG.
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/images/student.png" alt="A worksheet on a phone" width="220"><br><b>The worksheet</b><br><sub>One question per card, progress saved on the phone.</sub></td>
+    <td align="center" width="33%"><img src="docs/images/listen.png" alt="A question being read aloud" width="220"><br><b>Listen</b><br><sub>British English where the phone has a voice. Only the worksheet's text is read.</sub></td>
+    <td align="center" width="33%"><img src="docs/images/check-all.png" alt="The result card after Check all" width="220"><br><b>After “Check all”</b><br><sub>Score, a jump to what is left, then mistakes and the review deck.</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/mistakes.png" alt="List of mistakes with Corrected and Still to fix labels" width="220"><br><b>Mistakes</b><br><sub>Corrected, or still to fix. Tap one to go back to it.</sub></td>
+    <td align="center"><img src="docs/images/practice.png" alt="Optional practice mode" width="220"><br><b>Optional practice</b><br><sub>The same questions, one at a time. It never changes the score.</sub></td>
+    <td align="center"><img src="docs/images/deck.png" alt="The offer to keep mistakes in a review deck" width="220"><br><b>Review deck</b><br><sub>Nothing is saved until the student says yes.</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/home.png" alt="The student's home page with the review deck" width="220"><br><b>Home page</b><br><sub>What is ready today, recent worksheets, and <i>Clear everything on this device</i>.</sub></td>
+    <td align="center"><img src="docs/images/offline.png" alt="A worksheet opened offline, with the offline message" width="220"><br><b>Offline</b><br><sub>Opened worksheets still work without a connection.</sub></td>
+    <td align="center"><img src="docs/images/hint.png" alt="A wrong answer with a hint that names the spelling and capital-letter slip" width="220"><br><b>A hint for the real mistake</b><br><sub>Spelling and capital letters are named, the answer is not.</sub></td>
+  </tr>
+</table>
+
+**How students find their deck.** A **My review deck** button sits at the top of every worksheet opened from a link, on the result card, and on the deck card once it is saved. The teacher's page links to it too. On a phone, **Add to Home Screen** makes the installed app open on the home page.
+
+**Install.** Android: open the link in Chrome and choose **Install app**. iPhone: open it in Safari, tap **Share**, then **Add to Home Screen**.
+
+## Architecture
 
 <p align="center">
-  <img src="docs/images/share.png" alt="Step 3: share the link, with a short link and a QR code" width="720">
+  <img src="docs/images/architecture.svg" alt="Vocabloom architecture: the teacher's browser, a Vercel function in Dublin, the Claude API, optional Upstash Redis, and the students' phones" width="100%">
 </p>
 
-## The student view
+- **The server never stores a PDF or a student's answer.** A serverless function converts PDFs; everything else happens in the browser.
+- **The optional database** (Upstash Redis, Dublin) adds spending limits that hold across servers, a cache for repeat conversions and short links. Every item in it expires.
+- **A long link carries the whole worksheet** after the `#`, which browsers never send to a server.
+- **No dependencies at runtime.** The page is one generated file (`public/index.html`) built from small scripts in `src/`, so a worksheet can also be downloaded as a single `.html` file.
 
-Built for phones: large tap targets, one question per card, progress saved in the browser.
+A conversion request passes these checks, in order, and stops at the first that says no:
+
+| | Check | What it protects |
+|---|---|---|
+| 1 | Method (`POST` only) | The surface of the endpoint |
+| 2 | Access code (one per teacher, constant-time) | Your API credit |
+| 3 | The PDF (size, type, base64) | Nothing is paid for before it passes |
+| 4 | Conversions per hour, per client | Bursts |
+| 5 | The cache (SHA-256 of the PDF) | The same PDF is never paid for twice |
+| 6 | Daily budget, per teacher and per school | The total bill |
+| 7 | The AI call | Provider errors stay in the server log |
+| 8 | Output validation (`lib/normalize.js`) | Whatever the AI returns is reduced to the exact shape the page expects |
+
+The full design (layers, the store, short links, frontend modules, the service worker) is in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Security and privacy
 
 <p align="center">
-  <img src="docs/images/student.png" alt="Student view on a phone" width="260">
-  &nbsp;&nbsp;
-  <img src="docs/images/hint.png" alt="A wrong answer with a hint" width="260">
+  <img src="docs/images/security.svg" alt="Security in layers: eight checks on every conversion request, and protections in the browser, on the server and in the data" width="100%">
 </p>
 
-### Listen
+| Threat | Defence |
+|---|---|
+| Strangers spending API credit | Access codes, wrong-code limits, hourly limits, daily budgets, a cache, and a monthly spend limit at the AI provider |
+| A leaked code | Delete that teacher's pair in `ACCESS_CODES` and redeploy: the others keep working. Codes that still say `CHANGE-ME` are refused |
+| Missing or placeholder configuration | Fails closed: production refuses to convert without an access code |
+| Script injection (XSS) | Strict CSP: only the page's own script runs, identified by its SHA-256 hash. No inline handlers, no third-party scripts. All text is escaped |
+| Malicious or broken AI output | Validated and length-limited before use |
+| Hostile share links | Size and decompressed-size limits (zip-bomb protection), strict link formats |
+| Tampered browser storage | Everything read back is validated again, and stored links must match the exact shape of a worksheet link |
+| IP addresses | Never stored or logged: counters use a keyed hash |
+| Clickjacking, sniffing, leaks | `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy: no-referrer`, HSTS, minimal Permissions-Policy |
+| Supply chain | No runtime dependencies; CI on every pull request; `main` is protected |
 
-Each question has a speaker button. In a word bank, tap a word to hear it. The voice is British English where the phone has one, and only the worksheet's text is read, never what the student typed. Where the browser cannot speak, the buttons are simply not shown.
+**Privacy (EU).** No cookies, no analytics, no third-party fonts or scripts, no student accounts. Student answers, names and review decks stay in the student's own browser. Functions and storage run in Dublin. [`public/privacy.html`](public/privacy.html) is a privacy notice **template** the school must complete and have reviewed.
 
-<p align="center">
-  <img src="docs/images/listen.png" alt="A question being read aloud" width="260">
-</p>
+**Do not upload personal data.** The PDF is sent to the AI provider to be converted. Before use with students, the school needs a data processing agreement and a lawful basis. A GDPR and AI Act checklist is in [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md). To report a vulnerability, see [`SECURITY.md`](SECURITY.md).
 
-### Feedback that names the real mistake
+## Before you go live
 
-When a typed answer is close, the hint talks about what the student actually got wrong, not about the grammar point. If a student writes *I am brazillian* for *I am Brazilian.*, the hint is *Check the spelling and the capital letter of "brazillian".* It never gives the answer away; once the answer is shown, it says exactly what was different. When the answer is only a slip, the stored explanation is left out, because the student understood the grammar. Answers that are far off still get the teacher's (or the AI's) own hint and explanation. Grading itself ignores capital letters, so an answer such as *i live in dublin* is correct, with a gentle reminder about the capital letters.
+- [ ] Set a **monthly spend limit** in the AI provider's console. It is the one limit nothing else can bypass.
+- [ ] Set `ANTHROPIC_API_KEY` and a personal code per teacher in `ACCESS_CODES`. Remove any `CHANGE-ME` placeholder.
+- [ ] If you use the database: add Upstash from the Vercel Marketplace in a European region, and sign the agreement with the storage provider.
+- [ ] Complete [`public/privacy.html`](public/privacy.html): address, legal basis, and how the school informs students and parents. Then remove the yellow *For the school* note.
+- [ ] Open a short link with a real access code and check that it works end to end.
+- [ ] Try the page on a real iPhone (and an iPhone Duo, if you have one). Those layouts have only been checked in Chrome.
+- [ ] Confirm `main` is protected and the `test` check passes.
+- [ ] Tell students and parents how the tool is used, and, on shared computers, to use **Clear everything on this device**.
 
-### After "Check all"
+## Run it locally
 
-The result card comes first, then the student's mistakes, the optional practice and the offer to keep a review deck, so nothing is missed below the fold. The card has a button that jumps to the first question still to fix, and a link to **My review deck**.
-
-### Mistakes and optional practice
-
-<p align="center">
-  <img src="docs/images/mistakes.png" alt="List of mistakes with Corrected and Still to fix labels" width="260">
-  &nbsp;&nbsp;
-  <img src="docs/images/practice.png" alt="Optional practice mode" width="260">
-</p>
-
-### Review deck and home page
-
-Practice is for now. The review deck is for later: after a mistake the student is offered **Save to my review deck**, and nothing is saved until they say yes. Saved questions come back after 1, 3, 7, 14 and 30 days.
-
-Students find their deck from the **My review deck** button at the top of every worksheet opened from a link, from the result card, and from the deck card once it is saved. The teacher's page links to it too (**Student? Open my review deck**). The home page (**My review deck**, or the installed app) shows what is ready to review today and the worksheets the student opened recently. **Clear everything on this device** removes it all, which is useful on a shared computer.
-
-<p align="center">
-  <img src="docs/images/deck.png" alt="The offer to keep mistakes in a review deck" width="260">
-  &nbsp;&nbsp;
-  <img src="docs/images/home.png" alt="The student's home page with the review deck" width="260">
-</p>
-
-### Install it and use it offline
-
-On Android, open the link in Chrome and choose **Install app** (or **Add to Home screen**). On iPhone, open it in Safari, tap **Share**, then **Add to Home Screen**. The app opens on the home page. Once a worksheet has been opened, it opens again without a connection, and answers are saved on the phone as usual.
-
-<p align="center">
-  <img src="docs/images/offline.png" alt="A worksheet opened offline, with the offline message" width="260">
-</p>
-
-## Phones and computers
-
-Vocabloom is built phone first and also suits a computer.
-
-- **iPhone.** The page keeps clear of the notch and the home indicator, even held sideways, where the header also shrinks to leave room for the questions. Fields are never small enough to make Safari zoom in, and buttons do not stay highlighted after a tap. The teacher's **Share…** button opens the iPhone's own share sheet (Messages, WhatsApp, Mail), and sends the short link once one exists. An iPhone has no install button, so the review deck shows a tip: **Share**, then **Add to Home Screen**.
-- **Computer.** The teacher's tool uses a wider layout: the upload box takes a dropped PDF and can be reached with the keyboard, the review fields sit in two columns, and the share step keeps a preview of the student's page in view beside the link and the QR code. Students get a slightly wider column, the arrow keys move between answer buttons, and Escape closes pop-ups. Hover colours appear only where there is a mouse.
-- **iPhone Duo and other foldables.** Nothing detects the phone: the layout follows the size and shape of the window. Safari 27.1 reports 382 × 580 for the outer display (594 × 368 sideways) and 669 × 867 for the inner display (951 × 585 sideways). Held upright, both use the single column, with a tighter header on the outer display. Open sideways, a worksheet becomes a two-page spread: the questions run in two columns, a reading text stays on the left page while the questions scroll on the right, and the gutter sits on the fold. The score and the progress bar share one line when the window is short. When the phone is opened, closed or turned, the student stays on the same question. The teacher's tool uses its two-column layouts from 900 px wide, so it also fits the open inner display. Safari's two fold features (device posture and viewport segments) are off by default (Settings, Apps, Safari, Advanced, Feature Flags). The page does not need them; when they are on it also keeps headings away from the crease and keeps messages in the upper half of a phone folded like a laptop.
-
-<p align="center">
-  <img src="docs/images/computer-upload.png" alt="The upload step on a computer: what it does on the left, the form on the right" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/computer-share.png" alt="The share step on a computer: link and QR code on the left, what students see on the right" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/iphone-sideways.png" alt="A worksheet on an iPhone held sideways, with a compact header" width="520">
-</p>
-
-<p align="center">
-  <img src="docs/images/iphone-duo-displays.png" alt="The same worksheet on the outer display and on the inner display of an iPhone Duo held upright" width="640">
-</p>
-
-<p align="center">
-  <img src="docs/images/iphone-duo-book.png" alt="An iPhone Duo open sideways: the reading text on the left page, the questions on the right page" width="720">
-</p>
-
-## Run locally
-
-Requires Node 18 or newer. No `npm install` needed.
+Node 18 or newer. No `npm install` needed.
 
 ```bash
 cp .env.example .env      # add your ANTHROPIC_API_KEY and replace the CHANGE-ME access codes
 node server.js            # http://localhost:3000
 ```
 
-Try it without an API key (returns a demo worksheet for any PDF):
+Without an API key (returns a demo worksheet for any PDF):
 
 ```bash
 MOCK=1 node server.js
 ```
 
-To try short links and QR codes locally, without creating an account anywhere, start the built-in stand-in for the database in another terminal and give its two variables to the server:
+To try short links and QR codes without an account anywhere, start the stand-in database in another terminal:
 
 ```bash
 node scripts/fake-redis.js
 UPSTASH_REDIS_REST_URL=http://127.0.0.1:8787 UPSTASH_REDIS_REST_TOKEN=test-token MOCK=1 node server.js
 ```
 
+Tests: `npm test`. After changing anything in `src/`, run `npm run build`; the tests fail if the generated files are out of date.
+
 ## Deploy on Vercel
 
 The free plan is enough to start.
 
 1. Push this repository to GitHub.
-2. In Vercel: **Add New > Project**, then import the repository. No build settings needed.
+2. In Vercel: **Add New > Project**, import the repository. No build settings needed.
 3. In **Settings > Environment Variables**, add the variables below, then redeploy.
-4. Share the Vercel URL, and each teacher's own access code, with your teachers.
+4. Share the Vercel URL, and each teacher's own code, with your teachers.
 
 | Variable | Required | Description |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Yes | Your Claude API key. |
-| `ACCESS_CODES` | Yes (or `ACCESS_CODE`) | One personal code per teacher: `anna:a-long-code,ben:another-long-code`. To withdraw someone, delete their pair and redeploy. Placeholder codes that still say `CHANGE-ME` are refused. |
-| `ACCESS_CODE` | Alternative | A single code for the whole school. Simpler, but it cannot be withdrawn for one person. Both can be used together. |
+| `ACCESS_CODES` | Yes (or `ACCESS_CODE`) | One personal code per teacher: `anna:a-long-code,ben:another-long-code`. To withdraw someone, delete their pair and redeploy. |
+| `ACCESS_CODE` | Alternative | A single code for the whole school. Simpler, but cannot be withdrawn for one person. Both can be used together. |
 | `DAILY_LIMIT_PER_TEACHER` | No | Conversions per teacher per day (UTC). Default 30, `0` for no limit. |
 | `DAILY_LIMIT_TOTAL` | No | Conversions per day for the whole school. Default 150, `0` for no limit. |
-| `CACHE_TTL_DAYS` | No | Days to remember a conversion, so the same PDF costs nothing again. Default 7, `0` switches it off. Needs the database to be shared between servers. |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | No | The optional database. Adding Upstash from the Vercel Marketplace fills them in. See below. |
+| `CACHE_TTL_DAYS` | No | Days to remember a conversion. Default 7, `0` switches it off. Needs the database to be shared between servers. |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | No | The optional database. Adding Upstash from the Vercel Marketplace fills them in. |
 | `SHARE_TTL_DAYS` | No | Days a short link keeps working. Default 90. |
 | `RATE_LIMIT_SECRET` | No | A long random string used to scramble visitors' IP addresses before they are counted. |
 | `CLAUDE_MODEL` | No | Defaults to `claude-sonnet-5-5`. |
 
-Without any access code, the live site refuses to convert: anyone with the URL could otherwise spend your API credits.
+Without any access code, the live site refuses to convert: anyone with the URL could otherwise spend your API credit.
 
-### Controlling the cost
+**Controlling the cost.** A conversion costs a small amount of API usage (typically cents). Three layers keep it predictable: per-teacher codes with daily limits, a cache of finished exercises (never the PDF), and the monthly spend limit in the AI provider's console.
 
-Every conversion costs a small amount of API usage (typically cents). Three layers keep it predictable:
+**Short links and QR codes.** A normal link holds the whole worksheet, which is too long for a good QR code. Short links keep a copy of the worksheet on the server for `SHARE_TTL_DAYS`, so they need a small database: in Vercel open **Storage** (or **Marketplace**), add **Upstash for Redis** in a European region, and redeploy. Without it everything else works; limits and the cache then count per server instance, and the short-link box is not shown. A school that turns the database on should update its privacy notice (it has a section for this). See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md).
 
-1. **Per-teacher codes and daily limits**, in this project (`ACCESS_CODES`, `DAILY_LIMIT_PER_TEACHER`, `DAILY_LIMIT_TOTAL`).
-2. **A cache**: the same PDF is converted once, and the result is reused for `CACHE_TTL_DAYS`. Only the finished exercises are kept, never the PDF.
-3. **A monthly spend limit in the AI provider's console** (in the Anthropic Console, under Settings, then Spend limits). This is the one limit that nothing else can bypass, so set it too. When it is reached, teachers see that the monthly AI budget has been used up.
+## Phones, computers and foldables
 
-### Short links and QR codes
+Phone first, with a wider layout on a computer.
 
-A normal link holds the whole worksheet, which makes it too long for a good QR code. Short links keep a copy of the worksheet on the server for `SHARE_TTL_DAYS`, so they need a small database. The same database makes the limits and the cache work across all servers.
+- **iPhone.** Keeps clear of the notch and home indicator, even sideways. Fields never make Safari zoom in. **Share…** opens the iPhone's own share sheet.
+- **Computer.** The teacher's tool takes a dropped PDF, works from the keyboard and uses two columns. Students get arrow-key navigation.
+- **iPhone Duo and other foldables.** The layout follows the size and shape of the window: held sideways, a worksheet becomes a two-page spread and the student stays on the same question when the phone is opened, closed or turned.
 
-1. In Vercel, open your project, then **Storage** (or **Marketplace**) and add **Upstash for Redis**. Choose a region in Europe.
-2. Vercel adds the two variables to the project. Redeploy.
-3. In the teacher's **Share** step, **Short link and QR code** now appears.
+<p align="center">
+  <img src="docs/images/computer-upload.png" alt="The upload step on a computer" width="49%">
+  <img src="docs/images/computer-share.png" alt="The share step on a computer" width="49%">
+</p>
+<p align="center">
+  <img src="docs/images/iphone-duo-book.png" alt="An iPhone Duo open sideways: the reading text on the left page, the questions on the right page" width="80%">
+</p>
 
-Without the database everything else still works: limits and the cache only work within one server instance, and the short-link box is not shown. A school that turns the database on should update its privacy notice (it already has a section for this) and sign an agreement with the storage provider. See [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md).
+Sizes, fold features and how each rule was checked: [`docs/DEVICES.md`](docs/DEVICES.md).
 
 ## Project structure
 
 ```
-api/convert.js         POST /api/convert: who is asking, is the PDF acceptable, may it be paid for, convert
-api/share.js           GET and POST /api/share: short links
-lib/                   config, access codes, limits, storage, cache, short links, PDF checks, AI adapter,
-                       prompt, output validation, security, HTTP helpers
-src/                   frontend source: small scripts grouped by responsibility, styles, HTML template,
-                       service worker template
-scripts/build.js       builds src/ into the single-file public/index.html and public/sw.js, and keeps the CSP hash in step
-scripts/make-icons.js  draws the app icons (no image library)
-scripts/fake-redis.js  a tiny stand-in for the database, for local use and tests
-public/                what the website serves (index.html and sw.js are generated), demo worksheet, manifest, icons, privacy notice
+api/                   convert.js (POST /api/convert) and share.js (short links)
+lib/                   config, access codes, limits, storage, cache, short links, PDF checks,
+                       AI adapter, prompt, output validation, security headers, HTTP helpers
+src/                   frontend source: scripts grouped by responsibility, styles, HTML and service worker templates
+scripts/               build.js (src/ -> public/), make-icons.js, fake-redis.js
+public/                what the site serves: index.html and sw.js (generated), demo worksheet, manifest, icons, privacy notice
 server.js              zero-dependency local server
-test/                  tests (Node's built-in test runner)
-docs/                  ARCHITECTURE.md and COMPLIANCE.md
+test/                  tests, using Node's built-in test runner
+docs/                  ARCHITECTURE.md, COMPLIANCE.md, DEVICES.md and the images used in these pages
+.github/workflows/     CI: the tests run on every push and pull request
 ```
 
-After changing anything in `src/`, run `npm run build`. The tests fail if the generated files are out of date. More in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+`main` is protected: changes go through a pull request and the `test` check must pass. Functions run in the Dublin region (`vercel.json`).
 
-## Security and privacy (EU)
+## Documentation map
 
-- **GDPR by design:** no cookies, no analytics, no third-party fonts or scripts, no student accounts. Student answers, names and review decks stay in the student's own browser. The optional database holds only teaching material and counters, and every item in it expires. See [`public/privacy.html`](public/privacy.html): a privacy notice **template** that the school must complete and have reviewed.
-- **Do not upload personal data.** The PDF is sent to the AI provider to be converted. Before use with students, the school needs a data processing agreement and a lawful basis, and should check where the provider processes data.
-- **Hardening:** strict security headers (CSP that allows only the page's own script by hash, HSTS, `nosniff`, no framing), access codes compared in constant time, limits on wrong codes, conversions and daily use, IP addresses only as keyed hashes, validated AI output, escaped HTML, size-limited share links, a service worker that never touches uploads, no runtime dependencies. Details in [`SECURITY.md`](SECURITY.md) and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). A GDPR and AI Act checklist for schools is in [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md).
-- **Limits are shared across servers only with the database.** Without it each server instance counts separately. Either way, set a monthly spend limit in the AI provider's console.
-- Keep every access code secret, and withdraw a code if it leaks.
-
-## Tests
-
-```bash
-npm test
-```
-
-The `main` branch is protected: changes go through a pull request and the `test` check must pass. Functions run in the Dublin region (`vercel.json`).
+| Document | What is in it |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Layers, the conversion request, the store, short links, frontend modules, offline, the security design |
+| [`docs/COMPLIANCE.md`](docs/COMPLIANCE.md) | What data exists and where, roles under the GDPR, the checklist for schools |
+| [`docs/DEVICES.md`](docs/DEVICES.md) | iPhone, computer and foldable layouts, and how they were checked |
+| [`SECURITY.md`](SECURITY.md) | How to report a vulnerability, practices, what to do if a code leaks |
+| [`public/privacy.html`](public/privacy.html) | The privacy notice template for the school to complete |
 
 ## Limits to know
 
 - PDFs up to about 3 MB (Vercel request limit). Very long PDFs may be refused: split them.
 - Each conversion costs a small amount of API usage (typically cents).
-- Read-aloud uses the voices of the student's phone or browser, so quality varies by device. Some browsers use an online voice; the privacy notice says so.
-- Safari on iPhone can delete what a website saved (answers, review deck, offline copies) when the site has not been opened for about a week, unless it was added to the Home Screen. That is why the review deck suggests **Add to Home Screen** on an iPhone.
-- The layouts are checked in Chrome at phone and computer sizes, including a simulated notch, and at the sizes Safari 27.1 reports for the iPhone Duo, with Chrome's fold emulation. They have not been tried on a real iPhone, an iPhone Duo or in Safari: please test there and report anything odd. Safari's fold features are off by default and may change.
-- Student results are not stored on a server, by design. The review deck is per phone and per browser: it does not follow a student to another device. A platform with classes, accounts and teacher dashboards needs a database of its own: that is a separate, future project.
+- Read-aloud uses the voices of the student's phone or browser, so quality varies. Some browsers use an online voice; the privacy notice says so.
+- Safari on iPhone can delete what a website saved (answers, review deck, offline copies) after about a week without a visit, unless the site was added to the Home Screen.
+- The layouts are checked in Chrome at phone and computer sizes, including a simulated notch and the sizes Safari 27.1 reports for the iPhone Duo. They have **not** been tried on a real iPhone, an iPhone Duo or in Safari. Safari's fold features are off by default and may change.
+- Student results are not stored on a server, by design. The review deck is per phone and per browser and does not follow a student to another device. A platform with classes, accounts and dashboards would be a separate project with its own data protection work.
 
 ## Licence
 
